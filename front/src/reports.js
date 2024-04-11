@@ -34,7 +34,7 @@ const Reports = () => {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/sales`);
+        const res = await axios.get(`https://eazy-manager.vercel.app/sales`);
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -46,7 +46,7 @@ const Reports = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpenses = await axios.get(`http://localhost:3001/expenses`);
+        const resExpenses = await axios.get(`https://eazy-manager.vercel.app/expenses`);
         setExpenses(resExpenses.data);
       } catch (err) {
         console.log(err);
