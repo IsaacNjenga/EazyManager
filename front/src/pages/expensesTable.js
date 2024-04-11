@@ -25,7 +25,7 @@ function ExpenseTable() {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/sales`);
+        const res = await axios.get(`https://eazy-manager.vercel.app/sales`);
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -37,7 +37,7 @@ function ExpenseTable() {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpense = await axios.get(`http://localhost:3001/expenses`);
+        const resExpense = await axios.get(`https://eazy-manager.vercel.app/expenses`);
         setExpenses(resExpense.data);
       } catch (err) {
         console.log(err);
@@ -53,7 +53,7 @@ function ExpenseTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/expenses/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/expenses/` + id);
       setExpenses((prevExpenses) =>
         prevExpenses.filter((expense) => expense._id!== id)
       );
