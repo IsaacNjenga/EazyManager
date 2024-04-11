@@ -75,7 +75,7 @@ app.post("/add", (req, res) => {
     .catch((err) => res.status(400).json(err));
 });
 
-app.post("/addSale", (req, res) => {
+app.post("/addSale", async (req, res) => {
   const {
     number,
     description,
@@ -91,25 +91,34 @@ app.post("/addSale", (req, res) => {
     colour,
   } = req.body;
 
-  const newSale = new SalesModel({
-    number,
-    description,
-    price,
-    quantity,
-    total,
-    datesold,
-    saleperson,
-    commission,
-    image,
-    pnumber,
-    code,
-    colour,
-  });
+  try {
+    const newSale = new SalesModel({
+      number,
+      description,
+      price,
+      quantity,
+      total,
+      datesold,
+      saleperson,
+      commission,
+      image,
+      pnumber,
+      code,
+      colour,
+    });
 
-  newSale
-    .save()
-    .then((sale) => res.json(sale))
-    .catch((err) => res.status(400).json(err));
+    await newSale.save();
+    const product = await ProductsModel.findOne({ number: pnumber });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not Found" });
+    }
+    product.quantity -= quantity;
+    await product.save();
+    res.json(newSale);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
 app.post("/addExpense", (req, res) => {
