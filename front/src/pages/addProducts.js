@@ -52,7 +52,7 @@ function AddProducts() {
       image: image, 
     };
     axios
-      .post("http://localhost:3001/add", productData)
+      .post("https://eazy-manager.vercel.app/add", productData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
@@ -113,7 +113,7 @@ function AddProducts() {
       await Promise.all(
         productData.map(async (productMember) => {
           try {
-            await axios.post(`http://localhost:3001/add`, productMember);
+            await axios.post(`https://eazy-manager.vercel.app/add`, productMember);
           } catch (error) {
             console.log("Error adding product", error);
           }
