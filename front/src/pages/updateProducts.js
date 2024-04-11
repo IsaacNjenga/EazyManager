@@ -1,0 +1,277 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
+function UpdateProducts() {
+  const [product, setProduct] = useState({
+    number: "",
+    description: "",
+    colour: "",
+    price: "",
+    quantity: "",
+    code: "",
+    location: "",
+    bnumber: "",
+    summary: "",
+    image: "",
+  });
+
+  const [newImage, setNewImage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [imageChange, setImageChange] = useState(false);
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3001/getProducts/` + id)
+      .then((result) => {
+        setProduct(result.data);
+      })
+      .catch((err) => console.log(err));
+  }, [id]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "image") {
+      return;
+    }
+    const inputValueInCaps = value.toUpperCase();
+    setProduct((prev) => ({ ...prev, [name]: inputValueInCaps }));
+  };
+
+  const convertToBase64 = (e) => {
+    var reader = new FileReader();
+    reader.readAsDataURL(e.target.files[0]);
+    reader.onload = () => {
+      setNewImage(reader.result);
+      setImageChange(true);
+    };
+    reader.onerror = (error) => {
+      console.log("Error: ", error);
+    };
+  };
+
+  const update = (e) => {
+    e.preventDefault();
+    const productData = {
+      ...product,
+      image: imageChange ? newImage : product.image,
+    };
+    axios
+      .put(`http://localhost:3001/updateProducts/` + id, productData)
+      .then((result) => {
+        setShowAlert(true);
+        console.log(result);
+        setShowAnimation(true);
+        setTimeout(() => {
+          setShowAnimation(true);
+          navigate("/");
+        }, 2000);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const styles = {
+    width: "160px",
+    height: "150px",
+    maxHeight: "100%",
+    objectFit: "contain",
+    borderRadius: "10px",
+    transition: "all 0.4s ease-in",
+    border: "1px inset #050101",
+    boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
+  };
+
+  const back = () => {
+    navigate("/");
+  };
+
+  return (
+    <div>
+      <button onClick={back} className="backbtn">
+        Back to Inventory
+      </button>
+      <form className="form">
+        <div style={{ textAlign: "center" }}>
+          <span
+            style={{
+              fontSize: "35px",
+              color: "purple",
+              fontStyle: "italic",
+            }}
+          >
+            Easy
+          </span>
+          <span style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}>
+            Manager
+          </span>
+          <h3>Product Update</h3>
+        </div>
+        <hr />
+        <br />
+        Product Number:
+        <input
+          type="text"
+          placeholder="12345"
+          value={product.number}
+          onChange={handleChange}
+          name="number"
+        />
+        <br />
+        Description:
+        <input
+          type="text"
+          value={product.description}
+          placeholder="Description"
+          onChange={handleChange}
+          name="description"
+        />
+        <br />
+        Product Code:
+        <input
+          type="text"
+          value={product.code}
+          placeholder="XX123"
+          onChange={handleChange}
+          name="code"
+        />
+        <br />
+        Colour:
+        <input
+          type="text"
+          value={product.colour}
+          placeholder="Colour"
+          onChange={handleChange}
+          name="colour"
+        />
+        <br />
+        <hr />
+        <br />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1px",
+          }}
+        >
+          Quantity:
+          <input
+            type="text"
+            value={product.quantity}
+            placeholder="Quantity"
+            onChange={handleChange}
+            name="quantity"
+          />
+          Price per unit:
+          <input
+            type="text"
+            value={product.price}
+            placeholder="Price"
+            onChange={handleChange}
+            name="price"
+          />
+          FC Number:
+          <input
+            type="text"
+            value={product.bnumber}
+            placeholder="B/No"
+            onChange={handleChange}
+            name="bnumber"
+          />
+        </div>
+        <br />
+        <hr />
+        <br />
+        Location:
+        <input
+          type="text"
+          value={product.location}
+          placeholder="Location"
+          onChange={handleChange}
+          name="location"
+        />
+        <br />
+        <br />
+        Summary
+        <textarea
+          onChange={handleChange}
+          value={product.summary}
+          name="summary"
+          rows="6"
+          cols="76.5"
+        ></textarea>
+        <br />
+        <br />
+        <hr />
+        <br />
+        Image:
+        <hr />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img
+            width={100}
+            height={100}
+            src={product.image}
+            alt="Image_here"
+            style={styles}
+          />
+        </div>
+        <br />
+        <input
+          accept="image/*"
+          type="file"
+          onChange={convertToBase64}
+          name="image"
+        />
+        <br />
+        <hr />
+        {showAlert && (
+          <div className="alert">
+            <p style={{ textAlign: "center" }}>
+              Success! <i className="material-icons">check</i>{" "}
+            </p>
+          </div>
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <button className="addbtn" onClick={update}>
+            Update
+          </button>
+          <button onClick={back} className="backbtn">
+            Cancel
+          </button>
+        </div>
+      </form>
+      {showAnimation && (
+        <div className="hourglassOverlay">
+          <div className="hourglassBackground">
+            <div className="hourglassContainer">
+              <div className="hourglassCurves"></div>
+              <div className="hourglassCapTop"></div>
+              <div className="hourglassGlassTop"></div>
+              <div className="hourglassSand"></div>
+              <div className="hourglassSandStream"></div>
+              <div className="hourglassCapBottom"></div>
+              <div className="hourglassGlass"></div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default UpdateProducts;

@@ -1,0 +1,22 @@
+const mongoose = require("mongoose");
+
+const salesSchema = new mongoose.Schema(
+  {
+    number: String,
+    description: String,
+    price: Number,
+    quantity: Number,
+    total: Number,
+    datesold: String,
+    saleperson: String,
+    commission: Number,
+    image: String,
+    pnumber: String,
+    code: String,
+    colour: String,
+  },
+  { collection: "sales" }
+);
+
+const SalesModel = mongoose.model("Sale", salesSchema);
+module.exports = SalesModel;
