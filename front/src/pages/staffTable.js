@@ -35,7 +35,7 @@ function StaffTable() {
   useEffect(() => {
     const fetchAllStaffs = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/staff");
+        const res = await axios.get("https://eazy-manager.vercel.app/staff");
         setStaffs(res.data);
       } catch (err) {
         console.log(err);
@@ -51,7 +51,7 @@ function StaffTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/deleteStaff/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/deleteStaff/` + id);
       setStaffs((prevStaffs) => prevStaffs.filter((staff) => staff._id !== id));
       setUserWantsToDelete(true);
       setSelectedstaffNumber(null);
