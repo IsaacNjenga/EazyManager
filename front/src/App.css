@@ -1252,3 +1252,18 @@ hr {
  height: 1px;
   background-color: rgb(0, 0, 0); /* Change to the color you desire */
 }
+
+/* Styles for devices with a maximum width of 768px (e.g., tablets) */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+  }
+}
+
+/* Styles for devices with a maximum width of 480px (e.g., mobile phones) */
+@media (max-width: 480px) {
+  .container {
+    width: 100%;
+  }
+}
+
