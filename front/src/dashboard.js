@@ -56,14 +56,14 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/sales`)
+      .get(`https://eazy-manager.vercel.app/sales`)
       .then((result) => setSales(result.data))
       .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/expenses`)
+      .get(`https://eazy-manager.vercel.app/expenses`)
       .then((result) => setExpenses(result.data))
       .catch((err) => console.log(err));
   }, []);
