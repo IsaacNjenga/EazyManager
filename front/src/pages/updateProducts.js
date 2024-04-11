@@ -26,7 +26,7 @@ function UpdateProducts() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/getProducts/` + id)
+      .get(`https://eazy-manager.vercel.app/getProducts/` + id)
       .then((result) => {
         setProduct(result.data);
       })
@@ -61,7 +61,7 @@ function UpdateProducts() {
       image: imageChange ? newImage : product.image,
     };
     axios
-      .put(`http://localhost:3001/updateProducts/` + id, productData)
+      .put(`https://eazy-manager.vercel.app/updateProducts/` + id, productData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
