@@ -23,7 +23,7 @@ function UpdateStaff() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/getStaff/` + id)
+      .get(`https://eazy-manager.vercel.app/getStaff/` + id)
       .then((result) => {
         setStaff(result.data);
         console.log("Staff",staff)
@@ -66,7 +66,7 @@ function UpdateStaff() {
       image: imageChange ? newImage : staff.image,
     };
     axios
-      .put(`http://localhost:3001/updateStaff/` + id, staffData)
+      .put(`https://eazy-manager.vercel.app/updateStaff/` + id, staffData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
