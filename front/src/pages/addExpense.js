@@ -33,7 +33,7 @@ function AddExpense() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://localhost:3001/addExpense`, expense);
+      await axios.post(`https://eazy-manager.vercel.app/addExpense`, expense);
       navigate("/");
     } catch (err) {
       console.log(err);
