@@ -72,9 +72,11 @@ const Dashboard = () => {
   const formattedDateMidnight = new Date(formatDate);
   formattedDateMidnight.setHours(0, 0, 0, 0);
 
-  const filteredSales = sales.filter((sale) => {
-    const saleDate = new Date(sale.datesold);
-    return saleDate.getTime() === formattedDateMidnight.getTime();
+ const filteredSales = sales.filter((sale) => {
+    const saleDate = new Date(sale.datesold);  
+    const formattedSaleDate = new Date(saleDate);
+    formattedSaleDate.setHours(0, 0, 0, 0);
+    return formattedSaleDate.getTime() === formattedDateMidnight.getTime();
   });
 
   const filteredExpenses = expenses.filter((expense) => {
