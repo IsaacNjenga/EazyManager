@@ -39,7 +39,7 @@ function SalesTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/deleteSale/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/deleteSale/` + id);
       setSales((prevSales) => prevSales.filter((sale) => sale._id !== id));
       setUserWantsToDelete(true);
       setSelectedSaleNumber(null);
@@ -55,7 +55,7 @@ function SalesTable() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/sales`)
+      .get(`https://eazy-manager.vercel.app/sales`)
       .then((result) => setSales(result.data))
       .catch((err) => console.log(err));
   }, []);
