@@ -71,7 +71,17 @@ function UpdateProducts() {
           navigate("/");
         }, 2000);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+      console.error("Update failed:", err);
+      if (err.response) {
+        console.error("Server responded with:", err.response.data);
+      } else if (err.request) {
+        console.error("No response received:", err.request);
+      } else {
+        console.error("Error setting up request:", err.message);
+      }
+      // Handle error state or display error message to the user
+    });
   };
 
   const styles = {
