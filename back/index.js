@@ -15,7 +15,7 @@ app.use(cors( {
   }));
 
 mongoose.connect(
-  "mongodb+srv://IsaacNjenga:cations!@cluster0.xf14h71.mongodb.net/EasyManager"
+  "mongodb+srv://IsaacNjenga:cations!@cluster0.xf14h71.mongodb.net/EasyManager?retryWrites=true&w=majority&appName=Cluster0"
 );
 
 app.get("/products", (req, res) => {
