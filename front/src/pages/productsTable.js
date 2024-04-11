@@ -29,7 +29,7 @@ function ProductsTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/deleteProduct/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/deleteProduct/` + id);
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product._id !== id)
       );
@@ -47,7 +47,7 @@ function ProductsTable() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/products`)
+      .get(`https://eazy-manager.vercel.app/products`)
       .then((result) => setProducts(result.data))
       .catch((err) => console.log(err));
   }, []);
