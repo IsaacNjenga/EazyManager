@@ -53,7 +53,7 @@ function ExpenseTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`https://eazy-manager.vercel.app/expenses/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/deleteExpense/` + id);
       setExpenses((prevExpenses) =>
         prevExpenses.filter((expense) => expense._id!== id)
       );
