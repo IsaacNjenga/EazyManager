@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors( {
     origin:["https://eazy-manager-front.vercel.app"],
-    methods:["POST","GET"],
+    methods: ["POST", "GET", "PUT"],
     credentials: true
   }));
 
