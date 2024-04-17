@@ -87,19 +87,7 @@ function StaffTable() {
     color: list ? "white" : "initial",
   };
   return (
-    <div>
-      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
-        {" "}
-        + Add new{" "}
-      </Link>
-      <br />
-      <br />
-      <button onClick={gridlayout} style={buttonStyle}>
-        <i className="material-icons">view_module</i>
-      </button>
-      <button onClick={listLayout} style={buttonStyle2}>
-        <i className="material-icons">list</i>
-      </button>
+  <div>
       <form>
         <InputGroup>
           <Form.Control
@@ -108,6 +96,22 @@ function StaffTable() {
           />
         </InputGroup>
       </form>
+      <br />
+
+      <button onClick={gridlayout} style={buttonStyle}>
+        <i className="material-icons">view_module</i>
+      </button>
+      <button onClick={listLayout} style={buttonStyle2}>
+        <i className="material-icons">list</i>
+      </button>
+      <br />
+      <br />
+      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
+        {" "}
+        + Add new{" "}
+      </Link>
+      <br />
+      <br/>
 
       {grid && Array.isArray(staffs) ? (
         <div className="grid-layout">
@@ -204,7 +208,7 @@ function StaffTable() {
 
       {list && Array.isArray(staffs) ? (
         <table className="productstable">
-          <thead>
+          <thead className="table-header">
             <tr>
               <th>Image</th>
               <th>Sales ID</th>
@@ -212,13 +216,15 @@ function StaffTable() {
               <th>Last Name</th>
               <th>ID Number</th>
               <th>Date joined</th>
-            </tr>
-            <tr>
-              <td colSpan="10">
-                <hr />
-              </td>
+              <th></th>
             </tr>
           </thead>
+          <tr>
+            <td colSpan="10">
+              <hr />
+            </td>
+          </tr>
+
           <tbody>
             {staffs
               .filter((staff) => {
@@ -272,7 +278,7 @@ function StaffTable() {
                     >
                       {format(new Date(staff.datejoined), "dd-MM-yyyy")}
                     </td>
-                    <td>
+                    <td style={{ backgroundColor: "#5bacba" }}>
                       <button className="updatebtn">
                         <Link
                           to={`/update/${staff._id}`}
