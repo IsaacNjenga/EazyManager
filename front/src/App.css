@@ -371,7 +371,8 @@ h1 {
 }
 
 .productstable td {
-  padding: 13px;
+  padding: 15px;
+  text-align: center;
 }
 
 .salestable td {
@@ -1266,4 +1267,26 @@ hr {
     width: 100%;
   }
 }
+.productstable {
+  table-layout: auto;
+  width: 100%;
+}
+
+.table-container {
+  overflow: y;
+  max-height: 100%; /* Adjust this value based on your design */
+}
+
+.table-header {
+  position: sticky;
+  top: 0;
+  text-align: center;
+  padding: 15px;
+  color: white;
+}
+
+.table-body {
+  margin-top: 2%;
+}
+
 
