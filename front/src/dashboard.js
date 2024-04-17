@@ -79,10 +79,13 @@ const Dashboard = () => {
     return formattedSaleDate.getTime() === formattedDateMidnight.getTime();
   });
 
-  const filteredExpenses = expenses.filter((expense) => {
+   const filteredExpenses = expenses.filter((expense) => {
     const expenseDate = new Date(expense.date);
-    return expenseDate.getTime() === formattedDateMidnight.getTime();
+    const formattedExpenseDate = new Date(expenseDate);
+    formattedExpenseDate.setHours(0, 0, 0, 0);
+    return formattedExpenseDate.getTime() === formattedDateMidnight.getTime();
   });
+
 
   useEffect(() => {
     setSalePresent(filteredSales.length > 0);
