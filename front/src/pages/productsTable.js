@@ -86,6 +86,29 @@ function ProductsTable() {
     window.print();
   };
 
+  const groupedProductsByCode = products.reduce((acc, product) => {
+    const code = product.code;
+
+    // If the code doesn't exist in the accumulator yet, initialize it with an empty array
+    if (!acc[code]) {
+      acc[code] = [];
+    }
+
+    // Push the current product to the array for this code
+    acc[code].push(product);
+
+    return acc;
+  }, {});
+
+  // Calculate the total quantity for each product code
+  const codeTotals = {};
+  for (const code in groupedProductsByCode) {
+    codeTotals[code] = groupedProductsByCode[code].reduce(
+      (total, product) => total + product.quantity,
+      0
+    );
+  }
+
   return (
     <div>
       <form className="search-panels">
