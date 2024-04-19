@@ -442,9 +442,9 @@ const Dashboard = () => {
     [currentWeekMonth, sales, expenses]
   );
 
-  useEffect(() => {
+ useEffect(() => {
     weekGraph();
-  }, []);
+  }, [weekGraph]); 
   
 
   const handleDateChange = (date) => {
