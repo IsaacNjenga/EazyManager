@@ -299,7 +299,7 @@ const Reports = () => {
   }, [prevNextYear]);
 
   useEffect(() => {
-    prevNextMonth("currentDayMonth");
+    prevNextMonth();
   }, [prevNextMonth]);
 
   return (
