@@ -714,7 +714,7 @@ const Dashboard = () => {
           <div className="dates-and-stuff">
             {selectedPeriod === "today" && (
               <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>Sales Today</h1>
+                <h1 style={{ textAlign: "center" }}><u>Sales Today</u></h1>
                 {salePresent === true ? (
                   <table className="dashtable">
                     <thead>
