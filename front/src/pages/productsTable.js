@@ -121,7 +121,7 @@ function ProductsTable() {
       </form>
       <br />
 
-      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
+      <Link to="/add" className="addbtn" title="Add a new product" style={{ fontWeight: "bold" }}>
         + Add Product
       </Link>
       <br />
@@ -392,6 +392,7 @@ function ProductsTable() {
                             color: "black",
                             textAlign: "center",
                             fontWeight: "bold",
+                            width: "150px",
                           }}
                         >
                           {product.description}
@@ -400,7 +401,7 @@ function ProductsTable() {
                           style={{
                             backgroundColor: "#5bacba",
                             color: "white",
-                            width: "100px",
+                            width: "95px",
                           }}
                         >
                           {product.colour}
@@ -420,7 +421,7 @@ function ProductsTable() {
                           style={{
                             backgroundColor: "#5bacba",
                             color: "white",
-                            width: "150px",
+                            width: "100px",
                           }}
                         >
                           {product.number}
@@ -477,19 +478,17 @@ function ProductsTable() {
                             fontWeight: "bold",
                             backgroundColor: "#5bacba",
                             color: "red",
-                            width: "100px",
+                            width: "155px",
                           }}
                         >
                           {product.summary}
                         </td>
-                        <td
-                          style={{
-                            backgroundColor: "#5bacba",
-                            color: "white",
-                          }}
-                        >
+                        <td>
                           <div className="buttons-container">
-                            <button className="updatebtn">
+                            <button
+                              className="updatebtn"
+                              title="Update this record"
+                            >
                               <Link
                                 to={`/update/${product._id}`}
                                 style={{ color: "black" }}
@@ -499,6 +498,7 @@ function ProductsTable() {
                             </button>{" "}
                             <button
                               className="deletebtn"
+                              title="Delete this record"
                               onClick={() => click(product._id)}
                             >
                               <i className="material-icons">delete</i>
