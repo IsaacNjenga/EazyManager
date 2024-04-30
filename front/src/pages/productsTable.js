@@ -48,7 +48,12 @@ function ProductsTable() {
   useEffect(() => {
     axios
       .get(`https://eazy-manager.vercel.app/products`)
-      .then((result) => setProducts(result.data))
+      .then((result) => {
+        const sortedProducts = result.data.sort((a, b) => {
+          return a.code.localeCompare(b.code);
+        });
+        setProducts(sortedProducts);
+      })
       .catch((err) => console.log(err));
   }, []);
 
