@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -20,6 +20,7 @@ function AddProducts() {
     bnumber: "",
     summary: "",
   });
+  const [products, setProducts] = useState([])
   const [image, setImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -28,6 +29,21 @@ function AddProducts() {
   const [excel, setExcel] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    axios.get(`https://eazy-manager.vercel.app/products`)
+    .then((result) => {setProducts(result.data)})
+    .catch((err) => console.log(err));
+  })
+
+  const lastProduct = [...products]
+    .sort((a, b) => a.number.localeCompare(b.number))
+    .pop();
+
+  let incrementedProductNumber;
+  if (lastProduct) {
+    incrementedProductNumber = parseInt(lastProduct.number) + 1;
+  }
+  
   const excelEntry = () => {
     setExcel(true);
     setSingleEntry(false);
@@ -261,7 +277,7 @@ function AddProducts() {
         Product Number:
         <input
           type="text"
-          placeholder="12345"
+           placeholder={incrementedProductNumber}
           onChange={handleChange}
           name="number"
         />
