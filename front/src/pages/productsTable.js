@@ -57,6 +57,15 @@ function ProductsTable() {
       .catch((err) => console.log(err));
   }, []);
 
+  
+    /* useEffect(() => {
+    axios
+      .get(`http://localhost:3001/products`)
+      .then((result) => setProducts(result.data))
+      .catch((err) => console.log(err));
+  }, []);*/
+  
+
   const styles = {
     width: "auto",
     height: "auto",
@@ -94,18 +103,13 @@ function ProductsTable() {
   const groupedProductsByCode = products.reduce((acc, product) => {
     const code = product.code;
 
-    // If the code doesn't exist in the accumulator yet, initialize it with an empty array
     if (!acc[code]) {
       acc[code] = [];
     }
-
-    // Push the current product to the array for this code
     acc[code].push(product);
-
     return acc;
   }, {});
 
-  // Calculate the total quantity for each product code
   const codeTotals = {};
   for (const code in groupedProductsByCode) {
     codeTotals[code] = groupedProductsByCode[code].reduce(
@@ -126,7 +130,12 @@ function ProductsTable() {
       </form>
       <br />
 
-      <Link to="/add" className="addbtn" title="Add a new product" style={{ fontWeight: "bold" }}>
+      <Link
+        to="/add"
+        className="addbtn"
+        title="Add a new product"
+        style={{ fontWeight: "bold" }}
+      >
         + Add Product
       </Link>
       <br />
@@ -260,7 +269,7 @@ function ProductsTable() {
         <p></p>
       )}
 
-         {list && Array.isArray(products) ? (
+      {list && Array.isArray(products) ? (
         <div className="print-table">
           <div className="table-container">
             <table className="productstable">
@@ -320,15 +329,7 @@ function ProductsTable() {
                       borderRight: "0.5px solid white",
                     }}
                   >
-                    Total Quantity
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "center",
-                      borderRight: "0.5px solid white",
-                    }}
-                  >
-                    FC No.
+                    Batch No.
                   </th>
                   <th
                     style={{
@@ -345,6 +346,14 @@ function ProductsTable() {
                     }}
                   >
                     Location
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Total Quantity
                   </th>
                   <th
                     style={{
@@ -448,7 +457,7 @@ function ProductsTable() {
                             color: "white",
                           }}
                         >
-                          <b>{codeTotals[product.code]}</b>
+                          {product.bnumber}
                         </td>
                         <td
                           style={{
@@ -457,7 +466,7 @@ function ProductsTable() {
                             width: "100px",
                           }}
                         >
-                          {product.bnumber}
+                          Ksh.{product.price.toLocaleString()}
                         </td>
                         <td
                           style={{
@@ -467,7 +476,7 @@ function ProductsTable() {
                             width: "100px",
                           }}
                         >
-                          Ksh.{product.price.toLocaleString()}
+                          {product.location}
                         </td>
                         <td
                           style={{
@@ -476,7 +485,7 @@ function ProductsTable() {
                             width: "100px",
                           }}
                         >
-                          {product.location}
+                          <b>{codeTotals[product.code]}</b>
                         </td>
                         <td
                           style={{
@@ -553,3 +562,4 @@ function ProductsTable() {
 }
 
 export default ProductsTable;
+
