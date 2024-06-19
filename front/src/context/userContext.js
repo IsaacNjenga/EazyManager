@@ -13,9 +13,7 @@ export function UserContextProvider({ children }) {
       try {
         const { data } = await axios.get(`profile`);
         setUser(data);
-        if (user) {
-          setIsAuthenticated(true);
-        }
+        setIsAuthenticated(true);
       } catch (error) {
         setIsAuthenticated(false);
         console.error("Error fetching user data:", error);
@@ -24,7 +22,7 @@ export function UserContextProvider({ children }) {
       }
     };
 
-    if (!user) {
+    if (!user && isAuthenticated) {
       fetchData();
     }
   }, [user, isAuthenticated]); // Include user in dependencies to refetch user data if user state changes
