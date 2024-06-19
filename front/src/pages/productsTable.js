@@ -29,7 +29,7 @@ function ProductsTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/deleteProduct/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/deleteProduct/` + id);
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product._id !== id)
       );
@@ -47,10 +47,24 @@ function ProductsTable() {
 
   useEffect(() => {
     axios
+      .get(`https://eazy-manager.vercel.app/products`)
+      .then((result) => {
+        const sortedProducts = result.data.sort((a, b) => {
+          return a.code.localeCompare(b.code);
+        });
+        setProducts(sortedProducts);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  
+    /* useEffect(() => {
+    axios
       .get(`http://localhost:3001/products`)
       .then((result) => setProducts(result.data))
       .catch((err) => console.log(err));
-  }, []);
+  }, []);*/
+  
 
   const styles = {
     width: "auto",
@@ -86,6 +100,24 @@ function ProductsTable() {
     window.print();
   };
 
+  const groupedProductsByCode = products.reduce((acc, product) => {
+    const code = product.code;
+
+    if (!acc[code]) {
+      acc[code] = [];
+    }
+    acc[code].push(product);
+    return acc;
+  }, {});
+
+  const codeTotals = {};
+  for (const code in groupedProductsByCode) {
+    codeTotals[code] = groupedProductsByCode[code].reduce(
+      (total, product) => total + product.quantity,
+      0
+    );
+  }
+
   return (
     <div>
       <form className="search-panels">
@@ -98,7 +130,12 @@ function ProductsTable() {
       </form>
       <br />
 
-      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
+      <Link
+        to="/add"
+        className="addbtn"
+        title="Add a new product"
+        style={{ fontWeight: "bold" }}
+      >
         + Add Product
       </Link>
       <br />
@@ -234,172 +271,288 @@ function ProductsTable() {
 
       {list && Array.isArray(products) ? (
         <div className="print-table">
-          <table className="productstable">
-            <thead>
+          <div className="table-container">
+            <table className="productstable">
+              <thead className="table-header">
+                <tr>
+                  <th
+                    style={{
+                      borderRight: "0.5px solid white",
+                      textAlign: "center",
+                    }}
+                  >
+                    Image
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Description
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Colour
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Code
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Product No.
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Quantity
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Batch No.
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    AMT
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Location
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                      borderRight: "0.5px solid white",
+                    }}
+                  >
+                    Total Quantity
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "center",
+                    }}
+                  >
+                    Summary
+                  </th>
+                  <th></th>
+                </tr>
+              </thead>
               <tr>
-                <th>Image</th>
-                <th style={{ verticalAlign: "middle" }}>Description</th>
-                <th
-                  className="th hover-pointer"
-                  style={{ verticalAlign: "middle" }}
-                >
-                  Colour
-                </th>
-                <th>Code</th>
-                <th className="th hover-pointer">P/No </th>
+                <td colSpan="16">
+                  <hr />
+                </td>
+              </tr>
 
-                <th
-                  className="th hover-pointer"
-                  style={{ verticalAlign: "middle" }}
-                >
-                  Quantity
-                </th>
-                <th>FC/No</th>
-                <th>AMT</th>
-                <th className="th hover-pointer">Location</th>
-                <th>Summary</th>
-              </tr>
-              <tr>
-                <td colSpan="14"></td>
-              </tr>
-            </thead>
-            <tbody>
-              {products
-                .filter(
-                  (product) =>
-                    search.toLowerCase() === "" ||
-                    Object.values(product).some(
-                      (value) =>
-                        typeof value === "string" &&
-                        value.toLowerCase().includes(search)
-                    )
-                )
-                .map((product) => (
-                  <React.Fragment key={product._id}>
-                    <tr>
-                      <td>
-                        {
-                          <img
-                            src={product.image}
-                            alt="Image_here"
-                            style={styles}
-                            className="img2"
-                          />
-                        }
-                      </td>
-                      <td
-                        style={{
-                          backgroundColor: "#e0e0e0",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {product.description}
-                      </td>
-                      <td
-                        style={{ backgroundColor: "#5bacba", color: "white" }}
-                      >
-                        {product.colour}
-                      </td>
-                      <td
-                        style={{
-                          backgroundColor: "#e0e0e0",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {product.code}
-                      </td>
-                      <td
-                        style={{ backgroundColor: "#5bacba", color: "white" }}
-                      >
-                        {product.number}
-                      </td>
-                      <td
-                        style={{
-                          color: "red",
-                          fontWeight: "bold",
-                          backgroundColor: "#e0e0e0",
-                        }}
-                      >
-                        {product.quantity}
-                      </td>
-                      <td
-                        style={{ backgroundColor: "#5bacba", color: "white" }}
-                      >
-                        {product.bnumber}
-                      </td>
-                      <td
-                        style={{
-                          backgroundColor: "#e0e0e0",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        Ksh.{product.price.toLocaleString()}
-                      </td>
-                      <td
-                        style={{ backgroundColor: "#5bacba", color: "white" }}
-                      >
-                        {product.location}
-                      </td>
-                      <td
-                        style={{
-                          fontWeight: "bold",
-                          backgroundColor: "#e0e0e0",
-                          color: "red",
-                        }}
-                      >
-                        {product.summary}
-                      </td>
-                      <td>
-                        <div className="buttons-container">
-                          <button className="updatebtn">
-                            <Link
-                              to={`/update/${product._id}`}
-                              style={{ color: "black" }}
+              <tbody>
+                {products
+                  .filter(
+                    (product) =>
+                      search.toLowerCase() === "" ||
+                      Object.values(product).some(
+                        (value) =>
+                          typeof value === "string" &&
+                          value.toLowerCase().includes(search)
+                      )
+                  )
+                  .map((product) => (
+                    <React.Fragment key={product._id}>
+                      <tr>
+                        <td
+                          style={{
+                            backgroundColor: "#5bacba",
+                            color: "white",
+                          }}
+                        >
+                          {
+                            <img
+                              src={product.image}
+                              alt="Image_here"
+                              style={styles}
+                              className="img2"
+                            />
+                          }
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: "#e0e0e0",
+                            color: "black",
+                            textAlign: "center",
+                            fontWeight: "bold",
+                            width: "150px",
+                          }}
+                        >
+                          {product.description}
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: "#5bacba",
+                            color: "white",
+                            width: "95px",
+                          }}
+                        >
+                          {product.colour}
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: "#e0e0e0",
+                            color: "black",
+                            fontWeight: "bold",
+                            width: "100px",
+                          }}
+                        >
+                          {product.code}
+                        </td>
+
+                        <td
+                          style={{
+                            backgroundColor: "#5bacba",
+                            color: "white",
+                            width: "100px",
+                          }}
+                        >
+                          {product.number}
+                        </td>
+                        <td
+                          style={{
+                            color: "red",
+                            fontWeight: "bold",
+                            backgroundColor: "#e0e0e0",
+                            width: "100px",
+                          }}
+                        >
+                          {product.quantity}
+                        </td>
+                        <td
+                          style={{
+                            width: "100px",
+                            backgroundColor: "#5bacba",
+                            color: "white",
+                          }}
+                        >
+                          {product.bnumber}
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: "#e0e0e0",
+                            color: "black",
+                            width: "100px",
+                          }}
+                        >
+                          Ksh.{product.price.toLocaleString()}
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: "#5bacba",
+                            color: "white",
+                            fontWeight: "bold",
+                            width: "100px",
+                          }}
+                        >
+                          {product.location}
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: "#e0e0e0",
+                            color: "black",
+                            width: "100px",
+                          }}
+                        >
+                          <b>{codeTotals[product.code]}</b>
+                        </td>
+                        <td
+                          style={{
+                            fontWeight: "bold",
+                            backgroundColor: "#5bacba",
+                            color: "red",
+                            width: "155px",
+                          }}
+                        >
+                          {product.summary}
+                        </td>
+                        <td>
+                          <div className="buttons-container">
+                            <button
+                              className="updatebtn"
+                              title="Update this record"
                             >
-                              <i className="material-icons">edit</i>
-                            </Link>
-                          </button>{" "}
-                          <button
-                            className="deletebtn"
-                            onClick={() => click(product._id)}
-                          >
-                            <i className="material-icons">delete</i>
-                          </button>
-                          {!userWantsToDelete &&
-                            selectedProductNumber === product._id && (
-                              <div
-                                style={{
-                                  textAlign: "center",
-                                  alignItems: "center",
-                                }}
+                              <Link
+                                to={`/update/${product._id}`}
+                                style={{ color: "black" }}
                               >
-                                <p>Are you sure you want to delete?</p>
-                                <button
-                                  className="addbtn"
-                                  onClick={() => handleYesClick(product._id)}
+                                <i className="material-icons">edit</i>
+                              </Link>
+                            </button>{" "}
+                            <button
+                              className="deletebtn"
+                              title="Delete this record"
+                              onClick={() => click(product._id)}
+                            >
+                              <i className="material-icons">delete</i>
+                            </button>
+                            {!userWantsToDelete &&
+                              selectedProductNumber === product._id && (
+                                <div
+                                  style={{
+                                    textAlign: "center",
+                                    alignItems: "center",
+                                  }}
                                 >
-                                  Yes
-                                </button>
-                                <button
-                                  className="backbtn"
-                                  onClick={handleNoClick}
-                                >
-                                  No
-                                </button>
-                              </div>
-                            )}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="14">
-                        <hr />
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                ))}
-            </tbody>
-          </table>
+                                  <p>Are you sure you want to delete?</p>
+                                  <button
+                                    className="addbtn"
+                                    onClick={() => handleYesClick(product._id)}
+                                  >
+                                    Yes
+                                  </button>
+                                  <button
+                                    className="backbtn"
+                                    onClick={handleNoClick}
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                              )}
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="14">
+                          <hr />
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <p></p>
@@ -409,3 +562,4 @@ function ProductsTable() {
 }
 
 export default ProductsTable;
+

@@ -39,7 +39,7 @@ function SalesTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/deleteSale/` + id);
+      await axios.delete(`https://eazy-manager.vercel.app/deleteSale/` + id);
       setSales((prevSales) => prevSales.filter((sale) => sale._id !== id));
       setUserWantsToDelete(true);
       setSelectedSaleNumber(null);
@@ -55,7 +55,7 @@ function SalesTable() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/sales`)
+      .get(`https://eazy-manager.vercel.app/sales`)
       .then((result) => setSales(result.data))
       .catch((err) => console.log(err));
   }, []);
@@ -194,14 +194,15 @@ function SalesTable() {
                     <p>
                       <b>Item No:</b> {sale.pnumber}
                     </p>
-                    <p>
-                      <b>Item Code:</b> {sale.code}
+                      <p>
+                      <b>Code:</b> {sale.code}
                     </p>
                     <p>
-                      <b>Description:</b> <b>{sale.description}</b>
-                    </p>
-                    <p>
-                      <b>Colour:</b> {sale.colour}
+                      <b>Item:</b>{" "}
+                      <b>
+                        {" "}
+                        {sale.colour} {sale.description}{" "}
+                      </b>
                     </p>
                     <p>
                       <b>Price:</b> Ksh.{sale.price.toLocaleString()}
@@ -249,6 +250,7 @@ function SalesTable() {
                     >
                       Ksh.{sale.total.toLocaleString()}
                     </span>
+                    <br />
                     <br />
                     <div
                       style={{
@@ -300,299 +302,281 @@ function SalesTable() {
      {list &&
           groupedSalesByDateSorted.map((date) => (
             <div key={date}>
+             <div className="print-table">
               <h3>{format(new Date(date), "EEEE, MMMM do, yyyy")}</h3>
-              <table className="salestable">
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Image
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Description{" "}
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Colour{" "}
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Item No.
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Code
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Receipt No.
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Price
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Quantity
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Total{" "}
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Salesperson{" "}
-                    </th>
-                    <th
-                      style={{
-                        padding: "10px",
-                        backgroundColor: "#127a8c",
-                        color: "white",
-                      }}
-                    >
-                      Commission
-                    </th>
-                  </tr>
+              <div className="table-container">
+                <table className="productstable">
+                  <thead className="table-header">
+                    <tr>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                          textAlign: "center",
+                        }}
+                      >
+                        Image
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Description{" "}
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Colour{" "}
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Item No.
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Code
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Receipt No.
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Price
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Quantity
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Total{" "}
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "0.5px solid white",
+                        }}
+                      >
+                        Salesperson{" "}
+                      </th>
+                      <th>Commission</th>
+                      <th></th>
+                    </tr>
+                  </thead>
                   <tr>
                     <td colSpan="13">
                       <hr />
                     </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {groupedSalesByDate[date].map((sale, index) => (
-                    <React.Fragment key={sale.number}>
-                      <tr>
-                        <td style={{ borderRight: "2px solid grey" }}>
-                          <img
-                            src={sale.image}
-                            alt="img_here"
-                            style={styles}
-                            className="img2"
-                          />
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            backgroundColor: "#e0e0e0",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {sale.description}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            backgroundColor: "#5bacba",
-                            fontWeight: "bold",
-                            color: "white",
-                          }}
-                        >
-                          {sale.colour}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            backgroundColor: "#e0e0e0",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {sale.pnumber}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            fontWeight: "bold",
-                            backgroundColor: "#5bacba",
-                            color: "white",
-                          }}
-                        >
-                          {sale.code}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            backgroundColor: "#e0e0e0",
-                            color: "black",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {sale.number}
-                        </td>
-                        <td
-                          style={{
-                            fontWeight: "bold",
-                            backgroundColor: "#5bacba",
-                            color: "white",
-                            padding: "10px",
-                          }}
-                        >
-                          Ksh.{sale.price.toLocaleString()}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            backgroundColor: "#e0e0e0",
-                            color: "purple",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {sale.quantity}
-                        </td>
-                        <td
-                          style={{
-                            padding: "14px",
-                            backgroundColor: "#5bacba",
-                            color: "white",
-                          }}
-                        >
-                          <b>Ksh.{sale.total.toLocaleString()}</b>
-                        </td>
-                        <td
-                          style={{
-                            backgroundColor: "#e0e0e0",
-                            color: "black",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {sale.saleperson}
-                        </td>
-                        <td
-                          style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            backgroundColor: "#5bacba",
-                          }}
-                        >
-                          Ksh.{sale.commission.toLocaleString()}
-                        </td>
-                        <td>
-                        <div className="buttons-container">
-                          <button className="updatebtn">
-                            <Link
-                              to={`/update/${sale._id}`}
-                              style={{ color: "black" }}
-                            >
-                              <i className="material-icons">edit</i>
-                            </Link>
-                          </button>{" "}
-                          <button
-                            className="deletebtn"
-                            onClick={() => click(sale._id)}
-                          >
-                            <i className="material-icons">delete</i>
-                          </button>
-                          {!userWantsToDelete &&
-                            selectedSaleNumber === sale._id && (
-                              <div
-                                style={{
-                                  textAlign: "center",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <p>Are you sure you want to delete?</p>
-                                <button
-                                  className="addbtn"
-                                  onClick={() => handleYesClick(sale._id)}
-                                >
-                                  Yes
-                                </button>
-                                <button
-                                  className="backbtn"
-                                  onClick={handleNoClick}
-                                >
-                                  No
-                                </button>
-                              </div>
-                            )}
-                        </div>
-                      </td>
-                      </tr>
-                      {index < sales.length - 1 && (
+
+                  <tbody>
+                    {groupedSalesByDate[date].map((sale, index) => (
+                      <React.Fragment key={sale.number}>
                         <tr>
-                          <td colSpan="13">
-                            <hr />
+                          <td
+                            style={{
+                              backgroundColor: "#5bacba",
+                              borderRight: "0px solid grey",
+                            }}
+                          >
+                            <img
+                              src={sale.image}
+                              alt="img_here"
+                              style={styles}
+                              className="img2"
+                            />
+                          </td>
+                          <td
+                            style={{
+                              backgroundColor: "#e0e0e0",
+                              fontWeight: "bold",
+                              width: "150px",
+                            }}
+                          >
+                            {sale.description}
+                          </td>
+                          <td
+                            style={{
+                              backgroundColor: "#5bacba",
+                              fontWeight: "bold",
+                              color: "white",
+                            }}
+                          >
+                            {sale.colour}
+                          </td>
+                          <td
+                            style={{
+                              backgroundColor: "#e0e0e0",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {sale.pnumber}
+                          </td>
+                          <td
+                            style={{
+                              fontWeight: "bold",
+                              backgroundColor: "#5bacba",
+                              color: "white",
+                              width: "95px",
+                            }}
+                          >
+                            {sale.code}
+                          </td>
+                          <td
+                            style={{
+                              backgroundColor: "#e0e0e0",
+                              color: "black",
+                              fontWeight: "bold",
+                              textAlign: "center",
+                            }}
+                          >
+                            {sale.number}
+                          </td>
+                          <td
+                            style={{
+                              fontWeight: "bold",
+                              backgroundColor: "#5bacba",
+                              color: "white",
+                            }}
+                          >
+                            Ksh.{sale.price.toLocaleString()}
+                          </td>
+                          <td
+                            style={{
+                              backgroundColor: "#e0e0e0",
+                              color: "purple",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {sale.quantity}
+                          </td>
+                          <td
+                            style={{
+                              padding: "14px",
+                              backgroundColor: "#5bacba",
+                              color: "white",
+                            }}
+                          >
+                            <b>Ksh.{sale.total.toLocaleString()}</b>
+                          </td>
+                          <td
+                            style={{
+                              backgroundColor: "#e0e0e0",
+                              color: "black",
+                              fontWeight: "bold",
+                              width: "90px",
+                            }}
+                          >
+                            {sale.saleperson}
+                          </td>
+                          <td
+                            style={{
+                              color: "red",
+                              fontWeight: "bold",
+                              backgroundColor: "#5bacba",
+                              width: "95px",
+                            }}
+                          >
+                            Ksh.{sale.commission.toLocaleString()}
+                          </td>
+                          <td style={{ width: "100px" }}>
+                            <div className="buttons-container">
+                              <button className="updatebtn">
+                                <Link
+                                  to={`/update/${sale._id}`}
+                                  style={{ color: "black" }}
+                                >
+                                  <i className="material-icons">edit</i>
+                                </Link>
+                              </button>{" "}
+                              <button
+                                className="deletebtn"
+                                onClick={() => click(sale._id)}
+                              >
+                                <i className="material-icons">delete</i>
+                              </button>
+                              {!userWantsToDelete &&
+                                selectedSaleNumber === sale._id && (
+                                  <div
+                                    style={{
+                                      textAlign: "center",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <p>Are you sure you want to delete?</p>
+                                    <button
+                                      className="addbtn"
+                                      onClick={() => handleYesClick(sale._id)}
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      className="backbtn"
+                                      onClick={handleNoClick}
+                                    >
+                                      No
+                                    </button>
+                                  </div>
+                                )}
+                            </div>
                           </td>
                         </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
-                  <tr>
-                    <td colSpan="8" style={{ textAlign: "right" }}></td>
-                    <td
-                      style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        color: "green",
-                      }}
-                    >
-                      Ksh. {totalAmountByDate[date]}
-                    </td>
-                    <td colSpan="1" style={{ textAlign: "right" }}></td>
-                    <td
-                      colSpan="1"
-                      style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        color: "red",
-                      }}
-                    >
-                      Ksh. {totalCommissionByDate[date]}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                        {index < sales.length - 1 && (
+                          <tr>
+                            <td colSpan="13">
+                              <hr />
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))}
+                    <tr>
+                      <td colSpan="8" style={{ textAlign: "right" }}></td>
+                      <td
+                        style={{
+                          fontWeight: "bold",
+                          textAlign: "center",
+                          color: "green",
+                        }}
+                      >
+                        Ksh. {totalAmountByDate[date]}
+                      </td>
+                      <td colSpan="1" style={{ textAlign: "right" }}></td>
+                      <td
+                        colSpan="1"
+                        style={{
+                          fontWeight: "bold",
+                          textAlign: "center",
+                          color: "red",
+                        }}
+                      >
+                        Ksh. {totalCommissionByDate[date]}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
             </div>
           ))}
 

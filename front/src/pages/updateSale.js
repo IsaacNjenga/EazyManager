@@ -35,22 +35,22 @@ function UpdateSale() {
   useEffect(() => {
     const fetchItemNames = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/products`);
+        const response = await axios.get(`https://eazy-manager.vercel.app/products`);
         const items = response.data.map((item) => item.description);
         setItemNames(items);
 
-        const response2 = await axios.get(`http://localhost:3001/staff`);
+        const response2 = await axios.get(`https://eazy-manager.vercel.app/staff`);
         const salesName = response2.data.map((saleName) => saleName.firstname);
         setSalesName(salesName);
 
-        const response3 = await axios.get(`http://localhost:3001/products`);
+        const response3 = await axios.get(`https://eazy-manager.vercel.app/products`);
         const colours = response3.data.map((colour) => colour.colour);
         setColourName(colours);
 
-        const response4 = await axios.get(`http://localhost:3001/products`);
+        const response4 = await axios.get(`https://eazy-manager.vercel.app/products`);
         setProducts(response4.data);
 
-        const response5 = await axios.get(`http://localhost:3001/products`);
+        const response5 = await axios.get(`https://eazy-manager.vercel.app/products`);
         const itemCodes = response5.data.map((itemCode) => itemCode.code);
         setCodes(itemCodes);
       } catch (err) {
@@ -63,7 +63,7 @@ function UpdateSale() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/getSales/` + id)
+      .get(`https://eazy-manager.vercel.app/getSales/` + id)
       .then((result) => {
         setSale(result.data);
       })
@@ -154,7 +154,7 @@ function UpdateSale() {
       image: imageChange ? newImage : sale.image,
     };
     axios
-      .put(`http://localhost:3001/updateSales/` + id, salesData)
+      .put(`https://eazy-manager.vercel.app/updateSales/` + id, salesData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);

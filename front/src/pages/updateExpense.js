@@ -18,7 +18,7 @@ function UpdateExpense() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/getExpenses/` + id)
+      .get(`https://eazy-manager.vercel.app/getExpenses/` + id)
       .then((result) => {
         setExpense(result.data);
         console.log("expense", expense);
@@ -45,7 +45,7 @@ function UpdateExpense() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:3001/updateExpenses/` + id, expense);
+      await axios.put(`https://eazy-manager.vercel.app/updateExpenses/` + id, expense);
       navigate("/");
     } catch (err) {
       console.log(err);

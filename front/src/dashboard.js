@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import {
   BarChart,
@@ -56,14 +56,14 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/sales`)
+      .get(`https://eazy-manager.vercel.app/sales`)
       .then((result) => setSales(result.data))
       .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/expenses`)
+      .get(`https://eazy-manager.vercel.app/expenses`)
       .then((result) => setExpenses(result.data))
       .catch((err) => console.log(err));
   }, []);
@@ -72,15 +72,20 @@ const Dashboard = () => {
   const formattedDateMidnight = new Date(formatDate);
   formattedDateMidnight.setHours(0, 0, 0, 0);
 
-  const filteredSales = sales.filter((sale) => {
-    const saleDate = new Date(sale.datesold);
-    return saleDate.getTime() === formattedDateMidnight.getTime();
+ const filteredSales = sales.filter((sale) => {
+    const saleDate = new Date(sale.datesold);  
+    const formattedSaleDate = new Date(saleDate);
+    formattedSaleDate.setHours(0, 0, 0, 0);
+    return formattedSaleDate.getTime() === formattedDateMidnight.getTime();
   });
 
-  const filteredExpenses = expenses.filter((expense) => {
+   const filteredExpenses = expenses.filter((expense) => {
     const expenseDate = new Date(expense.date);
-    return expenseDate.getTime() === formattedDateMidnight.getTime();
+    const formattedExpenseDate = new Date(expenseDate);
+    formattedExpenseDate.setHours(0, 0, 0, 0);
+    return formattedExpenseDate.getTime() === formattedDateMidnight.getTime();
   });
+
 
   useEffect(() => {
     setSalePresent(filteredSales.length > 0);
@@ -349,41 +354,54 @@ const Dashboard = () => {
     }
   }
 
-  useEffect(() => {
-    const weekGraph = () => {
-      let newDate = new Date();
+  const weekGraph = useCallback(
+    (action) => {
+      let newDate = new Date(currentWeekMonth);
+      if (action === "nextWeek") {
+        newDate.setDate(newDate.getDate() + 7);
+      } else if (action === "lastWeek") {
+        newDate.setDate(newDate.getDate() - 7);
+      } else if (action === "currentWeek") {
+        newDate = new Date();
+      }
+
       newDate.setHours(0);
       newDate.setMinutes(0);
       newDate.setSeconds(0);
       newDate.setMilliseconds(0);
       setCurrentWeekMonth(newDate);
-  
-      let startDate = new Date(); 
+
+      let startDate = new Date(newDate);
       startDate.setHours(0, 0, 0, 0);
-  
+
       const weeksData = {};
-  
+
       for (let i = 1; i <= 7; i++) {
         const dayStartDate = new Date(startDate);
         const dayEndDate = new Date(startDate);
         dayEndDate.setHours(23, 59, 59, 999);
-  
+
         const dayOfMonth = dayStartDate.getDate();
-        const suffix = getSuffix(dayOfMonth); 
-        const weekday = dayStartDate.toLocaleString("en-UK", { weekday: "long" });
-  
-        const dayName = `${weekday}, ${dayOfMonth}${suffix}`;
-  
+        const suffix = getSuffix(dayOfMonth);
+        const month = dayStartDate.toLocaleString("en-UK", {
+          month:"short",
+        });
+        const weekday = dayStartDate.toLocaleString("en-UK", {
+          weekday: "long",
+        });
+
+        const dayName = `${weekday}, ${dayOfMonth}${suffix} ${month}`;
+
         const weekSales = sales.filter((sale) => {
           const saleDate = new Date(sale.datesold);
           return saleDate >= dayStartDate && saleDate <= dayEndDate;
         });
-  
+
         const weekExpense = expenses.filter((expense) => {
           const expenseDate = new Date(expense.date);
           return expenseDate >= dayStartDate && expenseDate <= dayEndDate;
         });
-  
+
         const weekTotalAmount = weekSales.reduce(
           (acc, sale) => acc + sale.total,
           0
@@ -398,7 +416,7 @@ const Dashboard = () => {
         );
         const netProfit = weekTotalAmount - weekTotalExpense;
         const weekTotalProfit = netProfit > 0 ? netProfit : 0;
-  
+
         weeksData[dayName] = {
           day: dayName,
           startDate: dayStartDate.toISOString().slice(0, 10),
@@ -408,22 +426,25 @@ const Dashboard = () => {
           totalProfit: weekTotalProfit,
           totalExpense: weekTotalExpense,
         };
-  
+
         startDate.setDate(startDate.getDate() - 1);
       }
-  
+
       const updatedWeekData = Object.keys(weeksData).map((dayName) => ({
         name: dayName,
         Revenue: weeksData[dayName].totalAmount,
         Profit: weeksData[dayName].totalProfit,
         Expenses: weeksData[dayName].totalExpense,
       }));
-  
+
       setWeekData(updatedWeekData);
-    };
-  
+    },
+    [currentWeekMonth, sales, expenses]
+  );
+
+ useEffect(() => {
     weekGraph();
-  }, [sales, expenses]);
+  }, [weekGraph]); 
   
 
   const handleDateChange = (date) => {
@@ -693,7 +714,7 @@ const Dashboard = () => {
           <div className="dates-and-stuff">
             {selectedPeriod === "today" && (
               <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>Sales Today</h1>
+                <h1 style={{ textAlign: "center" }}><u>Sales Today</u></h1>
                 {salePresent === true ? (
                   <table className="dashtable">
                     <thead>
@@ -1484,9 +1505,37 @@ const Dashboard = () => {
           <u>Sales of the Week</u>
         </h2>
         <br />
-        <div style={{ maxWidth: "900px", margin: "auto" }}>
+        <div style={{ alignItems: "center", textAlign: "center" }}>
+          <button
+            onClick={() => weekGraph("nextWeek")}
+            style={{ fontSize: "16px" }}
+          >
+            <i className="material-icons" style={{ fontSize: "16px" }}>
+              arrow_back
+            </i>
+            Next Week
+          </button>{" "}
+          <button
+            onClick={() => weekGraph("currentWeek")}
+            style={{ fontSize: "16px" }}
+          >
+            Current Week
+          </button>{" "}
+          <button
+            onClick={() => weekGraph("lastWeek")}
+            style={{ fontSize: "16px" }}
+          >
+            Last Week
+            <i className="material-icons" style={{ fontSize: "16px" }}>
+              arrow_forward
+            </i>
+          </button>
+        </div>
+        <br />
+        <br />
+        <div style={{ maxWidth: "1350px", margin: "auto" }}>
           <BarChart
-            width={1000}
+            width={1350}
             height={500}
             data={weekData}
             margin={{ left: 40, right: 20 }}

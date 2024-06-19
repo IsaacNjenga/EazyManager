@@ -63,7 +63,7 @@ function AddStaff() {
       image: image,
     };
     axios
-      .post("http://localhost:3001/addStaff", staffData)
+      .post("https://eazy-manager.vercel.app/addStaff", staffData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
@@ -135,7 +135,7 @@ function AddStaff() {
       await Promise.all(
         staffData.map(async (staffMember) => {
           try {
-            await axios.post("http://localhost:3001/addStaff", staffMember);
+            await axios.post("https://eazy-manager.vercel.app/addStaff", staffMember);
           } catch (error) {
             console.error("Error adding staff:", error);
           }

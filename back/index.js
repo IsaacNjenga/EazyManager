@@ -8,10 +8,14 @@ const ExpensesModel = require("./models/expensesModel");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors( {
+    origin:["https://eazy-manager-front.vercel.app"],
+    methods: ["POST", "GET", "PUT", "DELETE"],
+    credentials: true
+  }));
 
 mongoose.connect(
-  "mongodb+srv://IsaacNjenga:cations!@cluster0.xf14h71.mongodb.net/EasyManager"
+  "mongodb+srv://IsaacNjenga:cations!@cluster0.xf14h71.mongodb.net/EasyManager?retryWrites=true&w=majority&appName=Cluster0"
 );
 
 app.get("/products", (req, res) => {
@@ -71,7 +75,7 @@ app.post("/add", (req, res) => {
     .catch((err) => res.status(400).json(err));
 });
 
-app.post("/addSale", (req, res) => {
+app.post("/addSale", async (req, res) => {
   const {
     number,
     description,
@@ -87,25 +91,34 @@ app.post("/addSale", (req, res) => {
     colour,
   } = req.body;
 
-  const newSale = new SalesModel({
-    number,
-    description,
-    price,
-    quantity,
-    total,
-    datesold,
-    saleperson,
-    commission,
-    image,
-    pnumber,
-    code,
-    colour,
-  });
+  try {
+    const newSale = new SalesModel({
+      number,
+      description,
+      price,
+      quantity,
+      total,
+      datesold,
+      saleperson,
+      commission,
+      image,
+      pnumber,
+      code,
+      colour,
+    });
 
-  newSale
-    .save()
-    .then((sale) => res.json(sale))
-    .catch((err) => res.status(400).json(err));
+    await newSale.save();
+    const product = await ProductsModel.findOne({ number: pnumber });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not Found" });
+    }
+    product.quantity -= quantity;
+    await product.save();
+    res.json(newSale);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
 app.post("/addExpense", (req, res) => {

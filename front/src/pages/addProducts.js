@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -20,6 +20,7 @@ function AddProducts() {
     bnumber: "",
     summary: "",
   });
+  const [products, setProducts] = useState([]);
   const [image, setImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -27,6 +28,26 @@ function AddProducts() {
   const [singleEntry, setSingleEntry] = useState(false);
   const [excel, setExcel] = useState(false);
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [filled, setFilled] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get(`https://eazy-manager.vercel.app/products`)
+      .then((result) => {
+        setProducts(result.data);
+      })
+      .catch((err) => console.log(err));
+  });
+
+  const lastProduct = [...products]
+    .sort((a, b) => a.number.localeCompare(b.number))
+    .pop();
+
+  let incrementedProductNumber;
+  if (lastProduct) {
+    incrementedProductNumber = parseInt(lastProduct.number) + 1;
+  }
 
   const excelEntry = () => {
     setExcel(true);
@@ -44,25 +65,49 @@ function AddProducts() {
     setProduct((prev) => ({ ...prev, [e.target.name]: inputValueInCaps }));
   };
 
+  const validateRequiredFields = () => {
+    const requiredFields = [
+      "number",
+      "description",
+      "code",
+      "quantity",
+      "price",
+    ];
+    const isValid = requiredFields.every(
+      (field) => product[field].trim() !== ""
+    );
+    setFilled(isValid);
+    return isValid;
+  };
+
   const submit = (e) => {
     e.preventDefault();
-
-    const productData = {
-      ...product, 
-      image: image, 
-    };
-    axios
-      .post("http://localhost:3001/add", productData)
-      .then((result) => {
-        setShowAlert(true);
-        console.log(result);
-        setShowAnimation(true);
-        setTimeout(() => {
+    if (validateRequiredFields()) {
+      setError("");
+      const productData = {
+        ...product,
+        image: image,
+      };
+      axios
+        .post("https://eazy-manager.vercel.app/add", productData)
+        .then((result) => {
+          setShowAlert(true);
+          console.log(result);
           setShowAnimation(true);
-          navigate("/");
-        }, 2000);
-      })
-      .catch((err) => console.log(err));
+          setTimeout(() => {
+            setShowAnimation(true);
+            navigate("/");
+          }, 2000);
+        })
+        .catch((err) => {
+          if (err.response && err.response.status === 400) {
+            const errorMessage = err.response.data.message;
+            setError(`Error: ${errorMessage}`);
+          } else {
+            setError("The image selected is too large. Choose another.");
+          }
+        });
+    }
   };
 
   const convertToBase64 = (e) => {
@@ -74,6 +119,7 @@ function AddProducts() {
     };
     reader.onerror = (error) => {
       console.log("Error: ", error);
+      alert("Error:", error);
     };
   };
 
@@ -97,10 +143,10 @@ function AddProducts() {
         code: row[2].toUpperCase(),
         number: row[3],
         quantity: row[4],
-        bnumber: row[5].toUpperCase(),
+        bnumber: row[5],
         price: row[6],
         location: row[7].toUpperCase(),
-        summary: row[8].toUpperCase(),
+        summary: row[8],
       }));
       setProductData(productFromExcel);
     };
@@ -113,7 +159,7 @@ function AddProducts() {
       await Promise.all(
         productData.map(async (productMember) => {
           try {
-            await axios.post(`http://localhost:3001/add`, productMember);
+            await axios.post(`https://eazy-manager.vercel.app/add`, productMember);
           } catch (error) {
             console.log("Error adding product", error);
           }
@@ -191,7 +237,7 @@ function AddProducts() {
       {excel && (
         <div>
           <label>Get the Excel Document from here:</label>
-          <button onClick = {generateExcelTemplate}>Download Template</button>
+          <button onClick={generateExcelTemplate}>Download Template</button>
           <br />
           <br />
           <h3>Upload Document</h3>
@@ -237,138 +283,180 @@ function AddProducts() {
               </tbody>
             </table>
           )}
-          </div>
+        </div>
       )}
 
-      {singleEntry && (<form className="form" onSubmit={submit}>
-        <div style={{ textAlign: "center" }}>
+      {singleEntry && (
+        <form className="form" onSubmit={submit}>
+          <div style={{ textAlign: "center" }}>
+            <span
+              style={{
+                fontSize: "35px",
+                color: "purple",
+                fontStyle: "italic",
+              }}
+            >
+              Easy
+            </span>
+            <span
+              style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
+            >
+              Manager
+            </span>
+            <h3>Product Entry</h3>
+          </div>
+          <hr />
+          <br />
+          <span>Product Number</span>{" "}
           <span
+            style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+          >
+            *
+          </span>
+          :
+          <input
+            type="text"
+            placeholder={incrementedProductNumber}
+            onChange={handleChange}
+            name="number"
+          />
+          <br />
+          <span>Description</span>{" "}
+          <span
+            style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+          >
+            *
+          </span>
+          :
+          <input
+            type="text"
+            placeholder="Description"
+            onChange={handleChange}
+            name="description"
+          />
+          <br />
+          <span>Product Code</span>{" "}
+          <span
+            style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+          >
+            *
+          </span>
+          :
+          <input
+            type="text"
+            placeholder="XX123"
+            onChange={handleChange}
+            name="code"
+          />
+          <br />
+          Colour:
+          <input
+            type="text"
+            placeholder="Colour"
+            onChange={handleChange}
+            name="colour"
+          />
+          <br />
+          <hr />
+          <br />
+          <div
             style={{
-              fontSize: "35px",
-              color: "purple",
-              fontStyle: "italic",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1px",
             }}
           >
-            Easy
-          </span>
-          <span style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}>
-            Manager
-          </span>
-          <h3>Product Entry</h3>
-        </div>
-        <hr />
-        <br />
-        Product Number:
-        <input
-          type="text"
-          placeholder="12345"
-          onChange={handleChange}
-          name="number"
-        />
-        <br />
-        Description:
-        <input
-          type="text"
-          placeholder="Description"
-          onChange={handleChange}
-          name="description"
-        />
-        <br />
-        Product Code:
-        <input
-          type="text"
-          placeholder="XX123"
-          onChange={handleChange}
-          name="code"
-        />
-        <br />
-        Colour:
-        <input
-          type="text"
-          placeholder="Colour"
-          onChange={handleChange}
-          name="colour"
-        />
-        <br />
-        <hr />
-        <br />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "1px",
-          }}
-        >
-          Quantity:
-          <input
-            type="text"
-            placeholder="Quantity"
-            onChange={handleChange}
-            name="quantity"
-          />
-          Price per unit:
-          <input
-            type="text"
-            placeholder="Price"
-            onChange={handleChange}
-            name="price"
-          />
-          FC Number:
-          <input
-            type="text"
-            placeholder="B/No"
-            onChange={handleChange}
-            name="bnumber"
-          />
-        </div>
-        <br />
-        <hr />
-        <br />
-        Location:
-        <input
-          type="text"
-          placeholder="Location"
-          onChange={handleChange}
-          name="location"
-        />
-        <br />
-        <br />
-        Summary
-        <textarea
-          onChange={handleChange}
-          name="summary"
-          rows="6"
-          cols="76.5"
-        ></textarea>
-        <br />
-        <br />
-        <hr />
-        <br />
-        Image:
-        <hr />
-        <input accept="image/*" type="file" onChange={convertToBase64} />
-        <br />
-        <hr />
-        {showAlert && (
-          <div className="alert">
-            <p style={{ textAlign: "center" }}>
-              Success! <i className="material-icons">check</i>{" "}
-            </p>
+            Quantity *:
+            <input
+              type="text"
+              placeholder="Quantity"
+              onChange={handleChange}
+              name="quantity"
+            />
+            Price per unit *:
+            <input
+              type="text"
+              placeholder="Price"
+              onChange={handleChange}
+              name="price"
+            />
+            FC Number:
+            <input
+              type="text"
+              placeholder="B/No"
+              onChange={handleChange}
+              name="bnumber"
+            />
           </div>
-        )}
+          <br />
+          <hr />
+          <br />
+          Location:
+          <input
+            type="text"
+            placeholder="Location"
+            onChange={handleChange}
+            name="location"
+          />
+          <br />
+          <br />
+          Summary
+          <textarea
+            onChange={handleChange}
+            name="summary"
+            rows="6"
+            cols="76.5"
+          ></textarea>
+          <br />
+          <br />
+          <hr />
+          <br />
+          Image:
+          <hr />
+          <input accept="image/*" type="file" onChange={convertToBase64} />
+          <br />
+          <hr />
+          {showAlert && (
+            <div className="alert">
+              <p style={{ textAlign: "center" }}>
+                Success! <i className="material-icons">check</i>{" "}
+              </p>
+            </div>
+          )}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {!filled && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Please fill out all the fields marked with '
+              <span
+                style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+              >
+                *
+              </span>
+              ' before proceeding
+            </div>
+          )}
+          <br />
           <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-        <button className="addbtn">Add Product</button>
-        <button onClick={back} className="backbtn">
-          Cancel
-        </button>
-        </div>
-      </form>)}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <button className="addbtn">Add Product</button>
+            <button onClick={back} className="backbtn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+
       {showAnimation && (
         <div className="hourglassOverlay">
           <div className="hourglassBackground">

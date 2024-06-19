@@ -18,37 +18,23 @@ function AddSale() {
     code: "",
     colour: "",
   });
+  const [message, setMessage] = useState(null);
   const [image, setImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [products, setProducts] = useState([]);
-  const [itemNames, setItemNames] = useState([]);
   const [salesName, setSalesName] = useState([]);
-  const [colourNames, setColourName] = useState([]);
-  const [codes, setCodes] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/products`);
-        const items = response.data.map((item) => item.description);
-        setItemNames(items);
+        const response = await axios.get(`https://eazy-manager.vercel.app/products`);
+        setProducts(response.data);
 
-        const response2 = await axios.get(`http://localhost:3001/staff`);
+        const response2 = await axios.get(`https://eazy-manager.vercel.app/staff`);
         const salesName = response2.data.map((saleName) => saleName.firstname);
         setSalesName(salesName);
-
-        const response3 = await axios.get(`http://localhost:3001/products`);
-        const colours = response3.data.map((colour) => colour.colour);
-        setColourName(colours);
-
-        const response4 = await axios.get(`http://localhost:3001/products`);
-        setProducts(response4.data);
-
-        const response5 = await axios.get(`http://localhost:3001/products`);
-        const itemCodes = response5.data.map((itemCode) => itemCode.code);
-        setCodes(itemCodes);
       } catch (error) {
         console.log("Error fetching item:", error);
       }
@@ -56,61 +42,55 @@ function AddSale() {
     fetchItems();
   }, []);
 
+  const handleProductSelection = (e) => {
+    const selectedValue = e.target.value;
+
+    const selectedProduct = products.find(
+      (product) => product.number === selectedValue
+    );
+
+    if (selectedProduct) {
+      setSale((prev) => ({
+        ...prev,
+        description: selectedProduct.description,
+        colour: selectedProduct.colour,
+        code: selectedProduct.code,
+        pnumber: selectedProduct.number,
+      }));
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSale((prev) => {
-      const newValue =
-        name === "description" || name === "saleperson" || name === "code"
-          ? value.toUpperCase()
-          : name === "colour"
-          ? value
-          : name === "quantity"
-          ? parseInt(value) || 0
-          : parseFloat(value) || 0;
 
-      let updatedSale = { ...prev };
+    const newValue =
+      name === "description" || name === "saleperson" || name === "code"
+        ? value.toUpperCase()
+        : name === "colour"
+        ? value
+        : name === "quantity"
+        ? parseInt(value) || 0
+        : parseFloat(value) || 0;
 
-      if (name === "number") {
-        updatedSale = {
-          ...updatedSale,
-          number: newValue,
-        };
-        console.log("products:", products);
-      } else if (name === "pnumber") {
-        const selectedProduct = products.find(
-          (product) => product.number === parseInt(value)
-        );
-        if (selectedProduct) {
-          updatedSale = {
-            ...updatedSale,
-            description: selectedProduct.description,
-            code: selectedProduct.code,
-            colour: selectedProduct.colour,
-            pnumber: selectedProduct.number,
-          };
-        }
-      }
-
-      const total =
+    setSale((prev) => ({
+      ...prev,
+      [name]: newValue,
+      total:
         name === "price" || name === "quantity"
           ? calculateTotal(
               name === "price" ? newValue : prev.price,
               name === "quantity" ? newValue : prev.quantity
             )
-          : prev.total;
-
-      const commission =
+          : prev.total,
+      commission:
         name === "price" || name === "quantity"
-          ? calculateCommission(total)
-          : prev.commission;
-      console.log("updatedSale", updatedSale);
-      return {
-        ...updatedSale,
-        [name]: newValue,
-        total: total,
-        commission: commission,
-      };
-    });
+          ? calculateCommission(
+              name === "price"
+                ? newValue * prev.quantity
+                : prev.price * newValue
+            )
+          : prev.commission,
+    }));
   };
 
   const calculateTotal = (price, quantity) => {
@@ -138,8 +118,9 @@ function AddSale() {
       ...sale,
       image: image,
     };
+
     axios
-      .post("http://localhost:3001/addSale", saleData)
+      .post("https://eazy-manager.vercel.app/addSale", saleData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
@@ -153,14 +134,24 @@ function AddSale() {
   };
 
   const convertToBase64 = (e) => {
+    const file = e.target.files[0];
+
+    // Check if the file size exceeds the limit (in bytes)
+    const maxSizeInBytes = 1048576; // 1MB
+    if (file.size > maxSizeInBytes) {
+      setMessage("File size exceeds the maximum limit (1MB)");
+      return;
+    }
+
     var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(file);
     reader.onload = () => {
       console.log(reader.result);
       setImage(reader.result);
     };
     reader.onerror = (error) => {
       console.log("Error: ", error);
+      setMessage("An Error occurred. Please try again");
     };
   };
 
@@ -196,22 +187,23 @@ function AddSale() {
         />
         <br />
         <br />
-        <label>Select the Item:</label>
+        <label>Select The Product:</label>
+        <label>Product No. — Description (Code) | [Colour]</label>
         <select
           style={{ width: "656px" }}
           name="pnumber"
-          onChange={handleChange}
+          onChange={handleProductSelection}
           value={sale.pnumber}
         >
           <option value="" disabled></option>
-          <optgroup label="Item Number - Description (Code) | [Colour]">
+          <optgroup label="Product No. — Description (Code) | [Colour]">
             {products.map((product) => (
               <option
                 className="select"
                 key={product.number}
                 value={product.number}
               >
-                {`${product.number} - ${product.description} (${product.code}) | [${product.colour}]`}
+                {`${product.number} — ${product.description} (${product.code}) | [${product.colour}]`}
               </option>
             ))}
           </optgroup>
@@ -219,57 +211,22 @@ function AddSale() {
         <br />
         <br />
         <label>Description:</label>
-        <select
-          style={{ width: "600px" }}
+        <input
+          type="text"
           name="description"
-          onChange={handleChange}
           value={sale.description}
-        >
-          <option value="" disabled>
-          </option>
-          {itemNames.map((itemName, index) => (
-            <option key={index} value={itemName}>
-              {itemName}
-            </option>
-          ))}
-        </select>
+          readOnly
+        />
         <br />
         <br />
         <div style={{ display: "flex", alignItems: "center" }}>
           <div>
             <label>Colour:</label>
-            <select
-              style={{ width: "200px" }}
-              name="colour"
-              onChange={handleChange}
-              value={sale.colour}
-            >
-              <option value="" disabled>
-              </option>
-              {[...new Set(colourNames)].map((colourName, index) => (
-                <option key={index} value={colourName}>
-                  {colourName}
-                </option>
-              ))}
-            </select>
+            <input type="text" name="colour" value={sale.colour} readOnly />
           </div>
           <div style={{ marginLeft: "50px" }}>
-            <label>Item Code:</label>
-            <select
-              style={{ width: "200px" }}
-              name="code"
-              onChange={handleChange}
-              value={sale.code}
-            >
-              <option value="" disabled>
-                
-              </option>
-              {[...new Set(codes)].map((code, index) => (
-                <option key={index} value={code}>
-                  {code}
-                </option>
-              ))}
-              </select>
+            <label>Code:</label>
+            <input type="text" name="code" value={sale.code} readOnly />
           </div>
         </div>
 
@@ -357,12 +314,13 @@ function AddSale() {
             alignItems: "center",
           }}
         >
-        <button className="addbtn" onClick={submit}>
-          Add Sale
-        </button>
-        <button className="backbtn" onClick={back}>
-          Cancel
-        </button>
+          <button className="addbtn" onClick={submit}>
+            Add Sale
+          </button>
+          <button className="backbtn" onClick={back}>
+            Cancel
+          </button>
+          {message && <div>{message}</div>}
         </div>
       </form>
       {showAnimation && (
