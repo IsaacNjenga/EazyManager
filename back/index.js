@@ -18,9 +18,7 @@ const moment = require("moment");
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json()); // to parse JSON bodies
-const allowedOrigins = [
-  `https://eazy-manager-front.vercel.app`,
-];
+const allowedOrigins = [`http://localhost:3000`];
 
 const corsOptions = {
   origin: function (origin, callback) {

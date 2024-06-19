@@ -22,7 +22,7 @@ import AddSale from "./pages/addSale";
 import { UserContextProvider } from "./context/userContext";
 import ProtectedRoute from "./context/protectedRoutes";
 
-axios.defaults.baseURL = "https://eazy-manager.vercel.app/";
+axios.defaults.baseURL = "http://localhost:3001";
 axios.defaults.withCredentials = true;
 function App() {
   return (
