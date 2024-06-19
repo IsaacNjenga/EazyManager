@@ -18,13 +18,15 @@ const moment = require("moment");
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json()); // to parse JSON bodies
-app.use(
-  cors({
-    credentials: true,
-    methods: ["POST", "GET", "PUT", "DELETE"],
-    origin: "https://eazy-manager-front.vercel.app", 
-  })
-);
+const corsOptions = {
+  origin: "https://eazy-manager-front.vercel.app",
+  methods: ["POST", "GET", "PUT", "DELETE"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
 app.use(cookieParser());
 
 mongoose
@@ -389,8 +391,8 @@ app.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const loginInfo = new loginModel({number, loginTime});
-    await loginInfo.save()
+    const loginInfo = new loginModel({ number, loginTime });
+    await loginInfo.save();
 
     req.session.user = {
       number: user.number,
