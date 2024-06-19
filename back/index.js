@@ -22,7 +22,7 @@ app.use(
   cors({
     credentials: true,
     methods: ["POST", "GET", "PUT", "DELETE"],
-    origin:["https://eazy-manager-front.vercel.app"],
+    origin: "https://eazy-manager-front.vercel.app", 
   })
 );
 app.use(cookieParser());
