@@ -16,20 +16,44 @@ const session = require("express-session");
 const moment = require("moment");
 
 const app = express();
+
+//middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json()); // to parse JSON bodies
-
-const corsOptions = {
-  origin:`https://eazy-manager-front.vercel.app`,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
 app.use(cookieParser());
 
+//cors configuration
+const corsOptions = {
+  origin: `https://eazy-manager-front.vercel.app`,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+//cors handler function
+const allowCors = (fn) => async (req, res) => {
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  // another common pattern
+  // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  return await fn(req, res);
+};
+app.use(allowCors);
+
+//database connection
 mongoose
   .connect(
     "mongodb+srv://IsaacNjenga:cations!@cluster0.xf14h71.mongodb.net/EasyManager"
@@ -37,6 +61,7 @@ mongoose
   .then(() => console.log("Database connected"))
   .catch((err) => console.log("err", err));
 
+//Session setup
 app.use(
   session({
     secret: "my_very_complex_secret_key",
