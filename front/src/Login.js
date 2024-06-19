@@ -18,7 +18,7 @@ function Login() {
     const { number, password } = data;
 
     try {
-      const response = await axios.post("login", {
+      const response = await axios.post(`login`, {
         number,
         password,
       });
