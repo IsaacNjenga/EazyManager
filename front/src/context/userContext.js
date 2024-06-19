@@ -22,7 +22,7 @@ export function UserContextProvider({ children }) {
       }
     };
 
-    if (!user && isAuthenticated) {
+    if (!user && !loading) {
       fetchData();
     }
   }, [user, isAuthenticated]); // Include user in dependencies to refetch user data if user state changes
