@@ -1,144 +1,155 @@
-import "./App.css";
-import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import axios from "axios";
+import Navbar from "./source/navbar";
+import { Toaster } from "react-hot-toast";
 import Dashboard from "./dashboard";
 import Products from "./products";
 import Sales from "./sales";
 import Expenses from "./expenses";
 import Staff from "./staff";
 import Reports from "./reports";
+import Login from "./Login";
+import Register from "./Register";
+import UpdateStaff from "./pages/updateStaff";
+import AddStaff from "./pages/addStaff";
+import SplashScreen from "./splashScreen";
+import AddProducts from "./pages/addProducts";
+import UpdateProducts from "./pages/updateProducts";
+import UpdateExpense from "./pages/updateExpense";
+import AddExpense from "./pages/addExpense";
+import UpdateSale from "./pages/updateSale";
+import AddSale from "./pages/addSale";
+import { UserContextProvider } from "./context/userContext";
+import ProtectedRoute from "./context/protectedRoutes";
 
+axios.defaults.baseURL = "https://eazy-manager.vercel.app/";
+axios.defaults.withCredentials = true;
 function App() {
-  const [currentView, setCurrentView] = useState("dashboard");
-  const [navOpen, setNavOpen] = useState(false);
-  let [currentDateTime, setCurrentDateTime] = useState(new Date());
-
-  const renderView = () => {
-    switch (currentView) {
-      case "dashboard":
-        return <Dashboard />;
-      case "products":
-        return <Products />;
-      case "sales":
-        return <Sales />;
-      case "expenses":
-        return <Expenses />;
-
-      case "staff":
-        return <Staff />;
-      case "reports":
-        return <Reports />;
-      default:
-        return null;
-    }
-  };
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const formattedDate = currentDateTime.toLocaleDateString("en-UK", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  const formattedTime = currentDateTime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-  const dateTimeStyle = {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    padding: "20px",
-    fontWeight: "bold",
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const navbar = document.getElementById("mySidenav");
-      const sticky = navbar.offsetTop;
-
-      if (window.pageYOffset >= sticky) {
-        navbar.classList.add("sticky");
-      } else {
-        navbar.classList.remove("sticky");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
-    setNavOpen(true);
-  }
-
-  function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginLeft = "0";
-    setNavOpen(false);
-  }
-
   return (
-    <div>
-      <div>
-        <div id="timenav" className="time" style={dateTimeStyle}>
-          <p>{formattedDate}</p>
-          <p>{formattedTime}</p>
-        </div>
-        <div id="mySidenav" className={`sidenav ${navOpen ? "open" : ""}`}>
-          <a href="#nav" className="closebtn" onClick={closeNav}>
-            &times;
-          </a>
-          <a
-            className="active"
-            href="#dashboard"
-            onClick={() => setCurrentView("dashboard")}
-          >
-            <i class="glyphicon glyphicon-home"></i> Dashboard
-          </a>
-          <a href="#products" onClick={() => setCurrentView("products")}>
-            <i className="material-icons">assessment</i> Inventory
-          </a>
-          <a href="#sales" onClick={() => setCurrentView("sales")}>
-            <i className="material-icons">shopping_cart</i> Sales
-          </a>
-          <a href="#expenses" onClick={() => setCurrentView("expenses")}>
-            <i className="material-icons">style</i> Expenses
-          </a>
-
-          <a href="#staff" onClick={() => setCurrentView("staff")}>
-            <i className="material-icons">group</i> Salespersons
-          </a>
-          <a href="#reports" onClick={() => setCurrentView("reports")}>
-            <i className="material-icons">poll</i> Reports
-          </a>
-        </div>
-        <button className="menubtn" onClick={openNav}>
-          <i className="material-icons" style={{ fontSize: "48px" }}>
-            menu
-          </i>
-        </button>
-
-        <div id="main">{renderView()}</div>
-      </div>
-    </div>
+    <UserContextProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Toaster position="top-right" toastOptions={{ duration: 2200 }} />
+        <Routes>
+          <Route path="*" element={<SplashScreen />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/*"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sales/*"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Sales />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses/*"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Expenses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/staff/*"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Staff />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-staff/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <UpdateStaff />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-staff"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AddStaff />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-expense/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <UpdateExpense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-expense"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AddExpense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-sale/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <UpdateSale />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-sale"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "salesperson"]}>
+                <AddSale />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-product/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <UpdateProducts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-product"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AddProducts />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </UserContextProvider>
   );
 }
 
 export default App;
-//thread
-//operations
-//creation
-//termination
-//inputoutput

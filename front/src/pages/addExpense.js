@@ -33,19 +33,19 @@ function AddExpense() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`https://eazy-manager.vercel.app/addExpense`, expense);
-      navigate("/");
+      await axios.post(`addExpense`, expense);
+      navigate("/expenses");
     } catch (err) {
       console.log(err);
     }
   };
 
   const back = () => {
-    navigate("/");
+    navigate("/expenses");
   };
 
   return (
-    <div>
+    <div id="main">
       <h1>Add Expenses</h1>
       <button className="backbtn" onClick={back}>
         Go back

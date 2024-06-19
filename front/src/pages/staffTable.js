@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { format, isValid } from "date-fns";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import { toast } from "react-hot-toast";
 function StaffTable() {
   const [staffs, setStaffs] = useState([]);
   const [grid, setGrid] = useState(false);
@@ -35,7 +36,7 @@ function StaffTable() {
   useEffect(() => {
     const fetchAllStaffs = async () => {
       try {
-        const res = await axios.get("https://eazy-manager.vercel.app/staff");
+        const res = await axios.get("staff");
         setStaffs(res.data);
       } catch (err) {
         console.log(err);
@@ -51,7 +52,7 @@ function StaffTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`https://eazy-manager.vercel.app/deleteStaff/` + id);
+      await axios.delete(`deleteStaff/` + id);
       setStaffs((prevStaffs) => prevStaffs.filter((staff) => staff._id !== id));
       setUserWantsToDelete(true);
       setSelectedstaffNumber(null);
@@ -87,7 +88,7 @@ function StaffTable() {
     color: list ? "white" : "initial",
   };
   return (
-  <div>
+    <div>
       <form>
         <InputGroup>
           <Form.Control
@@ -106,12 +107,12 @@ function StaffTable() {
       </button>
       <br />
       <br />
-      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
+      <Link to="/add-staff" className="addbtn" style={{ fontWeight: "bold" }}>
         {" "}
         + Add new{" "}
       </Link>
       <br />
-      <br/>
+      <br />
 
       {grid && Array.isArray(staffs) ? (
         <div className="grid-layout">
@@ -168,7 +169,7 @@ function StaffTable() {
                     >
                       <button className="updatebtn">
                         <Link
-                          to={`/update/${staff._id}`}
+                          to={`/update-staff/${staff._id}`}
                           style={{ color: "black" }}
                         >
                           <i className="material-icons">edit</i>
@@ -188,7 +189,10 @@ function StaffTable() {
                         <p>Are you sure you want to delete?</p>
                         <button
                           className="addbtn"
-                          onClick={() => handleYesClick(staff._id)}
+                          onClick={() => {
+                            handleYesClick(staff._id);
+                            toast.success("Deleted!");
+                          }}
                         >
                           Yes
                         </button>
@@ -281,7 +285,7 @@ function StaffTable() {
                     <td style={{ backgroundColor: "#5bacba" }}>
                       <button className="updatebtn">
                         <Link
-                          to={`/update/${staff._id}`}
+                          to={`/update-staff/${staff._id}`}
                           style={{ color: "black" }}
                         >
                           <i className="material-icons">edit</i>
@@ -304,7 +308,10 @@ function StaffTable() {
                             <p>Are you sure you want to delete?</p>
                             <button
                               className="addbtn"
-                              onClick={() => handleYesClick(staff._id)}
+                              onClick={() => {
+                                handleYesClick(staff._id);
+                                toast.success("Deleted!");
+                              }}
                             >
                               Yes
                             </button>

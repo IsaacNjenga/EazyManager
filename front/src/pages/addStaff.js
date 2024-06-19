@@ -63,14 +63,14 @@ function AddStaff() {
       image: image,
     };
     axios
-      .post("https://eazy-manager.vercel.app/addStaff", staffData)
+      .post("addStaff", staffData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
         setShowAnimation(true);
         setTimeout(() => {
           setShowAnimation(true);
-          navigate("/");
+          navigate("/staff");
         }, 2000);
       })
       .catch((err) => console.log(err));
@@ -135,7 +135,7 @@ function AddStaff() {
       await Promise.all(
         staffData.map(async (staffMember) => {
           try {
-            await axios.post("https://eazy-manager.vercel.app/addStaff", staffMember);
+            await axios.post("addStaff", staffMember);
           } catch (error) {
             console.error("Error adding staff:", error);
           }
@@ -144,7 +144,7 @@ function AddStaff() {
       setShowAnimation(true);
       setTimeout(() => {
         setShowAnimation(false);
-        navigate("/");
+        navigate("/staff");
       }, 1000);
     } catch (err) {
       console.log(err);
@@ -177,11 +177,11 @@ function AddStaff() {
   };
 
   const back = () => {
-    navigate("/");
+    navigate("/staff");
   };
 
   return (
-    <div>
+    <div id = "main">
       <h2>Add new staff</h2>
       <button className="backbtn" onClick={back}>
         Back to Staff
@@ -313,16 +313,16 @@ function AddStaff() {
             )}
             <hr />
             <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-            <button className="addbtn">Add</button>
-            <button className="backbtn" onClick={back}>
-              Cancel
-            </button>
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <button className="addbtn">Add</button>
+              <button className="backbtn" onClick={back}>
+                Cancel
+              </button>
             </div>
           </form>
         </div>

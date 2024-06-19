@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import { toast } from "react-hot-toast";
 
 function ProductsTable() {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,8 @@ function ProductsTable() {
   const [search, setSearch] = useState("");
   const [userWantsToDelete, setUserWantsToDelete] = useState(true);
   const [selectedProductNumber, setSelectedProductNumber] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   function gridlayout() {
     setGrid(true);
@@ -29,7 +32,7 @@ function ProductsTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`https://eazy-manager.vercel.app/deleteProduct/` + id);
+      await axios.delete(`deleteProduct/` + id);
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product._id !== id)
       );
@@ -46,25 +49,46 @@ function ProductsTable() {
   };
 
   useEffect(() => {
+    setLoading(true); // Indicate that loading has started
+    setShowAnimation(true);
     axios
-      .get(`https://eazy-manager.vercel.app/products`)
+      .get(`products`)
       .then((result) => {
         const sortedProducts = result.data.sort((a, b) => {
           return a.code.localeCompare(b.code);
         });
         setProducts(sortedProducts);
+        setLoading(false); // Indicate that loading has ended after success
+        setShowAnimation(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setLoading(false); // Indicate that loading has ended after error
+        setShowAnimation(false);
+      });
   }, []);
 
-  
-    /* useEffect(() => {
-    axios
-      .get(`http://localhost:3001/products`)
-      .then((result) => setProducts(result.data))
-      .catch((err) => console.log(err));
-  }, []);*/
-  
+  if (loading) {
+    return (
+      <div>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const styles = {
     width: "auto",
@@ -131,7 +155,7 @@ function ProductsTable() {
       <br />
 
       <Link
-        to="/add"
+        to="/add-product"
         className="addbtn"
         title="Add a new product"
         style={{ fontWeight: "bold" }}
@@ -229,7 +253,7 @@ function ProductsTable() {
                     >
                       <button className="updatebtn">
                         <Link
-                          to={`/update/${product._id}`}
+                          to={`/update-product/${product._id}`}
                           style={{ color: "black" }}
                         >
                           <i className="material-icons">edit</i>
@@ -251,7 +275,10 @@ function ProductsTable() {
                           <p>Are you sure you want to delete?</p>
                           <button
                             className="addbtn"
-                            onClick={() => handleYesClick(product._id)}
+                            onClick={() => {
+                              handleYesClick(product._id);
+                              toast.success("Product deleted!");
+                            }}
                           >
                             Yes
                           </button>
@@ -504,7 +531,7 @@ function ProductsTable() {
                               title="Update this record"
                             >
                               <Link
-                                to={`/update/${product._id}`}
+                                to={`/update-product/${product._id}`}
                                 style={{ color: "black" }}
                               >
                                 <i className="material-icons">edit</i>
@@ -528,7 +555,10 @@ function ProductsTable() {
                                   <p>Are you sure you want to delete?</p>
                                   <button
                                     className="addbtn"
-                                    onClick={() => handleYesClick(product._id)}
+                                    onClick={() => {
+                                      handleYesClick(product._id);
+                                      toast.success("Product deleted!");
+                                    }}
                                   >
                                     Yes
                                   </button>

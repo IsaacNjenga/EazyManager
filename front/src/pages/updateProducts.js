@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 function UpdateProducts() {
   const [product, setProduct] = useState({
@@ -22,11 +23,12 @@ function UpdateProducts() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [imageChange, setImageChange] = useState(false);
   const navigate = useNavigate();
+  const [newQuantity, setNewQuantity] = useState(0);
   const { id } = useParams();
 
   useEffect(() => {
     axios
-      .get(`https://eazy-manager.vercel.app/getProducts/` + id)
+      .get(`getProducts/` + id)
       .then((result) => {
         setProduct(result.data);
       })
@@ -61,14 +63,15 @@ function UpdateProducts() {
       image: imageChange ? newImage : product.image,
     };
     axios
-      .put(`https://eazy-manager.vercel.app/updateProducts/` + id, productData)
+      .put(`updateProducts/` + id, productData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
         setShowAnimation(true);
         setTimeout(() => {
           setShowAnimation(true);
-          navigate("/");
+          toast.success("Product updated");
+          navigate("/products");
         }, 2000);
       })
       .catch((err) => {
@@ -95,12 +98,37 @@ function UpdateProducts() {
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
   };
 
-  const back = () => {
-    navigate("/");
+  const addQuantity = (e) => {
+    e.preventDefault();
+    setNewQuantity((prevQuantity) => prevQuantity + 1);
+  };
+
+  const removeQuantity = (e) => {
+    e.preventDefault();
+    setNewQuantity((prevQuantity) => (prevQuantity > 0 ? prevQuantity - 1 : 0));
+  };
+
+  const newValue = newQuantity + parseInt(product.quantity);
+
+  const change = (e) => {
+    e.preventDefault();
+    setProduct((prev) => ({ ...prev, quantity: newValue.toString() }));
+    setNewQuantity(0);
+  };
+
+  const cancel = (e) => {
+    e.preventDefault();
+    setProduct((prev) => ({ ...prev, quantity: product.quantity }));
+    setNewQuantity(0);
+  };
+
+  const back = (e) => {
+    e.preventDefault();
+    navigate("/products");
   };
 
   return (
-    <div>
+    <div id="main">
       <button onClick={back} className="backbtn">
         Back to Inventory
       </button>
@@ -159,6 +187,41 @@ function UpdateProducts() {
         />
         <br />
         <hr />
+        <br />
+        <div style={{ textAlign: "center" }}>
+          <h4>
+            <b>Current quantity: {product.quantity}</b>
+          </h4>
+          <p>How many to add?</p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
+              margin: "10px 0",
+            }}
+          >
+            <button onClick={addQuantity} className="addbtn">
+              +
+            </button>
+            <p>{newQuantity}</p>
+            <button onClick={removeQuantity} className="backbtn">
+              -
+            </button>
+          </div>
+          <p>
+            <b>
+              <i>New quantity will be: {newValue}</i>
+            </b>
+          </p>
+          <button onClick={change} className="addbtn">
+            Change
+          </button>
+          <button onClick={cancel} className="backbtn">
+            Cancel
+          </button>
+        </div>
         <br />
         <div
           style={{

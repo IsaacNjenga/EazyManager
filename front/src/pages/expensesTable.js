@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import { toast } from "react-hot-toast";
 function ExpenseTable() {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [daySelected, setDaySelected] = useState(false);
@@ -25,7 +26,7 @@ function ExpenseTable() {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`https://eazy-manager.vercel.app/sales`);
+        const res = await axios.get(`sales`);
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -37,7 +38,7 @@ function ExpenseTable() {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpense = await axios.get(`https://eazy-manager.vercel.app/expenses`);
+        const resExpense = await axios.get(`expenses`);
         setExpenses(resExpense.data);
       } catch (err) {
         console.log(err);
@@ -53,11 +54,12 @@ function ExpenseTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`https://eazy-manager.vercel.app/deleteExpense/` + id);
+      await axios.delete(`deleteExpense/` + id);
       setExpenses((prevExpenses) =>
-        prevExpenses.filter((expense) => expense._id!== id)
+        prevExpenses.filter((expense) => expense._id !== id)
       );
       setUserWantsToDelete(true);
+      console.log("Delete");
       setSelectedExpenseNumber(null);
     } catch (err) {
       console.log(err);
@@ -155,8 +157,10 @@ function ExpenseTable() {
       <br />
       <button className="button-name" onClick={handlePrint}>
         Print
-      </button><br/><br/>
-      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
+      </button>
+      <br />
+      <br />
+      <Link to="/add-expense" className="addbtn" style={{ fontWeight: "bold" }}>
         {" "}
         + Add Expense{" "}
       </Link>
@@ -176,6 +180,7 @@ function ExpenseTable() {
               <th>Description</th>
               <th>Cost</th>
               <th>Category</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -198,44 +203,51 @@ function ExpenseTable() {
                   <td style={{ backgroundColor: "#5bacba", color: "white" }}>
                     {expense.category}
                   </td>
-                  <td>
-                  <div className="buttons-container">
-                    <button className="updatebtn">
-                      <Link
-                        to={`/update/${expense._id}`}
-                        style={{ color: "black" }}
+                  <td
+                    style={{ backgroundColor: "#e0e0e0", fontWeight: "bold" }}
+                  >
+                    <div className="buttons-container">
+                      <button className="updatebtn">
+                        <Link
+                          to={`/update-expense/${expense._id}`}
+                          style={{ color: "black" }}
+                        >
+                          <i className="material-icons">edit</i>
+                        </Link>
+                      </button>{" "}
+                      <button
+                        className="deletebtn"
+                        onClick={() => click(expense._id)}
                       >
-                        <i className="material-icons">edit</i>
-                      </Link>
-                    </button>{" "}
-                    <button
-                      className="deletebtn"
-                      onClick={() => click(expense._id)}
-                    >
-                      <i className="material-icons">delete</i>
-                    </button>
-                    {!userWantsToDelete &&
-                      selectedExpenseNumber === expense._id && (
-                        <div>
-                          <p>Are you sure you want to delete?</p>
-                          <button
-                            className="addbtn"
-                            onClick={() => handleYesClick(expense._id)}
-                          >
-                            Yes
-                          </button>
-                          <button className="backbtn" onClick={handleNoClick}>
-                            No
-                          </button>
-                        </div>
-                      )}
-                      </div>
+                        <i className="material-icons">delete</i>
+                      </button>
+                      {!userWantsToDelete &&
+                        selectedExpenseNumber === expense._id && (
+                          <div>
+                            <p>Are you sure you want to delete?</p>
+                            <button
+                              className="addbtn"
+                              onClick={() => {
+                                handleYesClick(expense._id);
+                                toast.success("Expense deleted!");
+                              }}
+                            >
+                              Yes
+                            </button>
+                            <button className="backbtn" onClick={handleNoClick}>
+                              No
+                            </button>
+                          </div>
+                        )}
+                    </div>
                   </td>
                 </tr>
               ))}
             <tr>
               <td colSpan="1" style={{ textAlign: "right" }}></td>
-              <td><b>Total</b></td>
+              <td>
+                <b>Total</b>
+              </td>
               <td
                 style={{
                   fontWeight: "bold",
@@ -248,7 +260,8 @@ function ExpenseTable() {
             </tr>
           </tbody>
         </table>
-        <br /><hr/>
+        <br />
+        <hr />
         <table className="productstable">
           <thead>
             <tr>

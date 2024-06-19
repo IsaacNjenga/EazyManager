@@ -33,7 +33,7 @@ function AddProducts() {
 
   useEffect(() => {
     axios
-      .get(`https://eazy-manager.vercel.app/products`)
+      .get("products")
       .then((result) => {
         setProducts(result.data);
       })
@@ -89,14 +89,14 @@ function AddProducts() {
         image: image,
       };
       axios
-        .post("https://eazy-manager.vercel.app/add", productData)
+        .post("add", productData)
         .then((result) => {
           setShowAlert(true);
           console.log(result);
           setShowAnimation(true);
           setTimeout(() => {
             setShowAnimation(true);
-            navigate("/");
+            navigate("/products");
           }, 2000);
         })
         .catch((err) => {
@@ -159,7 +159,7 @@ function AddProducts() {
       await Promise.all(
         productData.map(async (productMember) => {
           try {
-            await axios.post(`https://eazy-manager.vercel.app/add`, productMember);
+            await axios.post(`add`, productMember);
           } catch (error) {
             console.log("Error adding product", error);
           }
@@ -168,7 +168,7 @@ function AddProducts() {
       setShowAnimation(true);
       setTimeout(() => {
         setShowAnimation(false);
-        navigate("/");
+        navigate("/products");
       }, 1000);
     } catch (err) {
       console.log(err);
@@ -211,11 +211,11 @@ function AddProducts() {
   };
 
   const back = () => {
-    navigate("/");
+    navigate("/products");
   };
 
   return (
-    <div>
+    <div id = "main">
       <button onClick={back} className="backbtn">
         Back to Inventory
       </button>

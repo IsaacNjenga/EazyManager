@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "react-hot-toast";
+import Select from "react-select";
 
 function UpdateSale() {
   const [sale, setSale] = useState({
@@ -22,37 +24,23 @@ function UpdateSale() {
   });
 
   const navigate = useNavigate();
-  const [newImage, setNewImage] = useState("");
+  const [image, setImage] = useState("");
   const [products, setProducts] = useState([]);
+  const [message, setMessage] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
-  const [itemNames, setItemNames] = useState([]);
   const [salesName, setSalesName] = useState([]);
-  const [colourNames, setColourName] = useState([]);
-  const [codes, setCodes] = useState([]);
+  const [isImageAvailable, setIsImageAvalailable] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [imageChange, setImageChange] = useState(false);
 
   useEffect(() => {
     const fetchItemNames = async () => {
       try {
-        const response = await axios.get(`https://eazy-manager.vercel.app/products`);
-        const items = response.data.map((item) => item.description);
-        setItemNames(items);
+        const response = await axios.get(`products`);
+        setProducts(response.data);
 
-        const response2 = await axios.get(`https://eazy-manager.vercel.app/staff`);
+        const response2 = await axios.get(`staff`);
         const salesName = response2.data.map((saleName) => saleName.firstname);
         setSalesName(salesName);
-
-        const response3 = await axios.get(`https://eazy-manager.vercel.app/products`);
-        const colours = response3.data.map((colour) => colour.colour);
-        setColourName(colours);
-
-        const response4 = await axios.get(`https://eazy-manager.vercel.app/products`);
-        setProducts(response4.data);
-
-        const response5 = await axios.get(`https://eazy-manager.vercel.app/products`);
-        const itemCodes = response5.data.map((itemCode) => itemCode.code);
-        setCodes(itemCodes);
       } catch (err) {
         console.log("Error fetching item:", err);
       }
@@ -63,67 +51,66 @@ function UpdateSale() {
 
   useEffect(() => {
     axios
-      .get(`https://eazy-manager.vercel.app/getSales/` + id)
+      .get(`getSales/` + id)
       .then((result) => {
         setSale(result.data);
       })
       .catch((err) => console.log(err));
   }, [id]);
 
+  const handleProductSelection = (selectedOption) => {
+    const selectedProduct = products.find(
+      (product) => product.number === selectedOption.value
+    );
+
+    if (selectedProduct) {
+      setSale((prev) => ({
+        ...prev,
+        description: selectedProduct.description,
+        colour: selectedProduct.colour,
+        code: selectedProduct.code,
+        pnumber: selectedProduct.number,
+      }));
+
+      // Set the image if available
+      if (selectedProduct.image) {
+        setIsImageAvalailable(true);
+        setImage(selectedProduct.image);
+      }
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSale((prev) => {
-      const newValue =
-        name === "description" || name === "saleperson" || name === "code"
-          ? value.toUpperCase()
-          : name === "colour"
-          ? value
-          : name === "quantity"
-          ? parseInt(value) || 0
-          : parseFloat(value) || 0;
 
-      let updatedSale = { ...prev };
+    const newValue =
+      name === "description" || name === "saleperson" || name === "code"
+        ? value.toUpperCase()
+        : name === "colour"
+        ? value
+        : name === "quantity"
+        ? parseInt(value) || 0
+        : parseFloat(value) || 0;
 
-      if (name === "number") {
-        updatedSale = {
-          ...updatedSale,
-          number: newValue,
-        };
-      } else if (name === "pnumber") {
-        const selectedProduct = products.find(
-          (product) => product.number === parseInt(value)
-        );
-        if (selectedProduct) {
-          updatedSale = {
-            ...updatedSale,
-            description: selectedProduct.description,
-            code: selectedProduct.code,
-            colour: selectedProduct.colour,
-            pnumber: selectedProduct.pnumber,
-          };
-        }
-      }
-
-      const total =
+    setSale((prev) => ({
+      ...prev,
+      [name]: newValue,
+      total:
         name === "price" || name === "quantity"
           ? calculateTotal(
               name === "price" ? newValue : prev.price,
               name === "quantity" ? newValue : prev.quantity
             )
-          : prev.total;
-
-      const commission =
+          : prev.total,
+      commission:
         name === "price" || name === "quantity"
-          ? calculateCommission(total)
-          : prev.commission;
-
-      return {
-        ...updatedSale,
-        [name]: newValue,
-        total: total,
-        commission: commission,
-      };
-    });
+          ? calculateCommission(
+              name === "price"
+                ? newValue * prev.quantity
+                : prev.price * newValue
+            )
+          : prev.commission,
+    }));
   };
 
   const calculateTotal = (price, quantity) => {
@@ -149,33 +136,42 @@ function UpdateSale() {
 
   const submit = async (e) => {
     e.preventDefault();
-    const salesData = {
+    const saleData = {
       ...sale,
-      image: imageChange ? newImage : sale.image,
+      image: image,
     };
     axios
-      .put(`https://eazy-manager.vercel.app/updateSales/` + id, salesData)
+      .put(`updateSales/` + id, saleData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
         setShowAnimation(true);
         setTimeout(() => {
           setShowAnimation(true);
-          navigate("/");
+          toast.success("Sale updated");
+          navigate("/sales");
         }, 2000);
       })
       .catch((err) => console.log(err));
   };
 
   const convertToBase64 = (e) => {
+    const file = e.target.files[0];
+    const maxSizeInBytes = 1048576; // 1MB
+    if (file.size > maxSizeInBytes) {
+      setMessage("File size exceeds the maximum limit (1MB)");
+      return;
+    }
+
     var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(file);
     reader.onload = () => {
-      setNewImage(reader.result);
-      setImageChange(true);
+      console.log(reader.result);
+      setImage(reader.result);
     };
     reader.onerror = (error) => {
       console.log("Error: ", error);
+      setMessage("An Error occurred. Please try again");
     };
   };
 
@@ -190,12 +186,34 @@ function UpdateSale() {
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
   };
 
+  const customStyles = {
+    option: (provided) => ({
+      ...provided,
+      display: "flex",
+      alignItems: "center",
+    }),
+  };
+
+  const productOptions = products.map((product) => ({
+    value: product.number,
+    label: (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src={product.image}
+          alt="no_Image"
+          style={{ width: 75, height: 75, marginRight: 10 }}
+        />
+        <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}]`}</span>
+      </div>
+    ),
+  }));
+
   const back = () => {
-    navigate("/");
+    navigate("/sales");
   };
 
   return (
-    <div>
+    <div id="main">
       <button className="backbtn" onClick={back}>
         Back to Sales
       </button>
@@ -222,81 +240,35 @@ function UpdateSale() {
         />
         <br />
         <br />
-        <label>Select the Item:</label>
-        <select
-          style={{ width: "656px" }}
-          name="pnumber"
-          onChange={handleChange}
-          value={sale.pnumber}
-        >
-          <option value="" disabled></option>
-          <optgroup label="Item Number - Description (Code) | [Colour]">
-            {products.map((product) => (
-              <option
-                className="select"
-                key={product.number}
-                value={product.number}
-              >
-                {`${product.number} - ${product.description} (${product.code}) | [${product.colour}]`}
-              </option>
-            ))}
-          </optgroup>
-        </select>
+        <label>Select The Product:</label>
+        <label>Product No. — Description (Code) | [Colour]</label>
+        <Select
+          styles={customStyles}
+          options={productOptions}
+          onChange={handleProductSelection}
+          value={productOptions.find((option) => option.value === sale.pnumber)}
+        />
         <br />
         <br />
         <label>Description:</label>
-        <select
-          style={{ width: "600px" }}
+        <input
+          type="text"
           name="description"
-          onChange={handleChange}
           value={sale.description}
-        >
-          <option value="" disabled>
-            Select
-          </option>
-          {itemNames.map((itemName, index) => (
-            <option key={index} value={itemName}>
-              {itemName}
-            </option>
-          ))}
-        </select>
+          readOnly
+        />
+        <br />
+        <br />
         <br />
         <br />
         <div style={{ display: "flex", alignItems: "center" }}>
           <div>
             <label>Colour:</label>
-            <select
-              style={{ width: "200px" }}
-              name="colour"
-              onChange={handleChange}
-              value={sale.colour}
-            >
-              <option value="" disabled>
-              </option>
-              {[...new Set(colourNames)].map((colourName, index) => (
-                <option key={index} value={colourName}>
-                  {colourName}
-                </option>
-              ))}
-            </select>
+            <input type="text" name="colour" value={sale.colour} readOnly />
           </div>
           <div style={{ marginLeft: "50px" }}>
-            <label>Item Code:</label>
-            <select
-              style={{ width: "200px" }}
-              name="code"
-              onChange={handleChange}
-              value={sale.code}
-            >
-              <option value="" disabled>
-                
-              </option>
-              {[...new Set(codes)].map((code, index) => (
-                <option key={index} value={code}>
-                  {code}
-                </option>
-              ))}
-              </select>
+            <label>Code:</label>
+            <input type="text" name="code" value={sale.code} readOnly />
           </div>
         </div>
         <br />
@@ -364,32 +336,29 @@ function UpdateSale() {
         </select>
         <br />
         <br />
-        <hr />
-        <br />
-        <label>Image:</label>
-        <hr />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <img
-            width={100}
-            height={100}
-            src={sale.image}
-            alt="Image_here"
-            style={styles}
-          />
-        </div>
-        <br />
-        <input
-          accept="image/*"
-          type="file"
-          onChange={convertToBase64}
-          name="image"
-        />
+        {!isImageAvailable && (
+          <div>
+            <hr />
+            <br />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img
+                width={100}
+                height={100}
+                src={sale.image}
+                alt="Image_here"
+                style={styles}
+              />
+            </div>
+            ;<label>Image:</label>
+            <input accept="image/*" type="file" onChange={convertToBase64} />
+          </div>
+        )}
         <br />
         <br />
         {showAlert && (
@@ -410,6 +379,7 @@ function UpdateSale() {
           <button onClick={back} className="backbtn">
             Cancel
           </button>
+          {message && <div>{message}</div>}
         </div>
       </form>
       {showAnimation && (

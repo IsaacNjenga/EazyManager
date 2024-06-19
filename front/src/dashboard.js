@@ -55,25 +55,35 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    axios
-      .get(`https://eazy-manager.vercel.app/sales`)
-      .then((result) => setSales(result.data))
-      .catch((err) => console.log(err));
-  }, []);
+    const fetchSales = async () => {
+      try {
+        const res = await axios.get(`sales`);
+        setSales(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchSales();
+  }, [currentDateTime]);
 
   useEffect(() => {
-    axios
-      .get(`https://eazy-manager.vercel.app/expenses`)
-      .then((result) => setExpenses(result.data))
-      .catch((err) => console.log(err));
-  }, []);
+    const fetchExpenses = async () => {
+      try {
+        const resExpense = await axios.get(`expenses`);
+        setExpenses(resExpense.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchExpenses();
+  }, [currentDateTime]);
 
   const formatDate = currentDateTime.toISOString().slice(0, 10);
   const formattedDateMidnight = new Date(formatDate);
   formattedDateMidnight.setHours(0, 0, 0, 0);
 
- const filteredSales = sales.filter((sale) => {
-    const saleDate = new Date(sale.datesold);  
+  const filteredSales = sales.filter((sale) => {
+    const saleDate = new Date(sale.datesold);
     const formattedSaleDate = new Date(saleDate);
     formattedSaleDate.setHours(0, 0, 0, 0);
     return formattedSaleDate.getTime() === formattedDateMidnight.getTime();
@@ -110,15 +120,14 @@ const Dashboard = () => {
   ).toLocaleString();
 
   const styles = {
-    width: "110px",
-    height: "110px",
+    width: "120px",
+    height: "150px",
     maxHeight: "50%",
     objectFit: "contain",
     borderRadius: "7px",
     transition: "all 0.4s ease-in",
     border: "1px inset #050101",
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
-    position: "relative",
   };
 
   const boxStyle = {
@@ -384,7 +393,7 @@ const Dashboard = () => {
         const dayOfMonth = dayStartDate.getDate();
         const suffix = getSuffix(dayOfMonth);
         const month = dayStartDate.toLocaleString("en-UK", {
-          month:"short",
+          month: "short",
         });
         const weekday = dayStartDate.toLocaleString("en-UK", {
           weekday: "long",
@@ -442,15 +451,14 @@ const Dashboard = () => {
     [currentWeekMonth, sales, expenses]
   );
 
- useEffect(() => {
+  useEffect(() => {
     weekGraph();
-  }, [weekGraph]); 
-  
+  }, [weekGraph]);
 
   const handleDateChange = (date) => {
     setShowAnimation(true);
     setTimeout(() => {
-      setShowAnimation(false); 
+      setShowAnimation(false);
       setDay(date);
       console.log(daySelected);
       setDaySelected(true);
@@ -475,7 +483,6 @@ const Dashboard = () => {
     acc[saleDay].push(sale);
     return acc;
   }, {});
-
 
   const totalExpenseByDate = Object.keys(groupedExpensesByDate).reduce(
     (acc, date) => {
@@ -516,8 +523,8 @@ const Dashboard = () => {
   ).toLocaleString();
 
   return (
-    <div>
-      <div id="main">
+    <div id="main">
+      <div>
         <div>
           <div style={{ textAlign: "center" }}>
             <span
@@ -532,11 +539,8 @@ const Dashboard = () => {
             </span>
           </div>
           <hr />
-          <h1 style={{ fontSize: "34px", color: "purple" }}>
-            Welcome Admin <i class="material-icons">spa</i>
-          </h1>
+          <br />
         </div>
-
         <div>
           <label>Select date:</label>
           <DatePicker
@@ -652,7 +656,7 @@ const Dashboard = () => {
           <div className="purchase-return">
             <p>
               <i
-                class="material-icons"
+                className="material-icons"
                 style={{ fontSize: "55px", color: "red" }}
               >
                 style
@@ -682,7 +686,7 @@ const Dashboard = () => {
           <div className="profit">
             <p>
               <i
-                class="material-icons"
+                className="material-icons"
                 style={{ fontSize: "55px", color: "green" }}
               >
                 trending_up
@@ -714,16 +718,22 @@ const Dashboard = () => {
           <div className="dates-and-stuff">
             {selectedPeriod === "today" && (
               <React.Fragment>
-                <h1 style={{ textAlign: "center" }}><u>Sales Today</u></h1>
+                <h1 style={{ textAlign: "center" }}>
+                  <u>Sales Today</u>
+                </h1>
                 {salePresent === true ? (
-                  <table className="dashtable">
-                    <thead>
+                  <table className="productstable">
+                    <thead
+                      className="
+                    table-header"
+                    >
                       <tr>
                         <th
                           style={{
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Image
@@ -858,8 +868,11 @@ const Dashboard = () => {
                   })}
                 </h2>
                 {salePresentYesterday === true ? (
-                  <table className="dashtable">
-                    <thead>
+                  <table className="productstable">
+                    <thead
+                      className="
+                  table-header"
+                    >
                       <tr>
                         <th
                           style={{
@@ -1005,8 +1018,11 @@ const Dashboard = () => {
                   })}
                 </h2>
                 {salePresentLastWeek === true ? (
-                  <table className="dashtable">
-                    <thead>
+                  <table className="productstable">
+                    <thead
+                      className="
+                  table-header"
+                    >
                       <tr>
                         <th
                           style={{
@@ -1162,8 +1178,11 @@ const Dashboard = () => {
                   {dayChose}
                 </h2>
                 {salePresentAnotherDay === true ? (
-                  <table className="dashtable">
-                    <thead>
+                  <table className="productstable">
+                    <thead
+                      className="
+                   table-header"
+                    >
                       <tr>
                         <th
                           style={{
@@ -1331,14 +1350,18 @@ const Dashboard = () => {
                   })}
                 </h2>
                 {salePresentLastMonth === true ? (
-                  <table className="dashtable">
-                    <thead>
+                  <table className="productstable">
+                    <thead
+                      className="
+                  table-header"
+                    >
                       <tr>
                         <th
                           style={{
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Image
@@ -1348,6 +1371,7 @@ const Dashboard = () => {
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Description
@@ -1357,6 +1381,7 @@ const Dashboard = () => {
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Price
@@ -1366,6 +1391,7 @@ const Dashboard = () => {
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Qty.
@@ -1375,6 +1401,7 @@ const Dashboard = () => {
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Total
@@ -1384,6 +1411,7 @@ const Dashboard = () => {
                             padding: "7px",
                             backgroundColor: "#127a8c",
                             color: "white",
+                            borderRight: "0.5px solid white",
                           }}
                         >
                           Sold by
@@ -1499,7 +1527,8 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-
+      <hr />
+      <br />
       <div>
         <h2 style={{ textAlign: "center" }}>
           <u>Sales of the Week</u>
@@ -1590,6 +1619,7 @@ const Dashboard = () => {
         </div>
       </div>
       <br />
+
       <hr />
 
       <footer style={{ textAlign: "center" }}>

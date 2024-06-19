@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "react-hot-toast";
 
 function UpdateExpense() {
   const [expense, setExpense] = useState({
@@ -18,7 +19,7 @@ function UpdateExpense() {
 
   useEffect(() => {
     axios
-      .get(`https://eazy-manager.vercel.app/getExpenses/` + id)
+      .get(`getExpenses/` + id)
       .then((result) => {
         setExpense(result.data);
         console.log("expense", expense);
@@ -45,19 +46,22 @@ function UpdateExpense() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`https://eazy-manager.vercel.app/updateExpenses/` + id, expense);
-      navigate("/");
+      await axios.put(`updatedExpenses/` + id, expense);
+      setTimeout(() => {
+        toast.success("Expense updated")
+        navigate("/expenses");
+      }, 1000);
     } catch (err) {
       console.log(err);
     }
   };
 
   const back = () => {
-    navigate("/");
+    navigate("/expenses");
   };
 
   return (
-    <div>
+    <div id="main">
       <h1>Update Expenses</h1>
       <button className="backbtn" onClick={back}>
         Go back
@@ -103,6 +107,7 @@ function UpdateExpense() {
           style={{ width: "656px" }}
           name="category"
           onChange={handleChange}
+          value={expense.category}
         >
           <option value="" disabled>
             Select

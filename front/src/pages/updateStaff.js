@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 function UpdateStaff() {
   const [staff, setStaff] = useState({
@@ -23,10 +24,10 @@ function UpdateStaff() {
 
   useEffect(() => {
     axios
-      .get(`https://eazy-manager.vercel.app/getStaff/` + id)
+      .get(`getStaff/` + id)
       .then((result) => {
         setStaff(result.data);
-        console.log("Staff",staff)
+        console.log("Staff", staff);
       })
       .catch((err) => console.log(err));
   }, [id]);
@@ -66,26 +67,30 @@ function UpdateStaff() {
       image: imageChange ? newImage : staff.image,
     };
     axios
-      .put(`https://eazy-manager.vercel.app/updateStaff/` + id, staffData)
+      .put(`updateStaff/` + id, staffData)
       .then((result) => {
         setShowAlert(true);
         console.log(result);
         setShowAnimation(true);
         setTimeout(() => {
           setShowAnimation(true);
-          navigate("/");
+          toast.success("Updated");
+          navigate("/staff");
         }, 2000);
       })
       .catch((err) => console.log(err));
   };
 
   const back = () => {
-    navigate("/");
+    navigate("/staff");
   };
 
   return (
-    <div>
+    <div id="main">
       <h1>Staff Update</h1>
+      <button className="backbtn" onClick={back}>
+        Back to Staff
+      </button>
       <form className="form">
         ID Number:
         <input type="text" value={staff.id} onChange={handleChange} name="id" />

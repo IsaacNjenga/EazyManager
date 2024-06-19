@@ -4,6 +4,7 @@ import axios from "axios";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { format, isValid } from "date-fns";
+import { toast } from "react-hot-toast";
 function SalesTable() {
   const [sales, setSales] = useState([]);
   const [grid, setGrid] = useState(false);
@@ -39,7 +40,7 @@ function SalesTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`https://eazy-manager.vercel.app/deleteSale/` + id);
+      await axios.delete(`deleteSale/` + id);
       setSales((prevSales) => prevSales.filter((sale) => sale._id !== id));
       setUserWantsToDelete(true);
       setSelectedSaleNumber(null);
@@ -55,21 +56,21 @@ function SalesTable() {
 
   useEffect(() => {
     axios
-      .get(`https://eazy-manager.vercel.app/sales`)
+      .get(`sales`)
       .then((result) => setSales(result.data))
       .catch((err) => console.log(err));
   }, []);
 
   const styles = {
-    width: "auto", 
-    height: "auto", 
-    maxHeight: "auto", 
+    width: "auto",
+    height: "auto",
+    maxHeight: "auto",
     objectFit: "contain",
     borderRadius: "10px",
     border: "1px inset #050101",
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
   };
-  
+
   const styles2 = {
     width: "160px",
     height: "150px",
@@ -135,20 +136,16 @@ function SalesTable() {
 
   return (
     <div>
-      {" "}
-      <form className="search-panels">
-        <InputGroup className="search-groups">
-          <Form.Control
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search sales..."
-          />
-        </InputGroup>
-      </form>
-      <br />
-      <Link to="/add" className="addbtn" style={{ fontWeight: "bold" }}>
-        + Add sale
-      </Link>
-      <br />
+      {grid && (
+        <form className="search-panels">
+          <InputGroup className="search-groups">
+            <Form.Control
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search sales..."
+            />
+          </InputGroup>
+        </form>
+      )}
       <br />
       <button onClick={gridlayout} style={buttonStyle}>
         <i className="material-icons">view_module</i>
@@ -161,6 +158,11 @@ function SalesTable() {
       <button className="button-name" onClick={handlePrint}>
         Print
       </button>
+      <br />
+      <br />
+      <Link to="/add-sale" className="addbtn" style={{ fontWeight: "bold" }}>
+        + Add sale
+      </Link>
       <br />
       {grid && Array.isArray(sales) ? (
         <div className="grid-layout">
@@ -194,7 +196,7 @@ function SalesTable() {
                     <p>
                       <b>Item No:</b> {sale.pnumber}
                     </p>
-                      <p>
+                    <p>
                       <b>Code:</b> {sale.code}
                     </p>
                     <p>
@@ -261,7 +263,7 @@ function SalesTable() {
                     >
                       <button className="updatebtn">
                         <Link
-                          to={`/update/${sale._id}`}
+                          to={`/update-sale/${sale._id}`}
                           style={{ color: "black" }}
                         >
                           <i className="material-icons">edit</i>
@@ -282,7 +284,10 @@ function SalesTable() {
                         <p>Are you sure you want to delete?</p>
                         <button
                           className="addbtn"
-                          onClick={() => handleYesClick(sale._id)}
+                          onClick={() => {
+                            handleYesClick(sale._id);
+                            toast.success("Sale deleted!");
+                          }}
                         >
                           Yes
                         </button>
@@ -299,10 +304,10 @@ function SalesTable() {
       ) : (
         <p></p>
       )}
-     {list &&
-          groupedSalesByDateSorted.map((date) => (
-            <div key={date}>
-             <div className="print-table">
+      {list &&
+        groupedSalesByDateSorted.map((date) => (
+          <div key={date}>
+            <div className="print-table">
               <h3>{format(new Date(date), "EEEE, MMMM do, yyyy")}</h3>
               <div className="table-container">
                 <table className="productstable">
@@ -503,7 +508,7 @@ function SalesTable() {
                             <div className="buttons-container">
                               <button className="updatebtn">
                                 <Link
-                                  to={`/update/${sale._id}`}
+                                  to={`/update-sale/${sale._id}`}
                                   style={{ color: "black" }}
                                 >
                                   <i className="material-icons">edit</i>
@@ -526,7 +531,10 @@ function SalesTable() {
                                     <p>Are you sure you want to delete?</p>
                                     <button
                                       className="addbtn"
-                                      onClick={() => handleYesClick(sale._id)}
+                                      onClick={() => {
+                                        handleYesClick(sale._id);
+                                        toast.success("Sale deleted!");
+                                      }}
                                     >
                                       Yes
                                     </button>
@@ -577,10 +585,11 @@ function SalesTable() {
                 </table>
               </div>
             </div>
-            </div>
-          ))}
-
-     <p>Total Sales Amount: Ksh. {totalAmount}</p>
+          </div>
+        ))}
+      <p>
+        <b>Total Sales Amount: Ksh. {totalAmount}</b>
+      </p>
     </div>
   );
 }

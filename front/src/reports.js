@@ -34,7 +34,7 @@ const Reports = () => {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`https://eazy-manager.vercel.app/sales`);
+        const res = await axios.get(`sales`);
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -46,7 +46,7 @@ const Reports = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpenses = await axios.get(`https://eazy-manager.vercel.app/expenses`);
+        const resExpenses = await axios.get(`expenses`);
         setExpenses(resExpenses.data);
       } catch (err) {
         console.log(err);
@@ -196,7 +196,8 @@ const Reports = () => {
   );
 
   const prevNextYear = useCallback(
-    (action) => {
+    (action) => 
+    {
       let newYear = new Date(currentYear);
       if (action === "prevYear") {
         newYear.setFullYear(newYear.getFullYear() - 1);
