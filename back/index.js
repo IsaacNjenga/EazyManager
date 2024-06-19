@@ -18,11 +18,20 @@ const moment = require("moment");
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json()); // to parse JSON bodies
+const allowedOrigins = [
+  `https://eazy-manager-front.vercel.app`,
+];
+
 const corsOptions = {
-  origin: "https://eazy-manager-front.vercel.app",
-  methods: ["POST", "GET", "PUT", "DELETE"],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
-  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
