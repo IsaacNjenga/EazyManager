@@ -407,7 +407,7 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.json({ error: "User not found" });
     }
-
+    const name = user.name;
     // Compare passwords
     const match = await comparePassword(password, user.password);
     if (!match) {
@@ -416,19 +416,20 @@ app.post("/login", async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { number: user.number, id: user._id, role: user.role },
+      { number: user.number, id: user._id, role: user.role, name: user.name },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     // Save login info to database (example)
     const loginTime = moment().format("DD-MM-YYYY, HH:mm:ss");
-    const loginInfo = new loginModel({ number, loginTime });
+    const loginInfo = new loginModel({ number, name, loginTime });
     await loginInfo.save();
 
     // Set session data (example)
     req.session.user = {
       number: user.number,
+      name: name,
       loginTime: new Date().toISOString(),
     };
 
@@ -462,8 +463,8 @@ app.get("/profile", (req, res) => {
         return res.status(401).json({ error: "Unauthorized" });
       } else {
         // If verification successful, return user details
-        const { number, id, role } = decodedToken;
-        res.json({ number, id, role }); // Adjust as per your user schema
+        const { number, id, role, name } = decodedToken;
+        res.json({ number, id, role, name }); // Adjust as per your user schema
         console.log(decodedToken);
       }
     });
@@ -476,10 +477,11 @@ app.get("/logout", async (req, res) => {
   try {
     if (req.session.user) {
       const { number } = req.session.user;
+      const { name } = req.session.user;
       const logoutTime = moment().format("DD-MM-YYYY, HH:mm:ss");
 
       //save the logout info in db
-      const logOutInfo = new logoutModel({ number, logoutTime });
+      const logOutInfo = new logoutModel({ number, name, logoutTime });
       await logOutInfo.save();
 
       // Clear session and cookies

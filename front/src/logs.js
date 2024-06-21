@@ -39,6 +39,7 @@ function Logs() {
               <tr>
                 <th>#</th>
                 <th>User Number</th>
+                <th>Name</th>
                 <th>Login Time</th>
               </tr>
             </thead>
@@ -47,6 +48,7 @@ function Logs() {
                 <tr key={login._id}>
                   <td>{index + 1}</td>
                   <td>{login.number}</td>
+                  <td>{login.name}</td>
                   <td>{login.loginTime}</td>
                 </tr>
               ))}
@@ -61,6 +63,7 @@ function Logs() {
               <tr>
                 <th>#</th>
                 <th>User Number</th>
+                <th>Name</th>
                 <th>Logout Time</th>
               </tr>
             </thead>
@@ -69,6 +72,7 @@ function Logs() {
                 <tr key={logout._id}>
                   <td>{index + 1}</td>
                   <td>{logout.number}</td>
+                  <td>{logout.name}</td>
                   <td>{logout.logoutTime}</td>
                 </tr>
               ))}
