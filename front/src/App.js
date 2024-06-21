@@ -22,9 +22,9 @@ import AddSale from "./pages/addSale";
 import { UserContextProvider } from "./context/userContext";
 import ProtectedRoute from "./context/protectedRoutes";
 
-axios.defaults.baseURL = "https://eazy-manager.vercel.app/";
+axios.defaults.baseURL = "https://eazy-manager.vercel.app/git add ";
 axios.defaults.withCredentials = true;
-//
+//https://eazy-manager.vercel.app/
 function App() {
   return (
     <UserContextProvider>
@@ -34,14 +34,7 @@ function App() {
         <Routes>
           <Route path="*" element={<SplashScreen />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/register"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <Register />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
             element={
