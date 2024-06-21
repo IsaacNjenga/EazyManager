@@ -24,34 +24,11 @@ app.use(cookieParser());
 
 //cors configuration
 const corsOptions = {
-  origin: `https://eazy-manager-front.vercel.app`,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+  origin: ['https://eazy-manager-front.vercel.app'], // Allow requests from this origin
+  credentials: true, // Allow cookies to be sent with the requests
 };
 app.use(cors(corsOptions));
-
-//cors handler function
-const allowCors = (fn) => async (req, res) => {
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  // another common pattern
-  // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-  );
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
-  return await fn(req, res);
-};
-app.use(allowCors);
+//'https://eazy-manager-front.vercel.app'
 
 //database connection
 mongoose

@@ -24,6 +24,7 @@ import ProtectedRoute from "./context/protectedRoutes";
 
 axios.defaults.baseURL = "https://eazy-manager.vercel.app/";
 axios.defaults.withCredentials = true;
+//
 function App() {
   return (
     <UserContextProvider>

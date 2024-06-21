@@ -6,7 +6,7 @@ import { UserContext } from "./context/userContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext); // Access setUser from UserContext
+  const { setUser, setLoggedIn } = useContext(UserContext); // Access setUser from UserContext
 
   const [data, setData] = useState({
     number: "",
@@ -25,7 +25,13 @@ function Login() {
       const { success, role, name } = response.data;
 
       if (success) {
-        setUser({ role, name }); // Update user context with the role
+        const profileResponse = await axios.get(`profile`);
+        if (profileResponse.data) {
+          setUser(profileResponse.data);
+          setLoggedIn(true);
+        } else {
+          toast.error("Failed to fetch profile.");
+        }
         if (role === "admin") {
           navigate("/dashboard");
           toast.success(`Welcome ${name}`);
