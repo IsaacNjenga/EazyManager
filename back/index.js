@@ -456,16 +456,19 @@ app.get("/check-session", (req, res) => {
 app.get("/profile", (req, res) => {
   const { token } = req.cookies;
   if (token) {
-    jwt.verify(token, process.env.JWT_SECRET, {}, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
       if (err) {
-        console.error("JWT verification error:", err); // Debugging
-        res.json(null);
+        console.error("JWT verification error:", err);
+        return res.status(401).json({ error: "Unauthorized" });
       } else {
-        res.json(user); // Return user details
+        // If verification successful, return user details
+        const { number, id, role } = decodedToken;
+        res.json({ number, id, role }); // Adjust as per your user schema
+        console.log(decodedToken);
       }
     });
   } else {
-    res.json(null); // No token found
+    res.status(401).json({ error: "No token found" });
   }
 });
 
