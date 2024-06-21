@@ -22,7 +22,7 @@ import AddSale from "./pages/addSale";
 import { UserContextProvider } from "./context/userContext";
 import ProtectedRoute from "./context/protectedRoutes";
 
-axios.defaults.baseURL = "https://eazy-manager.vercel.app/git add ";
+axios.defaults.baseURL = "https://eazy-manager.vercel.app/";
 axios.defaults.withCredentials = true;
 //https://eazy-manager.vercel.app/
 function App() {
