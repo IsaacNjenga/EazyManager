@@ -24,8 +24,10 @@ app.use(cookieParser());
 
 //cors configuration
 const corsOptions = {
-  origin: ['https://eazy-manager-front.vercel.app'], // Allow requests from this origin
-  credentials: true, // Allow cookies to be sent with the requests
+  origin: ["https://eazy-manager-front.vercel.app", "http://localhost:3000"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 app.use(cors(corsOptions));
 //'https://eazy-manager-front.vercel.app'
