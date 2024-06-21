@@ -8,7 +8,7 @@ const ExpensesModel = require("./models/expensesModel");
 const UserModel = require("./models/userModel");
 const logoutModel = require("./models/logoutModel");
 const loginModel = require("./models/loginModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
@@ -320,27 +320,26 @@ app.delete("/deleteExpense/:id", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-const hashPassword = (password) => {
-  return new Promise((resolve, reject) => {
-    bcrypt.genSalt(12, (err, salt) => {
-      if (err) {
-        reject(err);
-      }
-      bcrypt.hash(password, salt, (err, hash) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(hash);
-      });
-    });
-  });
+const hashPassword = async (password) => {
+  try {
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+  } catch (error) {
+    throw error;
+  }
 };
 
-const comparePassword = (password, hashed) => {
-  return bcrypt.compare(password, hashed);
+const comparePassword = async (password, hashedPassword) => {
+  try {
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    return isMatch;
+  } catch (error) {
+    throw error;
+  }
 };
 
-app.post("/register", async (req, res) => {
+/*app.post("/register", async (req, res) => {
   try {
     const { name, number, password, role } = req.body;
     if (!name) {
@@ -371,10 +370,48 @@ app.post("/register", async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+});*/
+
+// Register endpoint
+app.post("/register", async (req, res) => {
+  try {
+    const { name, number, password, role } = req.body;
+
+    // Validation
+    if (!name || !password || password.length < 6) {
+      return res.status(400).json({ error: "Invalid input data" });
+    }
+
+    // Check if user exists
+    const existingUser = await UserModel.findOne({ number });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    // Hash password
+    const hashedPassword = await hashPassword(password);
+
+    // Create new user
+    const newUser = new UserModel({
+      name,
+      number,
+      password: hashedPassword,
+      role,
+    });
+
+    // Save user to database
+    await newUser.save();
+
+    // Return success response
+    res.json(newUser);
+  } catch (error) {
+    console.error("Error in registration:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-//the backend
-app.post("/login", async (req, res) => {
+//the login
+/*app.post("/login", async (req, res) => {
   try {
     const { number, password } = req.body;
     const loginTime = moment().format("DD-MM-YYYY, HH:mm:ss");
@@ -412,6 +449,53 @@ app.post("/login", async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Internal server error" });
+  }
+});*/
+
+// Login endpoint
+app.post("/login", async (req, res) => {
+  try {
+    const { number, password } = req.body;
+
+    // Find user by number
+    const user = await UserModel.findOne({ number });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Compare passwords
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Incorrect password" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { number: user.number, id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Save login info to database (example)
+    const loginTime = moment().format("DD-MM-YYYY, HH:mm:ss");
+    const loginInfo = new loginModel({ number, loginTime });
+    await loginInfo.save();
+
+    // Set session data (example)
+    req.session.user = {
+      number: user.number,
+      loginTime: new Date().toISOString(),
+    };
+
+    // Set cookie with JWT token
+    res.cookie("token", token, { httpOnly: true }).json({
+      success: "Logged in successfully",
+      role: user.role,
+      name: user.name,
+    });
+  } catch (error) {
+    console.error("Error in login:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
