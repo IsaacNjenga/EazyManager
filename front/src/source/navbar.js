@@ -136,6 +136,15 @@ export default function Navbar() {
             >
               <i className="material-icons">poll</i> Reports
             </NavLink>
+            <NavLink
+              to="/logs"
+              activeclassname="active"
+              id="logs"
+              style={linkStyle}
+              onClick={tryToAccess}
+            >
+              <i className="material-icons">receipt</i> Logs
+            </NavLink>
 
             {user ? (
               <NavLink

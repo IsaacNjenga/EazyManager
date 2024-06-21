@@ -48,4 +48,3 @@ export function UserContextProvider({ children }) {
   );
 }
 
-//user, isAuthenticated

@@ -30,7 +30,6 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-//'https://eazy-manager-front.vercel.app'
 
 //database connection
 mongoose
@@ -71,6 +70,20 @@ app.get("/staff", (req, res) => {
 app.get("/expenses", (req, res) => {
   ExpensesModel.find({})
     .then((expenses) => res.json(expenses))
+    .catch((err) => res.json(err));
+});
+
+app.get("/logins", (req, res) => {
+  loginModel
+    .find({})
+    .then((logins) => res.json(logins))
+    .catch((err) => res.json(err));
+});
+
+app.get("/logouts", (req, res) => {
+  logoutModel
+    .find({})
+    .then((logouts) => res.json(logouts))
     .catch((err) => res.json(err));
 });
 
@@ -339,9 +352,12 @@ const comparePassword = async (password, hashedPassword) => {
   }
 };
 
-/*app.post("/register", async (req, res) => {
+// Register endpoint
+app.post("/register", async (req, res) => {
   try {
     const { name, number, password, role } = req.body;
+
+    // Validation
     if (!name) {
       return res.json({
         error: "Name is required",
@@ -352,13 +368,17 @@ const comparePassword = async (password, hashedPassword) => {
         error: "Password is required and should be at least 6 characters long",
       });
     }
+
+    // Check if user exists
     const exist = await UserModel.findOne({ number });
     if (exist) {
       return res.json({ error: "This ID already exists" });
     }
 
+    // Hash password
     const hashedPassword = await hashPassword(password);
 
+    // Create new user
     const user = await UserModel.create({
       name,
       number,
@@ -366,91 +386,16 @@ const comparePassword = async (password, hashedPassword) => {
       role,
     });
 
-    return res.json(user);
-  } catch (error) {
-    console.log(error);
-  }
-});*/
-
-// Register endpoint
-app.post("/register", async (req, res) => {
-  try {
-    const { name, number, password, role } = req.body;
-
-    // Validation
-    if (!name || !password || password.length < 6) {
-      return res.status(400).json({ error: "Invalid input data" });
-    }
-
-    // Check if user exists
-    const existingUser = await UserModel.findOne({ number });
-    if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
-    }
-
-    // Hash password
-    const hashedPassword = await hashPassword(password);
-
-    // Create new user
-    const newUser = new UserModel({
-      name,
-      number,
-      password: hashedPassword,
-      role,
-    });
-
     // Save user to database
-    await newUser.save();
+    await user.save();
 
     // Return success response
-    res.json(newUser);
+    res.json(user);
   } catch (error) {
     console.error("Error in registration:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-//the login
-/*app.post("/login", async (req, res) => {
-  try {
-    const { number, password } = req.body;
-    const loginTime = moment().format("DD-MM-YYYY, HH:mm:ss");
-
-    const user = await UserModel.findOne({ number });
-    if (!user) {
-      return res.json({ error: "User not found" });
-    }
-
-    const match = await comparePassword(password, user.password);
-
-    if (!match) {
-      return res.json({ error: "Incorrect password" });
-    }
-
-    const token = jwt.sign(
-      { number: user.number, id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    const loginInfo = new loginModel({ number, loginTime });
-    await loginInfo.save();
-
-    req.session.user = {
-      number: user.number,
-      loginTime: new Date().toISOString(),
-    };
-
-    res.cookie("token", token, { httpOnly: true }).json({
-      success: "Logged in successfully",
-      role: user.role,
-      name: user.name,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});*/
 
 // Login endpoint
 app.post("/login", async (req, res) => {
@@ -460,13 +405,13 @@ app.post("/login", async (req, res) => {
     // Find user by number
     const user = await UserModel.findOne({ number });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.json({ error: "User not found" });
     }
 
     // Compare passwords
-    const isMatch = await comparePassword(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: "Incorrect password" });
+    const match = await comparePassword(password, user.password);
+    if (!match) {
+      return res.json({ error: "Incorrect password" });
     }
 
     // Generate JWT token
@@ -514,7 +459,7 @@ app.get("/profile", (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, {}, (err, user) => {
       if (err) {
         console.error("JWT verification error:", err); // Debugging
-        res.json(null); // Or appropriate error response
+        res.json(null);
       } else {
         res.json(user); // Return user details
       }

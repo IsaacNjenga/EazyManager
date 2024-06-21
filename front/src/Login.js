@@ -26,8 +26,9 @@ function Login() {
 
       if (success) {
         const profileResponse = await axios.get(`profile`);
+        console.log(profileResponse);
         if (profileResponse.data) {
-          setUser(profileResponse.data);
+          setUser(response.data);
           setLoggedIn(true);
         } else {
           toast.error("Failed to fetch profile.");

@@ -1481,3 +1481,58 @@ a:hover {
 #change-button:hover {
   background-color: #3e8e41;
 }
+
+
+.logs-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logs-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.logs-tables-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.logs-table {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.logs-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.logs-table th,
+.logs-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.logs-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+}
+
+.logs-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.logs-table tbody tr:hover {
+  background-color: #e9e9e9;
+}
