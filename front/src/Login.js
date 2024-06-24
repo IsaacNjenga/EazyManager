@@ -22,25 +22,16 @@ function Login() {
     setShowAnimation(true);
 
     try {
-      // Adjust the URL to the full backend URL on Vercel
-      const response = await axios.post(
-        `https://eazy-manager.vercel.app/login`,
-        {
-          number,
-          password,
-        }
-      );
+      const response = await axios.post(`login`, { number, password });
 
       const { success, role, name } = response.data;
 
       if (success) {
-        // Assuming `/profile` is another endpoint on your backend
-        const profileResponse = await axios.get(
-          `https://eazy-manager.vercel.app/profile`
-        );
+        const profileResponse = await axios.get(`profile`);
 
         if (profileResponse.data) {
           setUser(profileResponse.data);
+          console.log(profileResponse.data);
           setLoggedIn(true);
           toast.success(`Welcome ${name}`);
 

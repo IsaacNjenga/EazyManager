@@ -10,26 +10,25 @@ export function UserContextProvider({ children }) {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (!loggedIn) {
-      const fetchData = async () => {
-        try {
-          const { data } = await axios.get(`profile`);
-          setUser(data);
-          setIsAuthenticated(true);
-          setLoggedIn(true);
-        } catch (error) {
-          setIsAuthenticated(false);
-          console.error("Error fetching user data:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(`profile`);
+        setUser(data);
+        setIsAuthenticated(true);
+        setLoggedIn(true);
+      } catch (error) {
+        setIsAuthenticated(false);
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (loggedIn) {
       fetchData();
     } else {
       setLoading(false); // Ensure loading is set to false if already logged in
     }
-  }, [loggedIn]);
+  }, [loggedIn, user, isAuthenticated]);
 
   return (
     <UserContext.Provider
