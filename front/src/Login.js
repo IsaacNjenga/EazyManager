@@ -7,6 +7,7 @@ import { UserContext } from "./context/userContext";
 function Login() {
   const navigate = useNavigate();
   const { setUser, setLoggedIn } = useContext(UserContext); // Access from UserContext
+  const [loading, setLoading] = useState(true);
 
   const [data, setData] = useState({
     number: "",
@@ -45,8 +46,32 @@ function Login() {
     } catch (error) {
       console.error("Error during login", error);
       toast.error("An error occurred during login.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const signUp = () => {
     navigate("/register");

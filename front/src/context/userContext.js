@@ -41,7 +41,23 @@ export function UserContextProvider({ children }) {
       }}
     >
       {loading ? (
-        <div>Loading...</div> // Render loading indicator until user data is fetched
+        <div>
+          {showAnimation && (
+            <div className="hourglassOverlay">
+              <div className="hourglassBackground">
+                <div className="hourglassContainer">
+                  <div className="hourglassCurves"></div>
+                  <div className="hourglassCapTop"></div>
+                  <div className="hourglassGlassTop"></div>
+                  <div className="hourglassSand"></div>
+                  <div className="hourglassSandStream"></div>
+                  <div className="hourglassCapBottom"></div>
+                  <div className="hourglassGlass"></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div> // Render loading indicator until user data is fetched
       ) : (
         children // Render children once user data is fetched
       )}
