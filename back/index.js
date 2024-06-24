@@ -465,7 +465,6 @@ app.get("/profile", (req, res) => {
         // If verification successful, return user details
         const { number, id, role, name } = decodedToken;
         res.json({ number, id, role, name }); // Adjust as per your user schema
-        console.log(decodedToken);
       }
     });
   } else {

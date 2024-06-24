@@ -30,9 +30,9 @@ function Login() {
         const profileResponse = await axios.get(`profile`);
 
         if (profileResponse.data) {
+          setLoggedIn(true);
           setUser(profileResponse.data);
           console.log(profileResponse.data);
-          setLoggedIn(true);
           toast.success(`Welcome ${name}`);
 
           if (role === "admin") {

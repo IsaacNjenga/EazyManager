@@ -59,6 +59,7 @@ export default function Navbar() {
       await axios.get("/logout");
       setIsAuthenticated(false);
       toast.success("Logged out");
+      window.location.reload();
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);

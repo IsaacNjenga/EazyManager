@@ -28,7 +28,7 @@ export function UserContextProvider({ children }) {
     } else {
       setLoading(false); // Ensure loading is set to false if already logged in
     }
-  }, [loggedIn, user, isAuthenticated]);
+  }, [loggedIn]);
 
   return (
     <UserContext.Provider
