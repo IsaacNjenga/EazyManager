@@ -26,8 +26,10 @@ export function UserContextProvider({ children }) {
       };
 
       fetchData();
+    } else {
+      setLoading(false); // Ensure loading is set to false if already logged in
     }
-  }, [loggedIn, user, isAuthenticated]); // Include user in dependencies to refetch user data if user state changes
+  }, [loggedIn]);
 
   return (
     <UserContext.Provider
@@ -41,25 +43,21 @@ export function UserContextProvider({ children }) {
       }}
     >
       {loading ? (
-        <div>
-          {showAnimation && (
-            <div className="hourglassOverlay">
-              <div className="hourglassBackground">
-                <div className="hourglassContainer">
-                  <div className="hourglassCurves"></div>
-                  <div className="hourglassCapTop"></div>
-                  <div className="hourglassGlassTop"></div>
-                  <div className="hourglassSand"></div>
-                  <div className="hourglassSandStream"></div>
-                  <div className="hourglassCapBottom"></div>
-                  <div className="hourglassGlass"></div>
-                </div>
-              </div>
+        <div className="hourglassOverlay">
+          <div className="hourglassBackground">
+            <div className="hourglassContainer">
+              <div className="hourglassCurves"></div>
+              <div className="hourglassCapTop"></div>
+              <div className="hourglassGlassTop"></div>
+              <div className="hourglassSand"></div>
+              <div className="hourglassSandStream"></div>
+              <div className="hourglassCapBottom"></div>
+              <div className="hourglassGlass"></div>
             </div>
-          )}
-        </div> // Render loading indicator until user data is fetched
+          </div>
+        </div>
       ) : (
-        children // Render children once user data is fetched
+        children
       )}
     </UserContext.Provider>
   );

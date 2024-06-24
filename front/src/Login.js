@@ -7,7 +7,8 @@ import { UserContext } from "./context/userContext";
 function Login() {
   const navigate = useNavigate();
   const { setUser, setLoggedIn } = useContext(UserContext); // Access from UserContext
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const [data, setData] = useState({
     number: "",
@@ -17,7 +18,8 @@ function Login() {
   const submit = async (e) => {
     e.preventDefault();
     const { number, password } = data;
-
+    setLoading(true); // Indicate that loading has started
+    setShowAnimation(true);
     try {
       const response = await axios.post(`login`, {
         number,
@@ -25,6 +27,8 @@ function Login() {
       });
       const { success, role, name } = response.data;
       if (success) {
+        setLoading(false); // Indicate that loading has ended after success
+        setShowAnimation(false);
         const profileResponse = await axios.get(`profile`);
         console.log(profileResponse);
         if (profileResponse.data) {
@@ -42,13 +46,13 @@ function Login() {
         }
       } else {
         toast.error("Login failed.");
+        setLoading(false); // Indicate that loading has ended after error
+        setShowAnimation(false);
       }
     } catch (error) {
       console.error("Error during login", error);
       toast.error("An error occurred during login.");
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   if (loading) {
