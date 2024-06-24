@@ -23,7 +23,7 @@ import { UserContextProvider } from "./context/userContext";
 import ProtectedRoute from "./context/protectedRoutes";
 import Logs from "./logs";
 
-axios.defaults.baseURL = "http://localhost:3001/";
+axios.defaults.baseURL = `https://eazy-manager.vercel.app/`;
 axios.defaults.withCredentials = true;
 //https://eazy-manager.vercel.app/
 function App() {
