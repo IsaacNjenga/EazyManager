@@ -6,8 +6,8 @@ import { UserContext } from "./context/userContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { setUser, setLoggedIn } = useContext(UserContext); // Access from UserContext
-  const [loading, setLoading] = useState(false);
+  const { setUser, setLoggedIn } = useContext(UserContext);
+  const [loading, setLoading] = useState(false); // Set initial loading state to false
   const [showAnimation, setShowAnimation] = useState(false);
 
   const [data, setData] = useState({
@@ -18,7 +18,7 @@ function Login() {
   const submit = async (e) => {
     e.preventDefault();
     const { number, password } = data;
-    setLoading(true); // Indicate that loading has started
+    setLoading(true);
     setShowAnimation(true);
     try {
       const response = await axios.post(`login`, {
@@ -27,55 +27,30 @@ function Login() {
       });
       const { success, role, name } = response.data;
       if (success) {
-        setLoading(false); // Indicate that loading has ended after success
-        setShowAnimation(false);
         const profileResponse = await axios.get(`profile`);
-        console.log(profileResponse);
         if (profileResponse.data) {
-          setUser(response.data);
+          setUser(profileResponse.data);
           setLoggedIn(true);
+          toast.success(`Welcome ${name}`);
+          if (role === "admin") {
+            navigate("/dashboard");
+          } else {
+            navigate("/add-sale");
+          }
         } else {
           toast.error("Failed to fetch profile.");
         }
-        if (role === "admin") {
-          navigate("/dashboard");
-          toast.success(`Welcome ${name}`);
-        } else {
-          toast.success(`Welcome ${name}`);
-          navigate("/add-sale");
-        }
       } else {
         toast.error("Login failed.");
-        setLoading(false); // Indicate that loading has ended after error
-        setShowAnimation(false);
       }
     } catch (error) {
       console.error("Error during login", error);
       toast.error("An error occurred during login.");
-    } 
+    } finally {
+      setLoading(false);
+      setShowAnimation(false);
+    }
   };
-
-  if (loading) {
-    return (
-      <div>
-        {showAnimation && (
-          <div className="hourglassOverlay">
-            <div className="hourglassBackground">
-              <div className="hourglassContainer">
-                <div className="hourglassCurves"></div>
-                <div className="hourglassCapTop"></div>
-                <div className="hourglassGlassTop"></div>
-                <div className="hourglassSand"></div>
-                <div className="hourglassSandStream"></div>
-                <div className="hourglassCapBottom"></div>
-                <div className="hourglassGlass"></div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   const signUp = () => {
     navigate("/register");
@@ -126,6 +101,21 @@ function Login() {
             Login
           </button>
         </form>
+        {loading && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
