@@ -16,6 +16,7 @@ export function UserContextProvider({ children }) {
           const { data } = await axios.get(`profile`);
           setUser(data);
           setIsAuthenticated(true);
+          setLoggedIn(true);
         } catch (error) {
           setIsAuthenticated(false);
           console.error("Error fetching user data:", error);
@@ -47,4 +48,3 @@ export function UserContextProvider({ children }) {
     </UserContext.Provider>
   );
 }
-

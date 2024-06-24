@@ -25,7 +25,7 @@ import Logs from "./logs";
 
 axios.defaults.baseURL = "https://eazy-manager.vercel.app/";
 axios.defaults.withCredentials = true;
-//https://eazy-manager.vercel.app/
+//
 function App() {
   return (
     <UserContextProvider>
