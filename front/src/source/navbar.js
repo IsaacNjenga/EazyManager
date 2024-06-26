@@ -59,6 +59,8 @@ export default function Navbar() {
       await axios.get("/logout");
       setIsAuthenticated(false);
       toast.success("Logged out");
+      localStorage.clear();
+      console.log("localStorage after clearing:", localStorage);
       window.location.reload();
       setUser(null);
     } catch (err) {

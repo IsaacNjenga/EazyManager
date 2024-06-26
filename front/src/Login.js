@@ -22,13 +22,23 @@ function Login() {
     setShowAnimation(true);
 
     try {
-      const response = await axios.post(`login`, { number, password });
+      const response = await axios.post(
+        `login`,
+        { number, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       const { success, role, name } = response.data;
 
       if (success) {
         const profileResponse = await axios.get(`profile`);
-
+        localStorage.setItem("token", response.data.token);
+        console.log("token", localStorage);
         if (profileResponse.data) {
           setLoggedIn(true);
           setUser(profileResponse.data);
