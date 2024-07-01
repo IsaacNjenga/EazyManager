@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import logoutModel from "./models/logoutModel.js";
 import "./config/db.js";
 import session from "express-session";
+import moment from "moment";
 import { Router } from "./routes/routes.js";
 
 dotenv.config({ path: "./config/.env" });
@@ -15,17 +16,12 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200, 
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 app.use(express.json()); // to parse JSON bodies
-app.use("/EasyManager", Router);
-
-app.options("*", cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
-
-//app.use(cookieParser());
 
 //Session setup
 app.use(
@@ -33,10 +29,32 @@ app.use(
     secret: "my_very_complex_secret_key",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 300000 }, 
+    cookie: { maxAge: 300000 },
   })
 );
 
+// Handle CORS preflight requests
+app.options("*", cors(corsOptions));
+app.use((req, res, next) => {
+  console.log("Request Method:", req.method);
+  console.log("Request Headers:", req.headers);
+  if (req.method === "OPTIONS") {
+    res.header(
+      "Access-Control-Allow-Origin",
+      "https://eazy-manager-front.vercel.app"
+    );
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+//main routes
+app.use("/EasyManager", Router);
+
+//logout route
 app.get("/logout", async (req, res) => {
   try {
     if (req.session.user) {
