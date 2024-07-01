@@ -7,19 +7,22 @@ import {
   write as writeExcel,
 } from "xlsx";
 import fileSaver from "file-saver";
+import Navbar from "../source/navbar";
 
 function AddProducts() {
-  const [product, setProduct] = useState({
-    number: "",
-    description: "",
-    colour: "",
-    price: "",
-    quantity: "",
-    code: "",
-    location: "",
-    bnumber: "",
-    summary: "",
-  });
+  const [product, setProduct] = useState([
+    {
+      number: "",
+      description: "",
+      colour: "",
+      price: "",
+      quantity: "",
+      code: "",
+      location: "",
+      bnumber: "",
+      summary: "",
+    },
+  ]);
   const [products, setProducts] = useState([]);
   const [image, setImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -33,12 +36,21 @@ function AddProducts() {
 
   useEffect(() => {
     axios
-      .get("products")
-      .then((result) => {
-        setProducts(result.data);
+      .get("products", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      .catch((err) => console.log(err));
-  });
+      .then((result) => {
+        if (Array.isArray(result.data)) {
+          setProducts(result.data);
+        } else {
+          setProducts([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products:", err);
+        setProducts([]);
+      });
+  }, []);
 
   const lastProduct = [...products]
     .sort((a, b) => a.number.localeCompare(b.number))
@@ -89,10 +101,11 @@ function AddProducts() {
         image: image,
       };
       axios
-        .post("add", productData)
+        .post("add", productData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
         .then((result) => {
           setShowAlert(true);
-          console.log(result);
           setShowAnimation(true);
           setTimeout(() => {
             setShowAnimation(true);
@@ -159,7 +172,11 @@ function AddProducts() {
       await Promise.all(
         productData.map(async (productMember) => {
           try {
-            await axios.post(`add`, productMember);
+            await axios.post(`add`, productMember, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            });
           } catch (error) {
             console.log("Error adding product", error);
           }
@@ -215,216 +232,243 @@ function AddProducts() {
   };
 
   return (
-    <div id = "main">
-      <button onClick={back} className="backbtn">
-        Back to Inventory
-      </button>
+    <>
+      <Navbar />
+      <div id="main">
+        <button onClick={back} className="backbtn">
+          Back to Inventory
+        </button>
 
-      <div className="entry-container">
-        <p className="text-content">
-          Add from <br /> Excel Document or Single Entry?
-        </p>
-        <div className="btnbox">
-          <button className="excelbtn" onClick={excelEntry}>
-            Excel Document
-          </button>{" "}
-          <button className="singlebtn" onClick={individualEntry}>
-            Single Entry
-          </button>
+        <div className="entry-container">
+          <p className="text-content">
+            Add from <br /> Excel Document or Single Entry?
+          </p>
+          <div className="btnbox">
+            <button className="excelbtn" onClick={excelEntry}>
+              Excel Document
+            </button>{" "}
+            <button className="singlebtn" onClick={individualEntry}>
+              Single Entry
+            </button>
+          </div>
         </div>
-      </div>
 
-      {excel && (
-        <div>
-          <label>Get the Excel Document from here:</label>
-          <button onClick={generateExcelTemplate}>Download Template</button>
-          <br />
-          <br />
-          <h3>Upload Document</h3>
-          <input
-            type="file"
-            style={{ width: "300px" }}
-            onChange={handleExcelUpload}
-            accept=".xlsx,.xls"
-          />
-          <br />
-          <button onClick={addExcelDoc}>Upload Excel Document</button>
-          <br />
-          <hr />
-          {productData.length > 0 && (
-            <table className="productstable">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Colour</th>
-                  <th>Code</th>
-                  <th>P/No</th>
-                  <th>Quantity</th>
-                  <th>FC/No</th>
-                  <th>AMT</th>
-                  <th>Location</th>
-                  <th>Summary</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productData.map((product, index) => (
-                  <tr key={index}>
-                    <td>{product.description}</td>
-                    <td>{product.colour}</td>
-                    <td>{product.code}</td>
-                    <td>{product.number}</td>
-                    <td>{product.quantity}</td>
-                    <td>{product.bnumber}</td>
-                    <td>Ksh.{product.price.toLocaleString()}</td>
-                    <td>{product.location}</td>
-                    <td>{product.summary}</td>
+        {excel && (
+          <div>
+            <label>Get the Excel Document from here:</label>
+            <button onClick={generateExcelTemplate}>Download Template</button>
+            <br />
+            <br />
+            <h3>Upload Document</h3>
+            <input
+              type="file"
+              style={{ width: "300px" }}
+              onChange={handleExcelUpload}
+              accept=".xlsx,.xls"
+            />
+            <br />
+            <button onClick={addExcelDoc}>Upload Excel Document</button>
+            <br />
+            <hr />
+            {productData.length > 0 && (
+              <table className="productstable">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Colour</th>
+                    <th>Code</th>
+                    <th>P/No</th>
+                    <th>Quantity</th>
+                    <th>FC/No</th>
+                    <th>AMT</th>
+                    <th>Location</th>
+                    <th>Summary</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      )}
+                </thead>
+                <tbody>
+                  {productData.map((product, index) => (
+                    <tr key={index}>
+                      <td>{product.description}</td>
+                      <td>{product.colour}</td>
+                      <td>{product.code}</td>
+                      <td>{product.number}</td>
+                      <td>{product.quantity}</td>
+                      <td>{product.bnumber}</td>
+                      <td>Ksh.{product.price.toLocaleString()}</td>
+                      <td>{product.location}</td>
+                      <td>{product.summary}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
 
-      {singleEntry && (
-        <form className="form" onSubmit={submit}>
-          <div style={{ textAlign: "center" }}>
+        {singleEntry && (
+          <form className="form" onSubmit={submit}>
+            <div style={{ textAlign: "center" }}>
+              <span
+                style={{
+                  fontSize: "35px",
+                  color: "purple",
+                  fontStyle: "italic",
+                }}
+              >
+                Easy
+              </span>
+              <span
+                style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
+              >
+                Manager
+              </span>
+              <h3>Product Entry</h3>
+            </div>
+            <hr />
+            <br />
+            <span>Product Number</span>{" "}
             <span
+              style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+            >
+              *
+            </span>
+            :
+            <input
+              type="text"
+              placeholder={
+                incrementedProductNumber || incrementedProductNumber === 0
+                  ? incrementedProductNumber.toString()
+                  : ""
+              }
+              onChange={handleChange}
+              name="number"
+            />
+            <br />
+            <span>Description</span>{" "}
+            <span
+              style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+            >
+              *
+            </span>
+            :
+            <input
+              type="text"
+              placeholder="Description"
+              onChange={handleChange}
+              name="description"
+            />
+            <br />
+            <span>Product Code</span>{" "}
+            <span
+              style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
+            >
+              *
+            </span>
+            :
+            <input
+              type="text"
+              placeholder="XX123"
+              onChange={handleChange}
+              name="code"
+            />
+            <br />
+            Colour:
+            <input
+              type="text"
+              placeholder="Colour"
+              onChange={handleChange}
+              name="colour"
+            />
+            <br />
+            <hr />
+            <br />
+            <div
               style={{
-                fontSize: "35px",
-                color: "purple",
-                fontStyle: "italic",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "1px",
               }}
             >
-              Easy
-            </span>
-            <span
-              style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
-            >
-              Manager
-            </span>
-            <h3>Product Entry</h3>
-          </div>
-          <hr />
-          <br />
-          <span>Product Number</span>{" "}
-          <span
-            style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
-          >
-            *
-          </span>
-          :
-          <input
-            type="text"
-            placeholder={incrementedProductNumber}
-            onChange={handleChange}
-            name="number"
-          />
-          <br />
-          <span>Description</span>{" "}
-          <span
-            style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
-          >
-            *
-          </span>
-          :
-          <input
-            type="text"
-            placeholder="Description"
-            onChange={handleChange}
-            name="description"
-          />
-          <br />
-          <span>Product Code</span>{" "}
-          <span
-            style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
-          >
-            *
-          </span>
-          :
-          <input
-            type="text"
-            placeholder="XX123"
-            onChange={handleChange}
-            name="code"
-          />
-          <br />
-          Colour:
-          <input
-            type="text"
-            placeholder="Colour"
-            onChange={handleChange}
-            name="colour"
-          />
-          <br />
-          <hr />
-          <br />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1px",
-            }}
-          >
-            Quantity *:
-            <input
-              type="text"
-              placeholder="Quantity"
-              onChange={handleChange}
-              name="quantity"
-            />
-            Price per unit *:
-            <input
-              type="text"
-              placeholder="Price"
-              onChange={handleChange}
-              name="price"
-            />
-            FC Number:
-            <input
-              type="text"
-              placeholder="B/No"
-              onChange={handleChange}
-              name="bnumber"
-            />
-          </div>
-          <br />
-          <hr />
-          <br />
-          Location:
-          <input
-            type="text"
-            placeholder="Location"
-            onChange={handleChange}
-            name="location"
-          />
-          <br />
-          <br />
-          Summary
-          <textarea
-            onChange={handleChange}
-            name="summary"
-            rows="6"
-            cols="76.5"
-          ></textarea>
-          <br />
-          <br />
-          <hr />
-          <br />
-          Image:
-          <hr />
-          <input accept="image/*" type="file" onChange={convertToBase64} />
-          <br />
-          <hr />
-          {showAlert && (
-            <div className="alert">
-              <p style={{ textAlign: "center" }}>
-                Success! <i className="material-icons">check</i>{" "}
-              </p>
+              Quantity *:
+              <input
+                type="text"
+                placeholder="Quantity"
+                onChange={handleChange}
+                name="quantity"
+              />
+              Price per unit *:
+              <input
+                type="text"
+                placeholder="Price"
+                onChange={handleChange}
+                name="price"
+              />
+              FC Number:
+              <input
+                type="text"
+                placeholder="B/No"
+                onChange={handleChange}
+                name="bnumber"
+              />
             </div>
-          )}
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {!filled && (
+            <br />
+            <hr />
+            <br />
+            Location:
+            <input
+              type="text"
+              placeholder="Location"
+              onChange={handleChange}
+              name="location"
+            />
+            <br />
+            <br />
+            Summary
+            <textarea
+              onChange={handleChange}
+              name="summary"
+              rows="6"
+              cols="76.5"
+            ></textarea>
+            <br />
+            <br />
+            <hr />
+            <br />
+            Image:
+            <hr />
+            <input accept="image/*" type="file" onChange={convertToBase64} />
+            <br />
+            <hr />
+            {showAlert && (
+              <div className="alert">
+                <p style={{ textAlign: "center" }}>
+                  Success! <i className="material-icons">check</i>{" "}
+                </p>
+              </div>
+            )}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {!filled && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                Please fill out all the fields marked with '
+                <span
+                  style={{
+                    color: "red",
+                    fontWeight: "bolder",
+                    fontSize: "18px",
+                  }}
+                >
+                  *
+                </span>
+                ' before proceeding
+              </div>
+            )}
+            <br />
             <div
               style={{
                 display: "flex",
@@ -432,47 +476,31 @@ function AddProducts() {
                 alignItems: "center",
               }}
             >
-              Please fill out all the fields marked with '
-              <span
-                style={{ color: "red", fontWeight: "bolder", fontSize: "18px" }}
-              >
-                *
-              </span>
-              ' before proceeding
+              <button className="addbtn">Add Product</button>
+              <button onClick={back} className="backbtn">
+                Cancel
+              </button>
             </div>
-          )}
-          <br />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <button className="addbtn">Add Product</button>
-            <button onClick={back} className="backbtn">
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
+          </form>
+        )}
 
-      {showAnimation && (
-        <div className="hourglassOverlay">
-          <div className="hourglassBackground">
-            <div className="hourglassContainer">
-              <div className="hourglassCurves"></div>
-              <div className="hourglassCapTop"></div>
-              <div className="hourglassGlassTop"></div>
-              <div className="hourglassSand"></div>
-              <div className="hourglassSandStream"></div>
-              <div className="hourglassCapBottom"></div>
-              <div className="hourglassGlass"></div>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
 

@@ -40,7 +40,9 @@ function SalesTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`deleteSale/` + id);
+      await axios.delete(`deleteSale/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setSales((prevSales) => prevSales.filter((sale) => sale._id !== id));
       setUserWantsToDelete(true);
       setSelectedSaleNumber(null);
@@ -56,7 +58,9 @@ function SalesTable() {
 
   useEffect(() => {
     axios
-      .get(`sales`)
+      .get(`sales`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => setSales(result.data))
       .catch((err) => console.log(err));
   }, []);

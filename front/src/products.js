@@ -3,10 +3,12 @@ import ProductsTable from "./pages/productsTable";
 import AddProducts from "./pages/addProducts";
 import UpdateProducts from "./pages/updateProducts";
 import { Routes, Route } from "react-router-dom";
+import Navbar from "./source/navbar";
 
 function Products() {
   return (
-    <div>
+    <>
+      <Navbar />
       <div id="main">
         <h1 style={{ textAlign: "center" }}>Products</h1>
         <hr />
@@ -16,7 +18,7 @@ function Products() {
           <Route path="/add-product" element={<AddProducts />} />
         </Routes>
       </div>
-    </div>
+    </>
   );
 }
 

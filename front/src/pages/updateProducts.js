@@ -28,7 +28,9 @@ function UpdateProducts() {
 
   useEffect(() => {
     axios
-      .get(`getProducts/` + id)
+      .get(`getProducts/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setProduct(result.data);
       })
@@ -63,7 +65,9 @@ function UpdateProducts() {
       image: imageChange ? newImage : product.image,
     };
     axios
-      .put(`updateProducts/` + id, productData)
+      .put(`updateProducts/` + id, productData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setShowAlert(true);
         console.log(result);
@@ -75,16 +79,16 @@ function UpdateProducts() {
         }, 2000);
       })
       .catch((err) => {
-      console.error("Update failed:", err);
-      if (err.response) {
-        console.error("Server responded with:", err.response.data);
-      } else if (err.request) {
-        console.error("No response received:", err.request);
-      } else {
-        console.error("Error setting up request:", err.message);
-      }
-      // Handle error state or display error message to the user
-    });
+        console.error("Update failed:", err);
+        if (err.response) {
+          console.error("Server responded with:", err.response.data);
+        } else if (err.request) {
+          console.error("No response received:", err.request);
+        } else {
+          console.error("Error setting up request:", err.message);
+        }
+        // Handle error state or display error message to the user
+      });
   };
 
   const styles = {

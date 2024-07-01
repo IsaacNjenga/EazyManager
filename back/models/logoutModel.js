@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const logoutSchema = new mongoose.Schema({
   number: { type: String, required: true },
@@ -6,6 +6,6 @@ const logoutSchema = new mongoose.Schema({
   logoutTime: { type: String, required: true },
 });
 
-const logoutModel = mongoose.model("Logout", logoutSchema);
+const LogoutModel = mongoose.model("Logout", logoutSchema);
 
-module.exports = logoutModel;
+export default LogoutModel;

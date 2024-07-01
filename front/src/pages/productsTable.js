@@ -32,7 +32,9 @@ function ProductsTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`deleteProduct/` + id);
+      await axios.delete(`deleteProduct/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product._id !== id)
       );
@@ -49,24 +51,30 @@ function ProductsTable() {
   };
 
   useEffect(() => {
-    setLoading(true); // Indicate that loading has started
+    setLoading(true);
     setShowAnimation(true);
     axios
-      .get(`products`)
+      .get(`products`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
-        const sortedProducts = result.data.sort((a, b) => {
-          return a.code.localeCompare(b.code);
-        });
+        const productsArray = Array.isArray(result.data.products)
+          ? result.data.products
+          : [];
+        const sortedProducts = productsArray.sort((a, b) =>
+          a.code.localeCompare(b.code)
+        );
         setProducts(sortedProducts);
-        setLoading(false); // Indicate that loading has ended after success
+        setLoading(false);
         setShowAnimation(false);
       })
       .catch((err) => {
-        console.log(err);
-        setLoading(false); // Indicate that loading has ended after error
+        console.error("Error fetching products:", err);
+        setLoading(false);
         setShowAnimation(false);
       });
   }, []);
+  
 
   if (loading) {
     return (
@@ -592,4 +600,3 @@ function ProductsTable() {
 }
 
 export default ProductsTable;
-

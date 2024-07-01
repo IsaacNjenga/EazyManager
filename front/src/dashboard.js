@@ -16,6 +16,7 @@ import empty from "./empty-box.png";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import Navbar from "./source/navbar";
 
 const Dashboard = () => {
   let [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -57,7 +58,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`sales`);
+        const res = await axios.get(`sales`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -69,7 +72,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpense = await axios.get(`expenses`);
+        const resExpense = await axios.get(`expenses`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setExpenses(resExpense.data);
       } catch (err) {
         console.log(err);
@@ -89,13 +94,12 @@ const Dashboard = () => {
     return formattedSaleDate.getTime() === formattedDateMidnight.getTime();
   });
 
-   const filteredExpenses = expenses.filter((expense) => {
+  const filteredExpenses = expenses.filter((expense) => {
     const expenseDate = new Date(expense.date);
     const formattedExpenseDate = new Date(expenseDate);
     formattedExpenseDate.setHours(0, 0, 0, 0);
     return formattedExpenseDate.getTime() === formattedDateMidnight.getTime();
   });
-
 
   useEffect(() => {
     setSalePresent(filteredSales.length > 0);
@@ -523,735 +527,926 @@ const Dashboard = () => {
   ).toLocaleString();
 
   return (
-    <div id="main">
-      <div>
+    <>
+      <Navbar />
+      <div id="main">
         <div>
-          <div style={{ textAlign: "center" }}>
-            <span
-              style={{ fontSize: "55px", color: "purple", fontStyle: "italic" }}
-            >
-              Easy
-            </span>
-            <span
-              style={{ fontSize: "55px", color: "red", fontWeight: "bold" }}
-            >
-              Manager
-            </span>
-          </div>
-          <hr />
-          <br />
-        </div>
-        <div>
-          <label>Select date:</label>
-          <DatePicker
-            className="customDatePicker"
-            type="date"
-            selected={day}
-            onChange={handleDateChange}
-            dateFormat="EEEE, dd-MM-yyyy"
-          />
-
-          {daySelected && (
-            <div>
-              <h3>{format(new Date(day), "EEEE, dd MMMM yyyy")}</h3>
+          <div>
+            <div style={{ textAlign: "center" }}>
+              <span
+                style={{
+                  fontSize: "55px",
+                  color: "purple",
+                  fontStyle: "italic",
+                }}
+              >
+                Easy
+              </span>
+              <span
+                style={{ fontSize: "55px", color: "red", fontWeight: "bold" }}
+              >
+                Manager
+              </span>
             </div>
-          )}
-        </div>
-        <br />
+            <hr />
+            <br />
+          </div>
+          <div>
+            <label>Select date:</label>
+            <DatePicker
+              className="customDatePicker"
+              type="date"
+              selected={day}
+              onChange={handleDateChange}
+              dateFormat="EEEE, dd-MM-yyyy"
+            />
 
-        <div style={{ display: "flex" }}>
-          <div className="tooltipp">
-            <button className="button-name" onClick={salesLastMonth}>
-              Last 30 days
-            </button>
-            <span className="tooltipptext">
-              {lastMonthStarting.toLocaleDateString("en-UK", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {lastMonthEnding.toLocaleDateString("en-UK", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
+            {daySelected && (
+              <div>
+                <h3>{format(new Date(day), "EEEE, dd MMMM yyyy")}</h3>
+              </div>
+            )}
+          </div>
+          <br />
+
+          <div style={{ display: "flex" }}>
+            <div className="tooltipp">
+              <button className="button-name" onClick={salesLastMonth}>
+                Last 30 days
+              </button>
+              <span className="tooltipptext">
+                {lastMonthStarting.toLocaleDateString("en-UK", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                -{" "}
+                {lastMonthEnding.toLocaleDateString("en-UK", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+
+            <div className="tooltipp">
+              <button className="button-name" onClick={salesLastWeek}>
+                Last 7 days
+              </button>
+              <span className="tooltipptext">
+                {lastWeekStarting.toLocaleDateString("en-UK", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                -{" "}
+                {lastWeekEnding.toLocaleDateString("en-UK", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+
+            <div className="tooltipp">
+              <button className="button-name" onClick={salesYesterday}>
+                Yesterday
+              </button>
+              <span className="tooltipptext">
+                {dateYesterday.toLocaleDateString("en-UK", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+
+            <div className="tooltipp">
+              <button className="button-name" onClick={salesToday}>
+                Today
+              </button>
+              <span className="tooltipptext">{formattedDate2}</span>
+            </div>
+          </div>
+          <br />
+
+          <br />
+
+          <div className="container1">
+            <div className="revenue">
+              <p>
+                <i
+                  class="material-icons"
+                  style={{ fontSize: "55px", color: "purple" }}
+                >
+                  monetization_on
+                </i>
+              </p>
+              <p style={{ fontSize: "23px", color: "purple" }}>Revenue</p>
+              <p style={{ fontSize: "30px", color: "purple" }}>
+                Ksh.{" "}
+                {selectedRevenue === "today" && (
+                  <React.Fragment>{revenue}</React.Fragment>
+                )}
+                {selectedRevenue === "yesterday" && (
+                  <React.Fragment>{yesterdayRevenue}</React.Fragment>
+                )}
+                {selectedRevenue === "lastWeek" && (
+                  <React.Fragment>{weeklyRevenue}</React.Fragment>
+                )}
+                {selectedRevenue === "lastMonth" && (
+                  <React.Fragment>{monthlyRevenue}</React.Fragment>
+                )}
+                {selectedRevenue === "anotherDay" && (
+                  <React.Fragment>{revenueByDay}</React.Fragment>
+                )}
+              </p>
+            </div>
+
+            <div className="purchase-return">
+              <p>
+                <i
+                  className="material-icons"
+                  style={{ fontSize: "55px", color: "red" }}
+                >
+                  style
+                </i>
+              </p>
+              <p style={{ fontSize: "23px", color: "red" }}>Expenses</p>
+              <p style={{ fontSize: "30px", color: "red" }}>
+                Ksh.{" "}
+                {selectedExpense === "today" && (
+                  <React.Fragment>{expenseToday}</React.Fragment>
+                )}
+                {selectedExpense === "yesterday" && (
+                  <React.Fragment>{yesterdayExpense}</React.Fragment>
+                )}
+                {selectedExpense === "lastWeek" && (
+                  <React.Fragment>{weeklyExpense}</React.Fragment>
+                )}
+                {selectedExpense === "lastMonth" && (
+                  <React.Fragment>{monthlyExpense}</React.Fragment>
+                )}
+                {selectedExpense === "anotherDay" && (
+                  <React.Fragment>{totExpenses}</React.Fragment>
+                )}
+              </p>
+            </div>
+
+            <div className="profit">
+              <p>
+                <i
+                  className="material-icons"
+                  style={{ fontSize: "55px", color: "green" }}
+                >
+                  trending_up
+                </i>
+              </p>
+              <p style={{ fontSize: "23px", color: "green" }}>Profits</p>
+              <p style={{ fontSize: "30px", color: "green" }}>
+                Ksh.
+                {selectedProfit === "today" && (
+                  <React.Fragment>{netProfit}</React.Fragment>
+                )}
+                {selectedProfit === "yesterday" && (
+                  <React.Fragment>{yesterdayNetProfit}</React.Fragment>
+                )}
+                {selectedProfit === "lastWeek" && (
+                  <React.Fragment>{weeklyNetProfit}</React.Fragment>
+                )}
+                {selectedProfit === "lastMonth" && (
+                  <React.Fragment>{monthlyNetProfit}</React.Fragment>
+                )}
+                {selectedProfit === "anotherDay" && (
+                  <React.Fragment>{netProfitByDay}</React.Fragment>
+                )}
+              </p>
+            </div>
           </div>
 
-          <div className="tooltipp">
-            <button className="button-name" onClick={salesLastWeek}>
-              Last 7 days
-            </button>
-            <span className="tooltipptext">
-              {lastWeekStarting.toLocaleDateString("en-UK", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {lastWeekEnding.toLocaleDateString("en-UK", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-
-          <div className="tooltipp">
-            <button className="button-name" onClick={salesYesterday}>
-              Yesterday
-            </button>
-            <span className="tooltipptext">
-              {dateYesterday.toLocaleDateString("en-UK", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-
-          <div className="tooltipp">
-            <button className="button-name" onClick={salesToday}>
-              Today
-            </button>
-            <span className="tooltipptext">{formattedDate2}</span>
-          </div>
-        </div>
-        <br />
-
-        <br />
-
-        <div className="container1">
-          <div className="revenue">
-            <p>
-              <i
-                class="material-icons"
-                style={{ fontSize: "55px", color: "purple" }}
-              >
-                monetization_on
-              </i>
-            </p>
-            <p style={{ fontSize: "23px", color: "purple" }}>Revenue</p>
-            <p style={{ fontSize: "30px", color: "purple" }}>
-              Ksh.{" "}
-              {selectedRevenue === "today" && (
-                <React.Fragment>{revenue}</React.Fragment>
-              )}
-              {selectedRevenue === "yesterday" && (
-                <React.Fragment>{yesterdayRevenue}</React.Fragment>
-              )}
-              {selectedRevenue === "lastWeek" && (
-                <React.Fragment>{weeklyRevenue}</React.Fragment>
-              )}
-              {selectedRevenue === "lastMonth" && (
-                <React.Fragment>{monthlyRevenue}</React.Fragment>
-              )}
-              {selectedRevenue === "anotherDay" && (
-                <React.Fragment>{revenueByDay}</React.Fragment>
-              )}
-            </p>
-          </div>
-
-          <div className="purchase-return">
-            <p>
-              <i
-                className="material-icons"
-                style={{ fontSize: "55px", color: "red" }}
-              >
-                style
-              </i>
-            </p>
-            <p style={{ fontSize: "23px", color: "red" }}>Expenses</p>
-            <p style={{ fontSize: "30px", color: "red" }}>
-              Ksh.{" "}
-              {selectedExpense === "today" && (
-                <React.Fragment>{expenseToday}</React.Fragment>
-              )}
-              {selectedExpense === "yesterday" && (
-                <React.Fragment>{yesterdayExpense}</React.Fragment>
-              )}
-              {selectedExpense === "lastWeek" && (
-                <React.Fragment>{weeklyExpense}</React.Fragment>
-              )}
-              {selectedExpense === "lastMonth" && (
-                <React.Fragment>{monthlyExpense}</React.Fragment>
-              )}
-              {selectedExpense === "anotherDay" && (
-                <React.Fragment>{totExpenses}</React.Fragment>
-              )}
-            </p>
-          </div>
-
-          <div className="profit">
-            <p>
-              <i
-                className="material-icons"
-                style={{ fontSize: "55px", color: "green" }}
-              >
-                trending_up
-              </i>
-            </p>
-            <p style={{ fontSize: "23px", color: "green" }}>Profits</p>
-            <p style={{ fontSize: "30px", color: "green" }}>
-              Ksh.
-              {selectedProfit === "today" && (
-                <React.Fragment>{netProfit}</React.Fragment>
-              )}
-              {selectedProfit === "yesterday" && (
-                <React.Fragment>{yesterdayNetProfit}</React.Fragment>
-              )}
-              {selectedProfit === "lastWeek" && (
-                <React.Fragment>{weeklyNetProfit}</React.Fragment>
-              )}
-              {selectedProfit === "lastMonth" && (
-                <React.Fragment>{monthlyNetProfit}</React.Fragment>
-              )}
-              {selectedProfit === "anotherDay" && (
-                <React.Fragment>{netProfitByDay}</React.Fragment>
-              )}
-            </p>
-          </div>
-        </div>
-
-        <div className="container2">
-          <div className="dates-and-stuff">
-            {selectedPeriod === "today" && (
-              <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>
-                  <u>Sales Today</u>
-                </h1>
-                {salePresent === true ? (
-                  <table className="productstable">
-                    <thead
-                      className="
+          <div className="container2">
+            <div className="dates-and-stuff">
+              {selectedPeriod === "today" && (
+                <React.Fragment>
+                  <h1 style={{ textAlign: "center" }}>
+                    <u>Sales Today</u>
+                  </h1>
+                  {salePresent === true ? (
+                    <table className="productstable">
+                      <thead
+                        className="
                     table-header"
-                    >
-                      <tr>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Image
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            alignItems: "center",
-                          }}
-                        >
-                          Description
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Price
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Qty.
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Total
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Sold by
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredSales.map((sale) => (
-                        <React.Fragment key={sale.number}>
-                          <tr>
-                            <td>
-                              <img
-                                src={sale.image}
-                                alt="img_here"
-                                style={styles}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                padding: "10px",
-                                backgroundColor: "#AFCECE",
-                                color: "black",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.description}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              Ksh.{sale.price.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.quantity}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                color: "green",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Ksh.{sale.total.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              {sale.saleperson}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div style={{ textAlign: "center", paddingTop: "5px" }}>
-                    <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
-                    <img src={empty} alt="Graph" style={boxStyle} />
-                  </div>
-                )}
-              </React.Fragment>
-            )}
+                      >
+                        <tr>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Image
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              alignItems: "center",
+                            }}
+                          >
+                            Description
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Price
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Qty.
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Total
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Sold by
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSales.map((sale) => (
+                          <React.Fragment key={sale.number}>
+                            <tr>
+                              <td>
+                                <img
+                                  src={sale.image}
+                                  alt="img_here"
+                                  style={styles}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  padding: "10px",
+                                  backgroundColor: "#AFCECE",
+                                  color: "black",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {sale.description}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                Ksh.{sale.price.toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                  textAlign: "center",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {sale.quantity}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                  color: "green",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Ksh.{sale.total.toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                {sale.saleperson}
+                              </td>
+                            </tr>
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div style={{ textAlign: "center", paddingTop: "5px" }}>
+                      <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
+                      <img src={empty} alt="Graph" style={boxStyle} />
+                    </div>
+                  )}
+                </React.Fragment>
+              )}
 
-            {selectedPeriod === "yesterday" && (
-              <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>Sales yesterday</h1>
-                <h2 style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}>
-                  {dateYesterday.toLocaleDateString("en-UK", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </h2>
-                {salePresentYesterday === true ? (
-                  <table className="productstable">
-                    <thead
-                      className="
+              {selectedPeriod === "yesterday" && (
+                <React.Fragment>
+                  <h1 style={{ textAlign: "center" }}>Sales yesterday</h1>
+                  <h2
+                    style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}
+                  >
+                    {dateYesterday.toLocaleDateString("en-UK", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </h2>
+                  {salePresentYesterday === true ? (
+                    <table className="productstable">
+                      <thead
+                        className="
                   table-header"
-                    >
-                      <tr>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Image
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Description
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Price
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Qty.
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Total
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Sold by
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredSalesYesterday.map((sale) => (
-                        <React.Fragment key={sale.number}>
-                          <tr>
-                            <td>
-                              <img
-                                src={sale.image}
-                                alt="img_here"
-                                style={styles}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                padding: "10px",
-                                backgroundColor: "#AFCECE",
-                                color: "black",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.description}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              Ksh.{sale.price.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.quantity}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                color: "green",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Ksh.{sale.total.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              {sale.saleperson}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div style={{ textAlign: "center", paddingTop: "5px" }}>
-                    <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
-                    <img src={empty} alt="Graph" style={boxStyle} />
-                  </div>
-                )}
-              </React.Fragment>
-            )}
+                      >
+                        <tr>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Image
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Description
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Price
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Qty.
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Total
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Sold by
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSalesYesterday.map((sale) => (
+                          <React.Fragment key={sale.number}>
+                            <tr>
+                              <td>
+                                <img
+                                  src={sale.image}
+                                  alt="img_here"
+                                  style={styles}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  padding: "10px",
+                                  backgroundColor: "#AFCECE",
+                                  color: "black",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {sale.description}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                Ksh.{sale.price.toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                  textAlign: "center",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {sale.quantity}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                  color: "green",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Ksh.{sale.total.toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                {sale.saleperson}
+                              </td>
+                            </tr>
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div style={{ textAlign: "center", paddingTop: "5px" }}>
+                      <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
+                      <img src={empty} alt="Graph" style={boxStyle} />
+                    </div>
+                  )}
+                </React.Fragment>
+              )}
 
-            {selectedPeriod === "lastWeek" && (
-              <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>Sales as from:</h1>
-                <h2 style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}>
-                  {lastWeekStarting.toLocaleDateString("en-UK", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}{" "}
-                  -{" "}
-                  {lastWeekEnding.toLocaleDateString("en-UK", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </h2>
-                {salePresentLastWeek === true ? (
-                  <table className="productstable">
-                    <thead
-                      className="
+              {selectedPeriod === "lastWeek" && (
+                <React.Fragment>
+                  <h1 style={{ textAlign: "center" }}>Sales as from:</h1>
+                  <h2
+                    style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}
+                  >
+                    {lastWeekStarting.toLocaleDateString("en-UK", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {lastWeekEnding.toLocaleDateString("en-UK", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </h2>
+                  {salePresentLastWeek === true ? (
+                    <table className="productstable">
+                      <thead
+                        className="
                   table-header"
-                    >
-                      <tr>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Image
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Description
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Price
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Qty.
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Total
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Sold by
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Date Sold
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredSalesLastWeek.map((sale) => (
-                        <React.Fragment key={sale.number}>
-                          <tr>
-                            <td>
-                              <img
-                                src={sale.image}
-                                alt="img_here"
-                                style={styles}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                padding: "10px",
-                                backgroundColor: "#AFCECE",
-                                color: "black",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.description}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              Ksh.{sale.price.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.quantity}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                color: "green",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Ksh.{sale.total.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              {sale.saleperson}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              {format(
-                                new Date(sale.datesold),
-                                "EEEE, dd/MM/yyyy"
-                              )}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div style={{ textAlign: "center", paddingTop: "5px" }}>
-                    <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
-                    <img src={empty} alt="Graph" style={boxStyle} />
-                  </div>
-                )}
-              </React.Fragment>
-            )}
+                      >
+                        <tr>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Image
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Description
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Price
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Qty.
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Total
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Sold by
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Date Sold
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSalesLastWeek.map((sale) => (
+                          <React.Fragment key={sale.number}>
+                            <tr>
+                              <td>
+                                <img
+                                  src={sale.image}
+                                  alt="img_here"
+                                  style={styles}
+                                />
+                              </td>
+                              <td
+                                style={{
+                                  padding: "10px",
+                                  backgroundColor: "#AFCECE",
+                                  color: "black",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {sale.description}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                Ksh.{sale.price.toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                  textAlign: "center",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {sale.quantity}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                  color: "green",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Ksh.{sale.total.toLocaleString()}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                {sale.saleperson}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "7px",
+                                  backgroundColor: "#AFCECE",
+                                }}
+                              >
+                                {format(
+                                  new Date(sale.datesold),
+                                  "EEEE, dd/MM/yyyy"
+                                )}
+                              </td>
+                            </tr>
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div style={{ textAlign: "center", paddingTop: "5px" }}>
+                      <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
+                      <img src={empty} alt="Graph" style={boxStyle} />
+                    </div>
+                  )}
+                </React.Fragment>
+              )}
 
-            {selectedPeriod === "anotherDay" && (
-              <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>Sales on:</h1>
-                <h2 style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}>
-                  {dayChose}
-                </h2>
-                {salePresentAnotherDay === true ? (
-                  <table className="productstable">
-                    <thead
-                      className="
+              {selectedPeriod === "anotherDay" && (
+                <React.Fragment>
+                  <h1 style={{ textAlign: "center" }}>Sales on:</h1>
+                  <h2
+                    style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}
+                  >
+                    {dayChose}
+                  </h2>
+                  {salePresentAnotherDay === true ? (
+                    <table className="productstable">
+                      <thead
+                        className="
                    table-header"
-                    >
-                      <tr>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Image
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Description
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Price
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Qty.
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Total
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Sold by
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Date Sold
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {groupedSalesByDate[dayChose] &&
-                        groupedSalesByDate[dayChose].map((sale) => (
+                      >
+                        <tr>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Image
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Description
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Price
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Qty.
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Total
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Sold by
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Date Sold
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groupedSalesByDate[dayChose] &&
+                          groupedSalesByDate[dayChose].map((sale) => (
+                            <React.Fragment key={sale.number}>
+                              <tr>
+                                <td>
+                                  <img
+                                    src={sale.image}
+                                    alt="img_here"
+                                    style={styles}
+                                  />
+                                </td>
+                                <td
+                                  style={{
+                                    padding: "10px",
+                                    backgroundColor: "#AFCECE",
+                                    color: "black",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {sale.description}
+                                </td>
+                                <td
+                                  style={{
+                                    padding: "7px",
+                                    backgroundColor: "#AFCECE",
+                                  }}
+                                >
+                                  Ksh.{sale.price.toLocaleString()}
+                                </td>
+                                <td
+                                  style={{
+                                    padding: "7px",
+                                    backgroundColor: "#AFCECE",
+                                    textAlign: "center",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {sale.quantity}
+                                </td>
+                                <td
+                                  style={{
+                                    padding: "7px",
+                                    backgroundColor: "#AFCECE",
+                                    color: "green",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  Ksh.{sale.total.toLocaleString()}
+                                </td>
+                                <td
+                                  style={{
+                                    padding: "7px",
+                                    backgroundColor: "#AFCECE",
+                                  }}
+                                >
+                                  {sale.saleperson}
+                                </td>
+
+                                <td
+                                  style={{
+                                    padding: "7px",
+                                    backgroundColor: "#AFCECE",
+                                  }}
+                                >
+                                  {format(
+                                    new Date(sale.datesold),
+                                    "EEEE, dd/MM/yyyy"
+                                  )}
+                                </td>
+                              </tr>
+                            </React.Fragment>
+                          ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div style={{ textAlign: "center", paddingTop: "5px" }}>
+                      <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
+                      <img src={empty} alt="Graph" style={boxStyle} />
+                    </div>
+                  )}
+                </React.Fragment>
+              )}
+
+              {selectedPeriod === "lastMonth" && (
+                <React.Fragment>
+                  <h1 style={{ textAlign: "center" }}>Sales as from:</h1>
+                  <h2
+                    style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}
+                  >
+                    {lastMonthStarting.toLocaleDateString("en-UK", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {lastMonthEnding.toLocaleDateString("en-UK", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </h2>
+                  {salePresentLastMonth === true ? (
+                    <table className="productstable">
+                      <thead
+                        className="
+                  table-header"
+                      >
+                        <tr>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Image
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Description
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Price
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Qty.
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Total
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                              borderRight: "0.5px solid white",
+                            }}
+                          >
+                            Sold by
+                          </th>
+                          <th
+                            style={{
+                              padding: "7px",
+                              backgroundColor: "#127a8c",
+                              color: "white",
+                            }}
+                          >
+                            Date Sold
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSalesLastMonth.map((sale) => (
                           <React.Fragment key={sale.number}>
                             <tr>
                               <td>
@@ -1322,310 +1517,134 @@ const Dashboard = () => {
                             </tr>
                           </React.Fragment>
                         ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div style={{ textAlign: "center", paddingTop: "5px" }}>
-                    <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
-                    <img src={empty} alt="Graph" style={boxStyle} />
-                  </div>
-                )}
-              </React.Fragment>
-            )}
-
-            {selectedPeriod === "lastMonth" && (
-              <React.Fragment>
-                <h1 style={{ textAlign: "center" }}>Sales as from:</h1>
-                <h2 style={{ textAlign: "center", backgroundColor: "#B1BDB9" }}>
-                  {lastMonthStarting.toLocaleDateString("en-UK", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}{" "}
-                  -{" "}
-                  {lastMonthEnding.toLocaleDateString("en-UK", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </h2>
-                {salePresentLastMonth === true ? (
-                  <table className="productstable">
-                    <thead
-                      className="
-                  table-header"
-                    >
-                      <tr>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Image
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Description
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Price
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Qty.
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Total
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                            borderRight: "0.5px solid white",
-                          }}
-                        >
-                          Sold by
-                        </th>
-                        <th
-                          style={{
-                            padding: "7px",
-                            backgroundColor: "#127a8c",
-                            color: "white",
-                          }}
-                        >
-                          Date Sold
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredSalesLastMonth.map((sale) => (
-                        <React.Fragment key={sale.number}>
-                          <tr>
-                            <td>
-                              <img
-                                src={sale.image}
-                                alt="img_here"
-                                style={styles}
-                              />
-                            </td>
-                            <td
-                              style={{
-                                padding: "10px",
-                                backgroundColor: "#AFCECE",
-                                color: "black",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.description}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              Ksh.{sale.price.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {sale.quantity}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                                color: "green",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Ksh.{sale.total.toLocaleString()}
-                            </td>
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              {sale.saleperson}
-                            </td>
-
-                            <td
-                              style={{
-                                padding: "7px",
-                                backgroundColor: "#AFCECE",
-                              }}
-                            >
-                              {format(
-                                new Date(sale.datesold),
-                                "EEEE, dd/MM/yyyy"
-                              )}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div style={{ textAlign: "center", paddingTop: "5px" }}>
-                    <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
-                    <img src={empty} alt="Graph" style={boxStyle} />
-                  </div>
-                )}
-              </React.Fragment>
-            )}
-          </div>
-        </div>
-        {showAnimation && (
-          <div className="hourglassOverlay">
-            <div className="hourglassBackground">
-              <div className="hourglassContainer">
-                <div className="hourglassCurves"></div>
-                <div className="hourglassCapTop"></div>
-                <div className="hourglassGlassTop"></div>
-                <div className="hourglassSand"></div>
-                <div className="hourglassSandStream"></div>
-                <div className="hourglassCapBottom"></div>
-                <div className="hourglassGlass"></div>
-              </div>
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div style={{ textAlign: "center", paddingTop: "5px" }}>
+                      <h2 style={{ fontWeight: "bold" }}>No sale made...</h2>
+                      <img src={empty} alt="Graph" style={boxStyle} />
+                    </div>
+                  )}
+                </React.Fragment>
+              )}
             </div>
           </div>
-        )}
-      </div>
-      <hr />
-      <br />
-      <div>
-        <h2 style={{ textAlign: "center" }}>
-          <u>Sales of the Week</u>
-        </h2>
-        <br />
-        <div style={{ alignItems: "center", textAlign: "center" }}>
-          <button
-            onClick={() => weekGraph("nextWeek")}
-            style={{ fontSize: "16px" }}
-          >
-            <i className="material-icons" style={{ fontSize: "16px" }}>
-              arrow_back
-            </i>
-            Next Week
-          </button>{" "}
-          <button
-            onClick={() => weekGraph("currentWeek")}
-            style={{ fontSize: "16px" }}
-          >
-            Current Week
-          </button>{" "}
-          <button
-            onClick={() => weekGraph("lastWeek")}
-            style={{ fontSize: "16px" }}
-          >
-            Last Week
-            <i className="material-icons" style={{ fontSize: "16px" }}>
-              arrow_forward
-            </i>
-          </button>
+          {showAnimation && (
+            <div className="hourglassOverlay">
+              <div className="hourglassBackground">
+                <div className="hourglassContainer">
+                  <div className="hourglassCurves"></div>
+                  <div className="hourglassCapTop"></div>
+                  <div className="hourglassGlassTop"></div>
+                  <div className="hourglassSand"></div>
+                  <div className="hourglassSandStream"></div>
+                  <div className="hourglassCapBottom"></div>
+                  <div className="hourglassGlass"></div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+        <hr />
         <br />
-        <br />
-        <div style={{ maxWidth: "1350px", margin: "auto" }}>
-          <BarChart
-            width={1350}
-            height={500}
-            data={weekData}
-            margin={{ left: 40, right: 20 }}
-          >
-            <CartesianGrid />
-            <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
-              <Label
-                value="(Ksh)"
-                offset={-20}
-                position="insideLeft"
-                style={{ textAnchor: "middle", fontSize: "16px" }}
+        <div>
+          <h2 style={{ textAlign: "center" }}>
+            <u>Sales of the Week</u>
+          </h2>
+          <br />
+          <div style={{ alignItems: "center", textAlign: "center" }}>
+            <button
+              onClick={() => weekGraph("nextWeek")}
+              style={{ fontSize: "16px" }}
+            >
+              <i className="material-icons" style={{ fontSize: "16px" }}>
+                arrow_back
+              </i>
+              Next Week
+            </button>{" "}
+            <button
+              onClick={() => weekGraph("currentWeek")}
+              style={{ fontSize: "16px" }}
+            >
+              Current Week
+            </button>{" "}
+            <button
+              onClick={() => weekGraph("lastWeek")}
+              style={{ fontSize: "16px" }}
+            >
+              Last Week
+              <i className="material-icons" style={{ fontSize: "16px" }}>
+                arrow_forward
+              </i>
+            </button>
+          </div>
+          <br />
+          <br />
+          <div style={{ maxWidth: "1350px", margin: "auto" }}>
+            <BarChart
+              width={1350}
+              height={500}
+              data={weekData}
+              margin={{ left: 40, right: 20 }}
+            >
+              <CartesianGrid />
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
+                <Label
+                  value="(Ksh)"
+                  offset={-20}
+                  position="insideLeft"
+                  style={{ textAnchor: "middle", fontSize: "16px" }}
+                />
+              </YAxis>
+              <Legend />
+              <Tooltip
+                formatter={(value, name, props) =>
+                  `Ksh.${value.toLocaleString()}`
+                }
               />
-            </YAxis>
-            <Legend />
-            <Tooltip
-              formatter={(value, name, props) =>
-                `Ksh.${value.toLocaleString()}`
-              }
-            />
-            <Bar dataKey="Revenue" fill="green">
-              {weekData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Revenue}
-                  fill="#8884d8"
-                />
-              ))}
-            </Bar>
-            <Bar dataKey="Profit" fill="blue">
-              {weekData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Profit}
-                  fill="#82ca9d"
-                />
-              ))}
-            </Bar>
-            <Bar dataKey="Expenses" fill="red">
-              {weekData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Expenses}
-                  fill="red"
-                />
-              ))}
-            </Bar>
-          </BarChart>
+              <Bar dataKey="Revenue" fill="green">
+                {weekData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Revenue}
+                    fill="#8884d8"
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Profit" fill="blue">
+                {weekData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Profit}
+                    fill="#82ca9d"
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Expenses" fill="red">
+                {weekData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Expenses}
+                    fill="red"
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </div>
         </div>
+        <br />
+
+        <hr />
+
+        <footer style={{ textAlign: "center" }}>
+          Copyright © {yearOnly}, EasyManager. All Rights Reserved.
+        </footer>
       </div>
-      <br />
-
-      <hr />
-
-      <footer style={{ textAlign: "center" }}>
-        Copyright © {yearOnly}, EasyManager. All Rights Reserved.
-      </footer>
-    </div>
+    </>
   );
 };
 

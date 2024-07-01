@@ -12,6 +12,7 @@ import {
   Label,
 } from "recharts";
 import { BarChart, Bar } from "recharts";
+import Navbar from "./source/navbar";
 
 const Reports = () => {
   let [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -34,7 +35,9 @@ const Reports = () => {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`sales`);
+        const res = await axios.get(`sales`,{
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -46,7 +49,9 @@ const Reports = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpenses = await axios.get(`expenses`);
+        const resExpenses = await axios.get(`expenses`,{
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setExpenses(resExpenses.data);
       } catch (err) {
         console.log(err);
@@ -64,7 +69,6 @@ const Reports = () => {
     setBar(true);
     setLine(false);
   }
-
 
   const prevNextMonth = useCallback(
     (action) => {
@@ -196,8 +200,7 @@ const Reports = () => {
   );
 
   const prevNextYear = useCallback(
-    (action) => 
-    {
+    (action) => {
       let newYear = new Date(currentYear);
       if (action === "prevYear") {
         newYear.setFullYear(newYear.getFullYear() - 1);
@@ -236,8 +239,8 @@ const Reports = () => {
       const totalMonthExpense = {};
 
       for (let i = 0; i < 12; i++) {
-        const monthStartDate = new Date(year, i, 1); 
-        const monthEndDate = new Date(year, i + 1, 0); 
+        const monthStartDate = new Date(year, i, 1);
+        const monthEndDate = new Date(year, i + 1, 0);
 
         const monthSales = sales.filter((sale) => {
           const saleDate = new Date(sale.datesold);
@@ -304,337 +307,339 @@ const Reports = () => {
   }, [prevNextMonth]);
 
   return (
-    <div id="main">
-      <h1 style={{ textAlign: "center" }}>Reports</h1>
-      <hr />
-      <button
-        className="backbtn"
-        onClick={barGraph}
-        style={{ fontSize: "16px" }}
-      >
-        <i class="glyphicon glyphicon-stats"></i>
-      </button>
-      {" | "}
-      <button
-        className="addbtn"
-        onClick={lineGraph}
-        style={{ fontSize: "16px" }}
-      >
-        <i class="material-icons">show_chart</i>
-      </button>
-      <br />
-      <br />
-      <br />
-      <button
-        onClick={() => prevNextMonth("prevDayMonth")}
-        style={{ fontSize: "16px" }}
-      >
-        <i className="material-icons" style={{ fontSize: "16px" }}>
-          arrow_back
-        </i>
-        Previous month
-      </button>{" "}
-      <button
-        onClick={() => prevNextMonth("currentDayMonth")}
-        style={{ fontSize: "16px" }}
-      >
-        This month
-      </button>{" "}
-      <button
-        onClick={() => prevNextMonth("nextDayMonth")}
-        style={{ fontSize: "16px" }}
-      >
-        Next month{" "}
-        <i className="material-icons" style={{ fontSize: "16px" }}>
-          arrow_forward
-        </i>
-      </button>
-      <h2 style={{ textAlign: "center" }}>
-        Daily{" "}
-        {currentDayMonth.toLocaleDateString("en-UK", {
-          month: "long",
-          year: "numeric",
-        })}{" "}
-        Sales
-      </h2>
-      {bar && (
-        <div>
-          <BarChart
-            width={1500}
-            height={500}
-            data={dayData}
-            margin={{ left: 40, right: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
-              <Label
-                value="(Ksh)"
-                offset={-20}
-                position="insideLeft"
-                style={{ textAnchor: "middle", fontSize: "16px" }}
+    <>
+      <Navbar />
+      <div id="main">
+        <h1 style={{ textAlign: "center" }}>Reports</h1>
+        <hr />
+        <button
+          className="backbtn"
+          onClick={barGraph}
+          style={{ fontSize: "16px" }}
+        >
+          <i class="glyphicon glyphicon-stats"></i>
+        </button>
+        {" | "}
+        <button
+          className="addbtn"
+          onClick={lineGraph}
+          style={{ fontSize: "16px" }}
+        >
+          <i class="material-icons">show_chart</i>
+        </button>
+        <br />
+        <br />
+        <br />
+        <button
+          onClick={() => prevNextMonth("prevDayMonth")}
+          style={{ fontSize: "16px" }}
+        >
+          <i className="material-icons" style={{ fontSize: "16px" }}>
+            arrow_back
+          </i>
+          Previous month
+        </button>{" "}
+        <button
+          onClick={() => prevNextMonth("currentDayMonth")}
+          style={{ fontSize: "16px" }}
+        >
+          This month
+        </button>{" "}
+        <button
+          onClick={() => prevNextMonth("nextDayMonth")}
+          style={{ fontSize: "16px" }}
+        >
+          Next month{" "}
+          <i className="material-icons" style={{ fontSize: "16px" }}>
+            arrow_forward
+          </i>
+        </button>
+        <h2 style={{ textAlign: "center" }}>
+          Daily{" "}
+          {currentDayMonth.toLocaleDateString("en-UK", {
+            month: "long",
+            year: "numeric",
+          })}{" "}
+          Sales
+        </h2>
+        {bar && (
+          <div>
+            <BarChart
+              width={1500}
+              height={500}
+              data={dayData}
+              margin={{ left: 40, right: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
+                <Label
+                  value="(Ksh)"
+                  offset={-20}
+                  position="insideLeft"
+                  style={{ textAnchor: "middle", fontSize: "16px" }}
+                />
+              </YAxis>
+              <Legend />
+              <Tooltip
+                formatter={(value, name, props) =>
+                  `Ksh.${value.toLocaleString()}`
+                }
               />
-            </YAxis>
-            <Legend />
-            <Tooltip
-              formatter={(value, name, props) =>
-                `Ksh.${value.toLocaleString()}`
-              }
-            />
 
-            <Bar dataKey="Revenue" fill="green">
-              {monthData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Revenue}
-                  fill="#8884d8"
+              <Bar dataKey="Revenue" fill="green">
+                {monthData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Revenue}
+                    fill="#8884d8"
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Profit" fill="blue">
+                {dayData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Profit}
+                    fill="#82ca9d"
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Expenses" fill="red">
+                {dayData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Expenses}
+                    fill="red"
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </div>
+        )}
+        {line && (
+          <div>
+            <LineChart
+              width={1310}
+              height={500}
+              data={dayData}
+              margin={{ left: 40, right: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
+                <Label
+                  value="(Ksh)"
+                  offset={-20}
+                  position="insideLeft"
+                  style={{ textAnchor: "middle", fontSize: "16px" }}
                 />
-              ))}
-            </Bar>
-            <Bar dataKey="Profit" fill="blue">
-              {dayData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Profit}
-                  fill="#82ca9d"
-                />
-              ))}
-            </Bar>
-            <Bar dataKey="Expenses" fill="red">
-              {dayData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Expenses}
-                  fill="red"
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </div>
-      )}
-      {line && (
-        <div>
-          <LineChart
-            width={1310}
-            height={500}
-            data={dayData}
-            margin={{ left: 40, right: 10 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
-              <Label
-                value="(Ksh)"
-                offset={-20}
-                position="insideLeft"
-                style={{ textAnchor: "middle", fontSize: "16px" }}
+              </YAxis>
+              <Legend />
+              <Tooltip
+                formatter={(value, name, props) =>
+                  `Ksh.${value.toLocaleString()}`
+                }
               />
-            </YAxis>
-            <Legend />
-            <Tooltip
-              formatter={(value, name, props) =>
-                `Ksh.${value.toLocaleString()}`
-              }
-            />
-            <Line datakey="Revenue" fill="green">
-              {dayData.map((entry, index) => (
-                <Rectangle
-                  key={`bar -${index}`}
-                  width={5}
-                  height={entry.Revenue}
-                  fill="#8884d8"
-                />
-              ))}
-            </Line>
-            <Line
-              type="monotone"
-              dataKey="Revenue"
-              stroke="red"
-              activeDot={{ r: 8 }}
-            />
-            <Line dataKey="Profit" fill="blue">
-              {dayData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Profit}
-                  fill="#82ca9d"
-                />
-              ))}
-            </Line>
-            <Line dataKey="Expenses" fill="red">
-              {dayData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Expenses}
-                  fill="red"
-                />
-              ))}
-            </Line>
-          </LineChart>
-        </div>
-      )}
-     
-      <hr />
-      <br />
-      <button
-        onClick={() => prevNextYear("prevYear")}
-        style={{ fontSize: "16px" }}
-      >
-        <i class="material-icons" style={{ fontSize: "16px" }}>
-          arrow_back
-        </i>
-        Previous Year
-      </button>{" "}
-      <button
-        onClick={() => prevNextYear("currentYear")}
-        style={{ fontSize: "16px" }}
-      >
-        This Year
-      </button>{" "}
-      <button
-        onClick={() => prevNextYear("nextYear")}
-        style={{ fontSize: "16px" }}
-      >
-        Next Year{" "}
-        <i class="material-icons" style={{ fontSize: "16px" }}>
-          arrow_forward
-        </i>
-      </button>{" "}
-      <h2 style={{ textAlign: "center" }}>
-        Annual Sales of{" "}
-        {currentYear.toLocaleDateString("en-UK", {
-          year: "numeric",
-        })}
-      </h2>
-      {bar && (
-        <div>
-          <BarChart
-            width={1310}
-            height={500}
-            data={monthData}
-            margin={{ left: 40, right: 10 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
-              <Label
-                value="(Ksh)"
-                offset={-20}
-                position="insideLeft"
-                style={{ textAnchor: "middle", fontSize: "16px" }}
+              <Line datakey="Revenue" fill="green">
+                {dayData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar -${index}`}
+                    width={5}
+                    height={entry.Revenue}
+                    fill="#8884d8"
+                  />
+                ))}
+              </Line>
+              <Line
+                type="monotone"
+                dataKey="Revenue"
+                stroke="red"
+                activeDot={{ r: 8 }}
               />
-            </YAxis>
-            <Legend />
-            <Tooltip
-              formatter={(value, name, props) =>
-                `Ksh.${value.toLocaleString()}`
-              }
-            />
+              <Line dataKey="Profit" fill="blue">
+                {dayData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Profit}
+                    fill="#82ca9d"
+                  />
+                ))}
+              </Line>
+              <Line dataKey="Expenses" fill="red">
+                {dayData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Expenses}
+                    fill="red"
+                  />
+                ))}
+              </Line>
+            </LineChart>
+          </div>
+        )}
+        <hr />
+        <br />
+        <button
+          onClick={() => prevNextYear("prevYear")}
+          style={{ fontSize: "16px" }}
+        >
+          <i class="material-icons" style={{ fontSize: "16px" }}>
+            arrow_back
+          </i>
+          Previous Year
+        </button>{" "}
+        <button
+          onClick={() => prevNextYear("currentYear")}
+          style={{ fontSize: "16px" }}
+        >
+          This Year
+        </button>{" "}
+        <button
+          onClick={() => prevNextYear("nextYear")}
+          style={{ fontSize: "16px" }}
+        >
+          Next Year{" "}
+          <i class="material-icons" style={{ fontSize: "16px" }}>
+            arrow_forward
+          </i>
+        </button>{" "}
+        <h2 style={{ textAlign: "center" }}>
+          Annual Sales of{" "}
+          {currentYear.toLocaleDateString("en-UK", {
+            year: "numeric",
+          })}
+        </h2>
+        {bar && (
+          <div>
+            <BarChart
+              width={1310}
+              height={500}
+              data={monthData}
+              margin={{ left: 40, right: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
+                <Label
+                  value="(Ksh)"
+                  offset={-20}
+                  position="insideLeft"
+                  style={{ textAnchor: "middle", fontSize: "16px" }}
+                />
+              </YAxis>
+              <Legend />
+              <Tooltip
+                formatter={(value, name, props) =>
+                  `Ksh.${value.toLocaleString()}`
+                }
+              />
 
-            <Bar dataKey="Revenue" fill="green">
-              {monthData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Revenue}
-                  fill="#8884d8"
+              <Bar dataKey="Revenue" fill="green">
+                {monthData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Revenue}
+                    fill="#8884d8"
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Profit" fill="blue">
+                {monthData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Profit}
+                    fill="#82ca9d"
+                  />
+                ))}
+              </Bar>
+              <Bar dataKey="Expenses" fill="red">
+                {dayData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Expenses}
+                    fill="#82ca9d"
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </div>
+        )}
+        {line && (
+          <div>
+            <LineChart
+              width={1310}
+              height={500}
+              data={monthData}
+              margin={{ left: 40, right: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
+                <Label
+                  value="(Ksh)"
+                  offset={-20}
+                  position="insideLeft"
+                  style={{ textAnchor: "middle", fontSize: "16px" }}
                 />
-              ))}
-            </Bar>
-            <Bar dataKey="Profit" fill="blue">
-              {monthData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Profit}
-                  fill="#82ca9d"
-                />
-              ))}
-            </Bar>
-            <Bar dataKey="Expenses" fill="red">
-              {dayData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Expenses}
-                  fill="#82ca9d"
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </div>
-      )}
-      {line && (
-        <div>
-          <LineChart
-            width={1310}
-            height={500}
-            data={monthData}
-            margin={{ left: 40, right: 10 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => `${value.toLocaleString()}`}>
-              <Label
-                value="(Ksh)"
-                offset={-20}
-                position="insideLeft"
-                style={{ textAnchor: "middle", fontSize: "16px" }}
+              </YAxis>
+              <Legend />
+              <Tooltip
+                formatter={(value, name, props) =>
+                  `Ksh.${value.toLocaleString()}`
+                }
               />
-            </YAxis>
-            <Legend />
-            <Tooltip
-              formatter={(value, name, props) =>
-                `Ksh.${value.toLocaleString()}`
-              }
-            />
-            <Line datakey="Revenue" fill="green">
-              {monthData.map((entry, index) => (
-                <Rectangle
-                  key={`bar -${index}`}
-                  width={5}
-                  height={entry.Revenue}
-                  fill="#8884d8"
-                />
-              ))}
-            </Line>
-            <Line
-              type="monotone"
-              dataKey="Revenue"
-              stroke="red"
-              activeDot={{ r: 8 }}
-            />
-            <Line dataKey="Profit" fill="blue">
-              {monthData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Profit}
-                  fill="#82ca9d"
-                />
-              ))}
-            </Line>
-            <Line dataKey="Expenses" fill="red">
-              {monthData.map((entry, index) => (
-                <Rectangle
-                  key={`bar-${index}`}
-                  width={5}
-                  height={entry.Expenses}
-                  fill="red"
-                />
-              ))}
-            </Line>
-          </LineChart>
-        </div>
-      )}
-      <br />
-      <hr />
-    </div>
+              <Line datakey="Revenue" fill="green">
+                {monthData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar -${index}`}
+                    width={5}
+                    height={entry.Revenue}
+                    fill="#8884d8"
+                  />
+                ))}
+              </Line>
+              <Line
+                type="monotone"
+                dataKey="Revenue"
+                stroke="red"
+                activeDot={{ r: 8 }}
+              />
+              <Line dataKey="Profit" fill="blue">
+                {monthData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Profit}
+                    fill="#82ca9d"
+                  />
+                ))}
+              </Line>
+              <Line dataKey="Expenses" fill="red">
+                {monthData.map((entry, index) => (
+                  <Rectangle
+                    key={`bar-${index}`}
+                    width={5}
+                    height={entry.Expenses}
+                    fill="red"
+                  />
+                ))}
+              </Line>
+            </LineChart>
+          </div>
+        )}
+        <br />
+        <hr />
+      </div>
+    </>
   );
 };
 

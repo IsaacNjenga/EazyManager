@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Navbar from "../source/navbar";
 function AddExpense() {
   const [expense, setExpense] = useState({
     number: "",
@@ -33,7 +34,9 @@ function AddExpense() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`addExpense`, expense);
+      await axios.post(`addExpense`, expense, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       navigate("/expenses");
     } catch (err) {
       console.log(err);
@@ -45,72 +48,77 @@ function AddExpense() {
   };
 
   return (
-    <div id="main">
-      <h1>Add Expenses</h1>
-      <button className="backbtn" onClick={back}>
-        Go back
-      </button>
-      <form className="form">
-        <div style={{ textAlign: "center" }}>
-          <span
-            style={{ fontSize: "35px", color: "purple", fontStyle: "italic" }}
-          >
-            Easy
-          </span>
-          <span style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}>
-            Manager
-          </span>
-          <h3>Expenses Entry</h3>
-        </div>
-        <hr />
-        <br />
-        Expense Number:
-        <input type="text" onChange={handleChange} name="number" />
-        <br />
-        Description:
-        <input type="text" onChange={handleChange} name="description" />
-        Cost:
-        <input type="text" onChange={handleChange} name="cost" />
-        Category:
-        <select
-          style={{ width: "656px" }}
-          name="category"
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Select
-          </option>
-          <option>Insurance</option>
-          <option>Legal/Professional Fees</option>
-          <option>Salaries</option>
-          <option>Repairs & Maintenance</option>
-          <option>Utilities</option>
-          <option>Marketing Expenses</option>
-          <option>Loan Payment</option>
-          <option>Meal Expenses</option>
-          <option>Tax Payable</option>
-          <option>Bank Charges/Fees</option>
-          <option>Miscellaneous</option>
-        </select>
-        <br />
-        <br />
-        Date:
-        <DatePicker
-          selected={expense.date}
-          onChange={handleDateChange}
-          dateFormat="EEEE, dd-MM-yyyy"
-        />
-        <br />
-        <hr />
-        <br />
-        <button className="addbtn" onClick={handleSubmit}>
-          Submit
-        </button>
+    <>
+      <Navbar />
+      <div id="main">
+        <h1>Add Expenses</h1>
         <button className="backbtn" onClick={back}>
-          Back
+          Go back
         </button>
-      </form>
-    </div>
+        <form className="form">
+          <div style={{ textAlign: "center" }}>
+            <span
+              style={{ fontSize: "35px", color: "purple", fontStyle: "italic" }}
+            >
+              Easy
+            </span>
+            <span
+              style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
+            >
+              Manager
+            </span>
+            <h3>Expenses Entry</h3>
+          </div>
+          <hr />
+          <br />
+          Expense Number:
+          <input type="text" onChange={handleChange} name="number" />
+          <br />
+          Description:
+          <input type="text" onChange={handleChange} name="description" />
+          Cost:
+          <input type="text" onChange={handleChange} name="cost" />
+          Category:
+          <select
+            style={{ width: "656px" }}
+            name="category"
+            onChange={handleChange}
+          >
+            <option value="" disabled>
+              Select
+            </option>
+            <option>Insurance</option>
+            <option>Legal/Professional Fees</option>
+            <option>Salaries</option>
+            <option>Repairs & Maintenance</option>
+            <option>Utilities</option>
+            <option>Marketing Expenses</option>
+            <option>Loan Payment</option>
+            <option>Meal Expenses</option>
+            <option>Tax Payable</option>
+            <option>Bank Charges/Fees</option>
+            <option>Miscellaneous</option>
+          </select>
+          <br />
+          <br />
+          Date:
+          <DatePicker
+            selected={expense.date}
+            onChange={handleDateChange}
+            dateFormat="EEEE, dd-MM-yyyy"
+          />
+          <br />
+          <hr />
+          <br />
+          <button className="addbtn" onClick={handleSubmit}>
+            Submit
+          </button>
+          <button className="backbtn" onClick={back}>
+            Back
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
 

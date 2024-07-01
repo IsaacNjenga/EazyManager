@@ -26,7 +26,9 @@ function ExpenseTable() {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get(`sales`);
+        const res = await axios.get(`sales`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setSales(res.data);
       } catch (err) {
         console.log(err);
@@ -38,7 +40,9 @@ function ExpenseTable() {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const resExpense = await axios.get(`expenses`);
+        const resExpense = await axios.get(`expenses`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setExpenses(resExpense.data);
       } catch (err) {
         console.log(err);
@@ -54,7 +58,9 @@ function ExpenseTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`deleteExpense/` + id);
+      await axios.delete(`deleteExpense/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setExpenses((prevExpenses) =>
         prevExpenses.filter((expense) => expense._id !== id)
       );

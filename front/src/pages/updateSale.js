@@ -51,7 +51,9 @@ function UpdateSale() {
 
   useEffect(() => {
     axios
-      .get(`getSales/` + id)
+      .get(`getSales/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setSale(result.data);
       })
@@ -141,7 +143,9 @@ function UpdateSale() {
       image: image,
     };
     axios
-      .put(`updateSales/` + id, saleData)
+      .put(`updateSales/` + id, saleData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setShowAlert(true);
         console.log(result);

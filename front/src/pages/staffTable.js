@@ -36,7 +36,9 @@ function StaffTable() {
   useEffect(() => {
     const fetchAllStaffs = async () => {
       try {
-        const res = await axios.get("staff");
+        const res = await axios.get("staff", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         setStaffs(res.data);
       } catch (err) {
         console.log(err);
@@ -52,7 +54,9 @@ function StaffTable() {
 
   const handleYesClick = async (id) => {
     try {
-      await axios.delete(`deleteStaff/` + id);
+      await axios.delete(`deleteStaff/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setStaffs((prevStaffs) => prevStaffs.filter((staff) => staff._id !== id));
       setUserWantsToDelete(true);
       setSelectedstaffNumber(null);

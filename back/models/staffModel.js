@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const staffSchema = new mongoose.Schema(
   {
@@ -7,11 +7,10 @@ const staffSchema = new mongoose.Schema(
     lastname: String,
     datejoined: String,
     image: String,
-    number:Number,
+    number: Number,
   },
   { collection: "staff" }
 );
 
 const StaffModel = mongoose.model("Staff", staffSchema);
-module.exports = StaffModel;
-
+export default StaffModel;

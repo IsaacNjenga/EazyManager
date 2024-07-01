@@ -3,10 +3,12 @@ import { Routes, Route } from "react-router-dom";
 import ExpenseTable from "./pages/expensesTable";
 import UpdateExpense from "./pages/updateExpense";
 import AddExpense from "./pages/addExpense";
+import Navbar from "./source/navbar";
 
 function Expenses() {
   return (
     <div>
+      <Navbar/>
       <div id="main">
         <h1 style={{ textAlign: "center" }}>Expenses</h1>
         <hr />

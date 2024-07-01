@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import Navbar from "../source/navbar";
 
 function UpdateStaff() {
   const [staff, setStaff] = useState({
@@ -24,10 +25,11 @@ function UpdateStaff() {
 
   useEffect(() => {
     axios
-      .get(`getStaff/` + id)
+      .get(`getStaff/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setStaff(result.data);
-        console.log("Staff", staff);
       })
       .catch((err) => console.log(err));
   }, [id]);
@@ -67,7 +69,9 @@ function UpdateStaff() {
       image: imageChange ? newImage : staff.image,
     };
     axios
-      .put(`updateStaff/` + id, staffData)
+      .put(`updateStaff/` + id, staffData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setShowAlert(true);
         console.log(result);
@@ -86,77 +90,85 @@ function UpdateStaff() {
   };
 
   return (
-    <div id="main">
-      <h1>Staff Update</h1>
-      <button className="backbtn" onClick={back}>
-        Back to Staff
-      </button>
-      <form className="form">
-        ID Number:
-        <input type="text" value={staff.id} onChange={handleChange} name="id" />
-        <br />
-        First Name:
-        <input
-          type="text"
-          value={staff.firstname}
-          onChange={handleChange}
-          name="firstname"
-        />
-        Last Name:
-        <input
-          type="text"
-          value={staff.lastname}
-          onChange={handleChange}
-          name="lastname"
-        />
-        Staff Number:
-        <input
-          type="text"
-          value={staff.number}
-          onChange={handleChange}
-          name="number"
-        />
-        Date Joined:
-        <DatePicker selected={staff.datejoined} onChange={handleDateChange} />
-        <br />
-        Image:
-        <input
-          accept="image/*"
-          type="file"
-          onChange={convertToBase64}
-          name="image"
-        />
-        <br />
-        {showAlert && (
-          <div className="alert">
-            <p style={{ textAlign: "center" }}>
-              Success! <i className="material-icons">check</i>{" "}
-            </p>
-          </div>
-        )}
-        <button className="addbtn" onClick={update}>
-          Update
-        </button>
+    <>
+      <Navbar />
+      <div id="main">
+        <h1>Staff Update</h1>
         <button className="backbtn" onClick={back}>
-          Cancel
+          Back to Staff
         </button>
-      </form>
-      {showAnimation && (
-        <div className="hourglassOverlay">
-          <div className="hourglassBackground">
-            <div className="hourglassContainer">
-              <div className="hourglassCurves"></div>
-              <div className="hourglassCapTop"></div>
-              <div className="hourglassGlassTop"></div>
-              <div className="hourglassSand"></div>
-              <div className="hourglassSandStream"></div>
-              <div className="hourglassCapBottom"></div>
-              <div className="hourglassGlass"></div>
+        <form className="form">
+          ID Number:
+          <input
+            type="text"
+            value={staff.id}
+            onChange={handleChange}
+            name="id"
+          />
+          <br />
+          First Name:
+          <input
+            type="text"
+            value={staff.firstname}
+            onChange={handleChange}
+            name="firstname"
+          />
+          Last Name:
+          <input
+            type="text"
+            value={staff.lastname}
+            onChange={handleChange}
+            name="lastname"
+          />
+          Staff Number:
+          <input
+            type="text"
+            value={staff.number}
+            onChange={handleChange}
+            name="number"
+          />
+          Date Joined:
+          <DatePicker selected={staff.datejoined} onChange={handleDateChange} />
+          <br />
+          Image:
+          <input
+            accept="image/*"
+            type="file"
+            onChange={convertToBase64}
+            name="image"
+          />
+          <br />
+          {showAlert && (
+            <div className="alert">
+              <p style={{ textAlign: "center" }}>
+                Success! <i className="material-icons">check</i>{" "}
+              </p>
+            </div>
+          )}
+          <button className="addbtn" onClick={update}>
+            Update
+          </button>
+          <button className="backbtn" onClick={back}>
+            Cancel
+          </button>
+        </form>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
 

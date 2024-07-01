@@ -10,6 +10,7 @@ import {
 } from "xlsx";
 import { format } from "date-fns";
 import fileSaver from "file-saver";
+import Navbar from "../source/navbar";
 
 function AddStaff() {
   const [staff, setStaff] = useState({
@@ -63,7 +64,9 @@ function AddStaff() {
       image: image,
     };
     axios
-      .post("addStaff", staffData)
+      .post("addStaff", staffData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setShowAlert(true);
         console.log(result);
@@ -181,169 +184,174 @@ function AddStaff() {
   };
 
   return (
-    <div id = "main">
-      <h2>Add new staff</h2>
-      <button className="backbtn" onClick={back}>
-        Back to Staff
-      </button>
-      <div className="entry-container">
-        <p className="text-content">
-          Add from <br /> Excel Document or Single Entry?
-        </p>
-        <div className="btnbox">
-          <button className="excelbtn" onClick={excelEntry}>
-            Excel Document
-          </button>{" "}
-          <button className="singlebtn" onClick={individualEntry}>
-            Single Entry
-          </button>
-        </div>
-      </div>
-
-      {excel && (
-        <div>
-          <label>Get the Excel document from here:</label>
-          <button onClick={generateExcelTemplate}>Download Template</button>
-          <br />
-          <br />
-          <h3>Upload Document</h3>
-          <input
-            type="file"
-            style={{ width: "300px" }}
-            onChange={handleExcelUpload}
-            accept=".xlsx,.xls"
-          />
-          <br />
-          <button onClick={addExcelDoc}>Upload Excel Document</button>
-          <br />
-          <hr />
-          {staffData.length > 0 && (
-            <table className="productstable">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Number</th>
-                  <th>Date Joined</th>
-                </tr>
-              </thead>
-              <tbody>
-                {staffData.map((staff, index) => (
-                  <tr key={index}>
-                    <td>{staff.id}</td>
-                    <td>{staff.firstname}</td>
-                    <td>{staff.lastname}</td>
-                    <td>{staff.number}</td>
-                    <td>{format(new Date(staff.datejoined), "yyyy-MM-dd")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      )}
-      {singleEntry && (
-        <div>
-          <form className="form" onSubmit={submit}>
-            <div style={{ textAlign: "center" }}>
-              <span
-                style={{
-                  fontSize: "35px",
-                  color: "purple",
-                  fontStyle: "italic",
-                }}
-              >
-                Easy
-              </span>
-              <span
-                style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
-              >
-                Manager
-              </span>
-              <h3>Staff Entry</h3>
-            </div>
-            <hr />
-            <br />
-            ID Number:
-            <input
-              type="text"
-              placeholder="ID Number"
-              onChange={handleChange}
-              name="id"
-            />
-            <br />
-            First Name:
-            <input
-              type="text"
-              placeholder="First Name"
-              onChange={handleChange}
-              name="firstname"
-            />
-            Last Name:
-            <input
-              type="text"
-              placeholder="Last Name"
-              onChange={handleChange}
-              name="lastname"
-            />
-            Staff Number:
-            <input
-              type="text"
-              placeholder="Staff Number"
-              onChange={handleChange}
-              name="number"
-            />
-            Date Joined:
-            <DatePicker
-              selected={staff.datejoined}
-              onChange={handleDateChange}
-            />
-            <br />
-            Image:
-            <hr />
-            <input accept="image/*" type="file" onChange={convertToBase64} />
-            <br />
-            {showAlert && (
-              <div className="alert">
-                <p style={{ textAlign: "center" }}>
-                  Success! <i className="material-icons">check</i>{" "}
-                </p>
-              </div>
-            )}
-            <hr />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <button className="addbtn">Add</button>
-              <button className="backbtn" onClick={back}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {showAnimation && (
-        <div className="hourglassOverlay">
-          <div className="hourglassBackground">
-            <div className="hourglassContainer">
-              <div className="hourglassCurves"></div>
-              <div className="hourglassCapTop"></div>
-              <div className="hourglassGlassTop"></div>
-              <div className="hourglassSand"></div>
-              <div className="hourglassSandStream"></div>
-              <div className="hourglassCapBottom"></div>
-              <div className="hourglassGlass"></div>
-            </div>
+    <>
+      <Navbar />
+      <div id="main">
+        <h2>Add new staff</h2>
+        <button className="backbtn" onClick={back}>
+          Back to Staff
+        </button>
+        <div className="entry-container">
+          <p className="text-content">
+            Add from <br /> Excel Document or Single Entry?
+          </p>
+          <div className="btnbox">
+            <button className="excelbtn" onClick={excelEntry}>
+              Excel Document
+            </button>{" "}
+            <button className="singlebtn" onClick={individualEntry}>
+              Single Entry
+            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        {excel && (
+          <div>
+            <label>Get the Excel document from here:</label>
+            <button onClick={generateExcelTemplate}>Download Template</button>
+            <br />
+            <br />
+            <h3>Upload Document</h3>
+            <input
+              type="file"
+              style={{ width: "300px" }}
+              onChange={handleExcelUpload}
+              accept=".xlsx,.xls"
+            />
+            <br />
+            <button onClick={addExcelDoc}>Upload Excel Document</button>
+            <br />
+            <hr />
+            {staffData.length > 0 && (
+              <table className="productstable">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Number</th>
+                    <th>Date Joined</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {staffData.map((staff, index) => (
+                    <tr key={index}>
+                      <td>{staff.id}</td>
+                      <td>{staff.firstname}</td>
+                      <td>{staff.lastname}</td>
+                      <td>{staff.number}</td>
+                      <td>
+                        {format(new Date(staff.datejoined), "yyyy-MM-dd")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+        {singleEntry && (
+          <div>
+            <form className="form" onSubmit={submit}>
+              <div style={{ textAlign: "center" }}>
+                <span
+                  style={{
+                    fontSize: "35px",
+                    color: "purple",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Easy
+                </span>
+                <span
+                  style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
+                >
+                  Manager
+                </span>
+                <h3>Staff Entry</h3>
+              </div>
+              <hr />
+              <br />
+              ID Number:
+              <input
+                type="text"
+                placeholder="ID Number"
+                onChange={handleChange}
+                name="id"
+              />
+              <br />
+              First Name:
+              <input
+                type="text"
+                placeholder="First Name"
+                onChange={handleChange}
+                name="firstname"
+              />
+              Last Name:
+              <input
+                type="text"
+                placeholder="Last Name"
+                onChange={handleChange}
+                name="lastname"
+              />
+              Staff Number:
+              <input
+                type="text"
+                placeholder="Staff Number"
+                onChange={handleChange}
+                name="number"
+              />
+              Date Joined:
+              <DatePicker
+                selected={staff.datejoined}
+                onChange={handleDateChange}
+              />
+              <br />
+              Image:
+              <hr />
+              <input accept="image/*" type="file" onChange={convertToBase64} />
+              <br />
+              {showAlert && (
+                <div className="alert">
+                  <p style={{ textAlign: "center" }}>
+                    Success! <i className="material-icons">check</i>{" "}
+                  </p>
+                </div>
+              )}
+              <hr />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <button className="addbtn">Add</button>
+                <button className="backbtn" onClick={back}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

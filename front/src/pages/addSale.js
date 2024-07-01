@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-hot-toast";
-import { UserContext } from "../context/userContext";
+import { UserContext } from "../App";
 import Select from "react-select";
+import Navbar from "../source/navbar";
 
 function AddSale() {
   const { user } = useContext(UserContext);
@@ -33,12 +34,18 @@ function AddSale() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`products`);
-        setProducts(response.data);
+        const response = await axios.get(`products`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const productsArray = Array.isArray(response.data.products)
+          ? response.data.products
+          : [];
+        setProducts(productsArray);
       } catch (error) {
         console.log("Error fetching item:", error);
       }
     };
+
     fetchItems();
   }, []);
 
@@ -125,36 +132,27 @@ function AddSale() {
     };
 
     axios
-      .post("addSale", saleData)
+      .post("addSale", saleData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setShowAlert(true);
-        console.log(result);
         setShowAnimation(true);
+        toast.success("Sale entered");
         setTimeout(() => {
-          if (user.role !== "admin") {
-            setShowAnimation(true);
-            toast.success("Sale entered");
-            navigate("/login");
-          } else {
-            setShowAnimation(true);
-            toast.success("Sale entered");
-            navigate("/sales");
-          }
+          navigate(user.role !== "admin" ? "/login" : "/sales");
         }, 2000);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setMessage(err.response?.data?.error || "An error occurred");
+        toast.error("Failed to add sale");
+      });
   };
 
   const convertToBase64 = (e) => {
-    const file = e.target.files[0];
-    const maxSizeInBytes = 1048576; // 1MB
-    if (file.size > maxSizeInBytes) {
-      setMessage("File size exceeds the maximum limit (1MB)");
-      return;
-    }
-
     var reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(e.target.files[0]);
     reader.onload = () => {
       console.log(reader.result);
       setImage(reader.result);
@@ -177,192 +175,195 @@ function AddSale() {
     }),
   };
 
-  const productOptions = products.map((product) => ({
-    value: product.number,
-    label: (
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <img
-          src={product.image}
-          alt="no_Image"
-          style={{ width: 75, height: 75, marginRight: 10 }}
-        />
-        <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
-      </div>
-    ),
-  }));
+  const productOptions = Array.isArray(products)
+    ? products.map((product) => ({
+        value: product.number,
+        label: (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={product.image}
+              alt="no_Image"
+              style={{ width: 75, height: 75, marginRight: 10 }}
+            />
+            <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
+          </div>
+        ),
+      }))
+    : [];
 
   return (
-    <div id="main">
-      <button className="backbtn" onClick={back}>
-        Back to Sales
-      </button>
-      <form className="form">
-        <div style={{ textAlign: "center" }}>
-          <span
-            style={{ fontSize: "35px", color: "purple", fontStyle: "italic" }}
-          >
-            Easy
-          </span>
-          <span style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}>
-            Manager
-          </span>
-          <h3>Sales entry</h3>
-        </div>
-        <hr />
-        <br />
-        <label>Receipt Number:</label>
-        <input
-          type="text"
-          value={sale.number}
-          onChange={handleChange}
-          name="number"
-        />
-        <br />
-        <br />
-        <label>Select The Product:</label>
-        <label>Product No. — Description (Code) | [Colour] - (Location)</label>
-        <Select
-          styles={customStyles}
-          options={productOptions}
-          onChange={handleProductSelection}
-          value={productOptions.find((option) => option.value === sale.pnumber)}
-        />
-        <br />
-        <br />
-        <label>Description:</label>
-        <input
-          type="text"
-          name="description"
-          value={sale.description}
-          readOnly
-        />
-        <br />
-        <br />
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div>
-            <label>Colour:</label>
-            <input type="text" name="colour" value={sale.colour} readOnly />
+    <>
+      <Navbar />
+      <div id="main">
+        <button className="backbtn" onClick={back}>
+          Back to Sales
+        </button>
+        <form className="form">
+          <div style={{ textAlign: "center" }}>
+            <span
+              style={{ fontSize: "35px", color: "purple", fontStyle: "italic" }}
+            >
+              Easy
+            </span>
+            <span
+              style={{ fontSize: "35px", color: "red", fontWeight: "bold" }}
+            >
+              Manager
+            </span>
+            <h3>Sales entry</h3>
           </div>
-          <div style={{ marginLeft: "50px" }}>
-            <label>Code:</label>
-            <input type="text" name="code" value={sale.code} readOnly />
-          </div>
-        </div>
-        <br />
-
-        <br />
-        <br />
-        <hr />
-        <br />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "1px",
-          }}
-        >
-          <label>Price:</label>
-          <input
-            type="number"
-            placeholder="Price"
-            onChange={handleChange}
-            name="price"
-          />
-          <label>Quantity:</label>
-          <input
-            type="number"
-            placeholder="Quantity"
-            onChange={handleChange}
-            name="quantity"
-          />
-          <label>Total:</label>
-          <input type="text" placeholder="Total" value={sale.total} readOnly />
-          <label>Commission:</label>
+          <hr />
+          <br />
+          <label>Receipt Number:</label>
           <input
             type="text"
-            placeholder="Commission"
-            value={sale.commission.toLocaleString()}
+            value={sale.number}
+            onChange={handleChange}
+            name="number"
+          />
+          <br />
+          <br />
+          <label>Select The Product:</label>
+          <label>
+            Product No. — Description (Code) | [Colour] - (Location)
+          </label>
+          <Select
+            styles={customStyles}
+            options={productOptions}
+            onChange={handleProductSelection}
+            value={productOptions.find(
+              (option) => option.value === sale.pnumber
+            )}
+          />
+          <br />
+          <br />
+          <label>Description:</label>
+          <input
+            type="text"
+            name="description"
+            value={sale.description}
             readOnly
           />
-        </div>
-        <br />
-        <hr />
-        <br />
-        <label>Date of Sale:</label>
-        <DatePicker
-          selected={sale.datesold}
-          onChange={handleDateChange}
-          dateFormat="EEEE, dd-MM-yyyy"
-        />
-        <br />
-        <br />
-        <label>Salesperson: {user.name.toUpperCase()}</label>
-        {/*<select
-          name="saleperson"
-          onChange={handleChange}
-          value={sale.saleperson}
-        >
-          <option value="" disabled>
-            Select
-          </option>
-          {salesName.map((saleName) => (
-            <option key={saleName} value={saleName}>
-              {saleName}
-            </option>
-          ))}
-          </select>*/}
-        <br />
-
-        {!isImageAvailable && (
-          <div>
-            <hr />
-            <br />
-            <label>Image:</label>
-            <input accept="image/*" type="file" onChange={convertToBase64} />
-          </div>
-        )}
-        <br />
-        <br />
-        {showAlert && (
-          <div className="alert">
-            <p style={{ textAlign: "center" }}>
-              Success! <i className="material-icons">check</i>
-            </p>
-          </div>
-        )}
-        <hr />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <button className="addbtn" onClick={submit}>
-            Add Sale
-          </button>
-          <button className="backbtn" onClick={back}>
-            Cancel
-          </button>
-          {message && <div>{message}</div>}
-        </div>
-      </form>
-      {showAnimation && (
-        <div className="hourglassOverlay">
-          <div className="hourglassBackground">
-            <div className="hourglassContainer">
-              <div className="hourglassCurves"></div>
-              <div className="hourglassCapTop"></div>
-              <div className="hourglassGlassTop"></div>
-              <div className="hourglassSand"></div>
-              <div className="hourglassSandStream"></div>
-              <div className="hourglassCapBottom"></div>
-              <div className="hourglassGlass"></div>
+          <br />
+          <br />
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div>
+              <label>Colour:</label>
+              <input type="text" name="colour" value={sale.colour} readOnly />
+            </div>
+            <div style={{ marginLeft: "50px" }}>
+              <label>Code:</label>
+              <input type="text" name="code" value={sale.code} readOnly />
             </div>
           </div>
-        </div>
-      )}
-    </div>
+          <br />
+
+          <br />
+          <br />
+          <hr />
+          <br />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1px",
+            }}
+          >
+            <label>Price:</label>
+            <input
+              type="number"
+              placeholder="Price"
+              onChange={handleChange}
+              name="price"
+            />
+            <label>Quantity:</label>
+            <input
+              type="number"
+              placeholder="Quantity"
+              onChange={handleChange}
+              name="quantity"
+            />
+            <label>Total:</label>
+            <input
+              type="text"
+              placeholder="Total"
+              value={sale.total}
+              readOnly
+            />
+            <label>Commission:</label>
+            <input
+              type="text"
+              placeholder="Commission"
+              value={sale.commission.toLocaleString()}
+              readOnly
+            />
+          </div>
+          <br />
+          <hr />
+          <br />
+          <label>Date of Sale:</label>
+          <DatePicker
+            selected={sale.datesold}
+            onChange={handleDateChange}
+            dateFormat="EEEE, dd-MM-yyyy"
+          />
+          <br />
+          <br />
+          <label>Salesperson: {user.name.toUpperCase()}</label>
+
+          <br />
+
+          {!isImageAvailable && (
+            <div>
+              <hr />
+              <br />
+              <label>Image:</label>
+              <input accept="image/*" type="file" onChange={convertToBase64} />
+            </div>
+          )}
+          <br />
+          <br />
+          {showAlert && (
+            <div className="alert">
+              <p style={{ textAlign: "center" }}>
+                Success! <i className="material-icons">check</i>
+              </p>
+            </div>
+          )}
+          <hr />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <button className="addbtn" onClick={submit}>
+              Add Sale
+            </button>
+            <button className="backbtn" onClick={back}>
+              Cancel
+            </button>
+            {message && <div>{message}</div>}
+          </div>
+        </form>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

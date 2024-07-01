@@ -2,12 +2,12 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axios from "axios";
-import { UserContext } from "./context/userContext";
+import { UserContext } from "./App";
 
 function Login() {
   const navigate = useNavigate();
   const { setUser, setLoggedIn } = useContext(UserContext);
-  const [loading, setLoading] = useState(false); // Set initial loading state to false
+  const [loading, setLoading] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
 
   const [data, setData] = useState({
@@ -33,25 +33,18 @@ function Login() {
         }
       );
 
-      const { success, role, name } = response.data;
+      const { success, user, token } = response.data;
 
       if (success) {
-        const profileResponse = await axios.get(`profile`);
-        localStorage.setItem("token", response.data.token);
-        console.log("token", localStorage);
-        if (profileResponse.data) {
-          setLoggedIn(true);
-          setUser(profileResponse.data);
-          console.log(profileResponse.data);
-          toast.success(`Welcome ${name}`);
+        localStorage.setItem("token", token);
+        setLoggedIn(true);
+        setUser(user);
+        toast.success(`Welcome ${user.name}`);
 
-          if (role === "admin") {
-            navigate("/dashboard");
-          } else {
-            navigate("/add-sale");
-          }
+        if (user.role === "admin") {
+          navigate("/dashboard");
         } else {
-          toast.error("Failed to fetch profile.");
+          navigate("/add-sale");
         }
       } else {
         toast.error("Login failed.");

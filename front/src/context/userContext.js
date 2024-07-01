@@ -1,15 +1,31 @@
-import axios from "axios";
+/*import axios from "axios";
 import { createContext, useState, useEffect } from "react";
 
-export const UserContext = createContext(null);
+//export const UserContext = createContext(null);
 
 export function UserContextProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
+    axios
+      .get("verify")
+      .then((res) => {
+        if (res.data.success) {
+          setUser(res.data.user);
+          setIsAuthenticated(true);
+          setLoggedIn(true);
+        }
+      })
+      .catch((err) => {
+        setIsAuthenticated(false);
+        console.error("Error fetching user data:", err);
+      });
+  }, []);
+
+  /*useEffect(() => {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(`profile`);
@@ -61,3 +77,4 @@ export function UserContextProvider({ children }) {
     </UserContext.Provider>
   );
 }
+*/

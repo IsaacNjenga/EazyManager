@@ -16,12 +16,21 @@ function Register() {
     e.preventDefault();
     const { name, number, password, role } = data;
     try {
-      const { data } = await axios.post("register", {
-        name,
-        number,
-        password,
-        role,
-      });
+      const { data } = await axios.post(
+        "register",
+        {
+          name,
+          number,
+          password,
+          role,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       if (data.error) {
         toast.error(data.error);
       } else {

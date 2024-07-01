@@ -3,10 +3,12 @@ import { Routes, Route } from "react-router-dom";
 import SalesTable from "./pages/salesTable";
 import UpdateSale from "./pages/updateSale";
 import AddSale from "./pages/addSale";
+import Navbar from "./source/navbar";
 
 function Sales() {
   return (
     <div>
+      <Navbar/>
       <div id="main">
         <h1 style={{ textAlign: "center" }}>Sales</h1>
         <hr />

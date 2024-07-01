@@ -19,7 +19,9 @@ function UpdateExpense() {
 
   useEffect(() => {
     axios
-      .get(`getExpenses/` + id)
+      .get(`getExpenses/` + id, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((result) => {
         setExpense(result.data);
         console.log("expense", expense);
@@ -46,9 +48,11 @@ function UpdateExpense() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`updatedExpenses/` + id, expense);
+      await axios.put(`updatedExpenses/` + id, expense, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setTimeout(() => {
-        toast.success("Expense updated")
+        toast.success("Expense updated");
         navigate("/expenses");
       }, 1000);
     } catch (err) {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext, Fragment } from "react";
 import { NavLink } from "react-router-dom";
-import { UserContext } from "../context/userContext";
+import { UserContext } from "../App";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
 export default function Navbar() {
-  const { user, setUser, isAuthenticated, setIsAuthenticated } =
+  const { user, setUser, isAuthenticated, loggedIn, setIsAuthenticated } =
     useContext(UserContext);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -15,12 +15,6 @@ export default function Navbar() {
     }, 1000);
     return () => clearInterval(intervalId);
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      setIsAuthenticated(true);
-    }
-  }, [user, setIsAuthenticated]);
 
   const formattedDate = currentDateTime.toLocaleDateString("en-UK", {
     weekday: "long",
@@ -56,11 +50,12 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await axios.get("/logout");
+      await axios.get("/logout", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setIsAuthenticated(false);
       toast.success("Logged out");
       localStorage.clear();
-      console.log("localStorage after clearing:", localStorage);
       window.location.reload();
       setUser(null);
     } catch (err) {
@@ -69,14 +64,14 @@ export default function Navbar() {
   };
 
   const tryToAccess = () => {
-    if (user.role !== "admin") {
+    if (user && user.role !== "admin") {
       toast.error("You are not authorised");
     }
   };
 
   return (
     <Fragment>
-      {isAuthenticated ? (
+      {loggedIn ? (
         <nav style={{ display: "flex" }}>
           <div id="timenav" className="time" style={dateTimeStyle}>
             <p>{formattedDate}</p>
@@ -84,11 +79,15 @@ export default function Navbar() {
           </div>
           <div className="icon-bar">
             <br />
-            {user && <NavLink>{user.name}</NavLink>}
+            {user && (
+              <NavLink to="/" className="username-btn">
+                {user.name}
+              </NavLink>
+            )}
             <br />
             <NavLink
               to="/dashboard"
-              activeclassname="active"
+              activeClassName="active"
               id="dashboard"
               style={linkStyle}
               onClick={tryToAccess}
@@ -97,7 +96,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/products"
-              activeclassname="active"
+              activeClassName="active"
               id="products"
               style={linkStyle}
               onClick={tryToAccess}
@@ -106,7 +105,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/sales"
-              activeclassname="active"
+              activeClassName="active"
               id="sales"
               style={linkStyle}
             >
@@ -114,7 +113,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/expenses"
-              activeclassname="active"
+              activeClassName="active"
               id="expenses"
               style={linkStyle}
               onClick={tryToAccess}
@@ -123,7 +122,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/staff"
-              activeclassname="active"
+              activeClassName="active"
               id="staff"
               style={linkStyle}
               onClick={tryToAccess}
@@ -132,7 +131,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/reports"
-              activeclassname="active"
+              activeClassName="active"
               id="reports"
               style={linkStyle}
               onClick={tryToAccess}
@@ -141,7 +140,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/logs"
-              activeclassname="active"
+              activeClassName="active"
               id="logs"
               style={linkStyle}
               onClick={tryToAccess}
@@ -152,7 +151,7 @@ export default function Navbar() {
             {user ? (
               <NavLink
                 to="/"
-                activeclassname="active"
+                activeClassName="active"
                 id="logout"
                 style={linkStyle}
                 onClick={handleLogout}
@@ -162,7 +161,7 @@ export default function Navbar() {
             ) : (
               <NavLink
                 to="/"
-                activeclassname="active"
+                activeClassName="active"
                 id="logout"
                 style={linkStyle}
               >
