@@ -12,9 +12,30 @@ function Register() {
     role: "",
   });
 
+  const validateForm = ({ name, number, password, role }) => {
+    const nameRegex = /^[A-Za-z]+$/;
+    if (!name.trim()) return "Name is required";
+    if (!nameRegex.test(name)) {
+      return "Name should contain only letters";    }
+    if (!role.trim()) return "Role is required";
+    if (!number.trim()) return "Sales ID is required";
+    if (!/^\d+$/.test(number)) return "Sales ID must contain only numbers";
+    if (!password || password.length < 6)
+      return "Password should be at least 6 characters long";
+    return null;
+  };
+
   const submit = async (e) => {
     e.preventDefault();
+
     const { name, number, password, role } = data;
+    const error = validateForm({ name, number, password, role });
+
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
     try {
       const { data } = await axios.post(
         "register",
@@ -31,8 +52,11 @@ function Register() {
           withCredentials: true,
         }
       );
+
       if (data.error) {
-        toast.error(data.error);
+        data.error.forEach((err) => {
+          toast.error(err.msg);
+        });
       } else {
         setData({ data });
         toast.success("Registration was successful. Proceed to Sign In!");
@@ -40,6 +64,7 @@ function Register() {
       }
     } catch (error) {
       console.log("error", error);
+      toast.error("There was an error. Please refresh and try again.");
     }
   };
 

@@ -13,19 +13,31 @@ const Register = async (req, res) => {
     // Validation
     if (!name) {
       return res.json({
-        error: "Name is required",
+        error: [{ msg: "Name is required" }],
       });
     }
+    if (!role) {
+      return res.status(400).json({ error: [{ msg: "Role is required" }] });
+    }
+    if (!/^\d+$/.test(number)) {
+      return res
+        .status(400)
+        .json({ error: [{ msg: "Sales ID must contain only numbers" }] });
+    }
     if (!password || password.length < 6) {
-      return res.json({
-        error: "Password is required and should be at least 6 characters long",
+      return res.status(400).json({
+        error: [
+          {
+            msg: "Password is required and should be at least 6 characters long",
+          },
+        ],
       });
     }
 
     // Check if user exists
     const exist = await UserModel.findOne({ number });
     if (exist) {
-      return res.status(400).json({
+      return res.json({
         error: [{ msg: "User already exists" }],
       });
     }
