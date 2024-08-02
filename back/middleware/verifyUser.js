@@ -11,7 +11,7 @@ export const VerifyUser = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, async (err, payload) => {
       try {
         if (err) {
-          return res.status(401).json({ error: "Unauthorised" });
+          return res.status(401).json({ error: "Unauthorised User" });
         }
         const user = await UserModel.findOne({ _id: payload._id }).select(
           "-password"
