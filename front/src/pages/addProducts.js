@@ -32,6 +32,7 @@ function AddProducts() {
   const [excel, setExcel] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
   const [filled, setFilled] = useState(true);
 
   useEffect(() => {
@@ -94,6 +95,7 @@ function AddProducts() {
 
   const submit = (e) => {
     e.preventDefault();
+    setLoading(true);
     if (validateRequiredFields()) {
       setError("");
       const productData = {
@@ -107,12 +109,14 @@ function AddProducts() {
         .then((result) => {
           setShowAlert(true);
           setShowAnimation(true);
+          setLoading(false);
           setTimeout(() => {
             setShowAnimation(true);
             navigate("/products");
           }, 2000);
         })
         .catch((err) => {
+          setLoading(false);
           if (err.response && err.response.status === 400) {
             const errorMessage = err.response.data.message;
             setError(`Error: ${errorMessage}`);

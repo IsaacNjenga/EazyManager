@@ -23,6 +23,7 @@ function AddSale() {
     code: "",
     colour: "",
   });
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [image, setImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -125,7 +126,7 @@ function AddSale() {
 
   const submit = (e) => {
     e.preventDefault();
-
+    setLoading(true);
     const saleData = {
       ...sale,
       image: image,
@@ -138,6 +139,7 @@ function AddSale() {
       .then((result) => {
         setShowAlert(true);
         setShowAnimation(true);
+        setLoading(false);
         toast.success("Sale entered");
         setTimeout(() => {
           navigate(user.role !== "admin" ? "/login" : "/sales");
@@ -145,6 +147,7 @@ function AddSale() {
       })
       .catch((err) => {
         console.log(err);
+        setLoading(false);
         setMessage(err.response?.data?.error || "An error occurred");
         toast.error("Failed to add sale");
       });
@@ -190,6 +193,28 @@ function AddSale() {
         ),
       }))
     : [];
+
+  if (loading) {
+    return (
+      <div>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
