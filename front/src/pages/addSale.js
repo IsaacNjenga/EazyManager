@@ -194,7 +194,7 @@ function AddSale() {
       }))
     : [];
 
-  if (loading) {
+  /*if (loading) {
     return (
       <div>
         {showAnimation && (
@@ -214,7 +214,7 @@ function AddSale() {
         )}
       </div>
     );
-  }
+  }*/
 
   return (
     <>
