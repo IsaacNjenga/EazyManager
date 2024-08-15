@@ -24,7 +24,7 @@ import Logs from "./logs";
 
 export const UserContext = createContext();
 
-axios.defaults.baseURL = `http://localhost:3001/EasyManager/`;
+axios.defaults.baseURL = `https://eazy-manager.vercel.app/EasyManager/`;
 axios.defaults.withCredentials = true;
 
 //https://eazy-manager.vercel.app/
