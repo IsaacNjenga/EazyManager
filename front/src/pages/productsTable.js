@@ -18,6 +18,8 @@ function ProductsTable() {
   const [sortByCode, setSortByCode] = useState(true);
   const [sortByNumber, setSortByNumber] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
 
   function gridlayout() {
     setGrid(true);
@@ -171,6 +173,24 @@ function ProductsTable() {
     setSelectedItem(null);
   };
 
+  const filteredProducts = products.filter(
+    (product) =>
+      search.toLowerCase() === "" ||
+      Object.values(product).some(
+        (value) =>
+          typeof value === "string" &&
+          value.toLowerCase().includes(search)
+      )
+  );
+  
+
+  // Pagination logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   if (loading) {
     return (
       <div>
@@ -238,9 +258,9 @@ function ProductsTable() {
       <br />
       <br />
 
-      {grid && Array.isArray(products) ? (
+      {grid && Array.isArray(currentProducts) ? (
         <div className="grid-layout">
-          {products
+          {currentProducts
             .filter(
               (product) =>
                 search.toLowerCase() === "" ||
@@ -357,7 +377,7 @@ function ProductsTable() {
         <p></p>
       )}
 
-      {list && Array.isArray(products) ? (
+      {list && Array.isArray(currentProducts) ? (
         <div className="print-table">
           <div className="table-container">
             <table className="productstable">
@@ -460,7 +480,7 @@ function ProductsTable() {
               </tr>
 
               <tbody>
-                {products
+                {currentProducts
                   .filter(
                     (product) =>
                       search.toLowerCase() === "" ||
@@ -707,6 +727,20 @@ function ProductsTable() {
           </div>
         </div>
       )}
+       {/* Pagination Controls */}
+       <div className="pagination">
+        {Array.from({ length: Math.ceil(filteredProducts.length / productsPerPage) }).map(
+          (_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={index + 1 === currentPage ? "active" : ""}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
+      </div>
     </div>
   );
 }
