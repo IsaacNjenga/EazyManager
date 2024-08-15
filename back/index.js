@@ -6,6 +6,7 @@ import "./config/db.js";
 import session from "express-session";
 import moment from "moment";
 import { Router } from "./routes/routes.js";
+import bodyParser from "body-parser";
 
 dotenv.config({ path: "./config/.env" });
 
@@ -20,8 +21,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json()); // to parse JSON bodies
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: "10mb" })); // Increase the limit as needed
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+//app.use(express.json()); // to parse JSON bodies
+//app.use(express.urlencoded({ extended: false }));
 
 //Session setup
 app.use(

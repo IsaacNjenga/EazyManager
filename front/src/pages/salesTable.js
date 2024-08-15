@@ -66,9 +66,9 @@ function SalesTable() {
   }, []);
 
   const styles = {
-    width: "auto",
-    height: "auto",
-    maxHeight: "auto",
+    width: "150px",
+    height: "150px",
+    maxHeight: "100%",
     objectFit: "contain",
     borderRadius: "10px",
     border: "1px inset #050101",

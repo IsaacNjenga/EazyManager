@@ -178,43 +178,35 @@ function AddSale() {
     }),
   };
 
-  const productOptions = Array.isArray(products)
-    ? products.map((product) => ({
-        value: product.number,
-        label: (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={product.image}
-              alt="no_Image"
-              style={{ width: 75, height: 75, marginRight: 10 }}
-            />
-            <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
-          </div>
-        ),
-      }))
-    : [];
-
-  if (loading) {
-    return (
-      <div>
-        {showAnimation && (
-          <div className="hourglassOverlay">
-            <div className="hourglassBackground">
-              <div className="hourglassContainer">
-                <div className="hourglassCurves"></div>
-                <div className="hourglassCapTop"></div>
-                <div className="hourglassGlassTop"></div>
-                <div className="hourglassSand"></div>
-                <div className="hourglassSandStream"></div>
-                <div className="hourglassCapBottom"></div>
-                <div className="hourglassGlass"></div>
-              </div>
-            </div>
-          </div>
-        )}
+  const productOptions = products.map((product) => ({
+    value:product.number || product.description || product.code, // Combine searchable fields
+    label: (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src={product.image}
+          alt="no_Image"
+          style={{ width: 75, height: 75, marginRight: 10 }}
+        />
+        <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
       </div>
-    );
-  }
+    ),
+  }));
+
+  //previous code
+  /*const productOptions = products.map((product) => ({
+    value: product.number,
+    label: (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src={product.image}
+          alt="no_Image"
+          style={{ width: 75, height: 75, marginRight: 10 }}
+        />
+        <span>{${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})}</span>
+      </div>
+    ),
+  }));
+ */
 
   return (
     <>
@@ -256,9 +248,9 @@ function AddSale() {
             styles={customStyles}
             options={productOptions}
             onChange={handleProductSelection}
-            value={productOptions.find(
-              (option) => option.value === sale.pnumber
-            )}
+            getOptionValue={(option) => option.value} // Use combined value for searching
+            placeholder="Type to search..."
+            isSearchable={true}
           />
           <br />
           <br />

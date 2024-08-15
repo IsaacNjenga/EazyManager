@@ -128,15 +128,24 @@ function AddProducts() {
   };
 
   const convertToBase64 = (e) => {
+    const file = e.target.files[0];
+
+    // Check if file is larger than 10MB
+    const maxSize = 10 * 1024 * 1024; // 10 MB in bytes
+    if (file.size > maxSize) {
+      alert("File size exceeds 10 MB. Please select a smaller file.");
+      return;
+    }
+
     var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(file);
     reader.onload = () => {
       console.log(reader.result);
       setImage(reader.result);
     };
     reader.onerror = (error) => {
       console.log("Error: ", error);
-      alert("Error:", error);
+      alert("Payload is too large. Select a smaller image");
     };
   };
 

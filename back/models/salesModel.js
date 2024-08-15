@@ -15,7 +15,7 @@ const salesSchema = new mongoose.Schema(
     code: String,
     colour: String,
   },
-  { collection: "sales" }
+  { collection: "sales", timestamps: true }
 );
 
 const SalesModel = mongoose.model("Sale", salesSchema);

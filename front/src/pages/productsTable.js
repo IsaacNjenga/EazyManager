@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import { format } from "date-fns";
 import { toast } from "react-hot-toast";
 
 function ProductsTable() {
@@ -14,6 +15,9 @@ function ProductsTable() {
   const [selectedProductNumber, setSelectedProductNumber] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [sortByCode, setSortByCode] = useState(true);
+  const [sortByNumber, setSortByNumber] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   function gridlayout() {
     setGrid(true);
@@ -50,6 +54,12 @@ function ProductsTable() {
     setSelectedProductNumber(null);
   };
 
+  const sortProducts = (productsArray, sortByCode) => {
+    return sortByCode
+      ? productsArray.sort((a, b) => a.code.localeCompare(b.code))
+      : productsArray.sort((a, b) => a.number.localeCompare(b.number));
+  };
+
   useEffect(() => {
     setLoading(true);
     setShowAnimation(true);
@@ -61,47 +71,23 @@ function ProductsTable() {
         const productsArray = Array.isArray(result.data.products)
           ? result.data.products
           : [];
-        const sortedProducts = productsArray.sort((a, b) =>
-          a.code.localeCompare(b.code)
-        );
+        const sortedProducts = sortProducts(productsArray, sortByCode);
         setProducts(sortedProducts);
         setLoading(false);
         setShowAnimation(false);
       })
       .catch((err) => {
         console.error("Error fetching products:", err);
+        alert("An error occured. Try refreshing the page");
         setLoading(false);
         setShowAnimation(false);
       });
-  }, []);
-  
-
-  if (loading) {
-    return (
-      <div>
-        {showAnimation && (
-          <div className="hourglassOverlay">
-            <div className="hourglassBackground">
-              <div className="hourglassContainer">
-                <div className="hourglassCurves"></div>
-                <div className="hourglassCapTop"></div>
-                <div className="hourglassGlassTop"></div>
-                <div className="hourglassSand"></div>
-                <div className="hourglassSandStream"></div>
-                <div className="hourglassCapBottom"></div>
-                <div className="hourglassGlass"></div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
+  }, [sortByCode, sortByNumber]);
 
   const styles = {
-    width: "auto",
-    height: "auto",
-    maxHeight: "auto",
+    width: "150px",
+    height: "150px",
+    maxHeight: "100%",
     objectFit: "contain",
     borderRadius: "10px",
     border: "1px inset #050101",
@@ -150,6 +136,63 @@ function ProductsTable() {
     );
   }
 
+  function byCode() {
+    setSortByCode(true);
+    setSortByNumber(false);
+  }
+
+  function byNumber() {
+    setSortByNumber(true);
+    setSortByCode(false);
+  }
+
+  const productHistory = (productNumber) => {
+    try {
+      axios
+        .get(`products`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
+        .then((result) => {
+          const productsArray = Array.isArray(result.data.products)
+            ? result.data.products
+            : [];
+          const fetchedProduct = productsArray.find(
+            (product) => product._id === productNumber
+          );
+          setSelectedItem(fetchedProduct);
+        });
+    } catch (error) {
+      alert("An error occurred. Try refreshing or logging in again");
+      console.log(error);
+    }
+  };
+
+  const closeHistoryModal = () => {
+    setSelectedItem(null);
+  };
+
+  if (loading) {
+    return (
+      <div>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
       <form className="search-panels">
@@ -183,6 +226,16 @@ function ProductsTable() {
       <button className="button-name" onClick={handlePrint}>
         Print
       </button>
+      <br />
+      <br />
+      <div className="dropdown-content">
+        <button onClick={byCode}>Sort by Code</button>
+        {"  "}
+        <button onClick={byNumber}>Sort by Number</button>
+      </div>
+      <br />
+      <br />
+      <br />
       <br />
 
       {grid && Array.isArray(products) ? (
@@ -535,6 +588,13 @@ function ProductsTable() {
                         <td>
                           <div className="buttons-container">
                             <button
+                              className="historybtn"
+                              title="View the history"
+                              onClick={() => productHistory(product._id)}
+                            >
+                              <i className="material-icons">visibility</i>
+                            </button>
+                            <button
                               className="updatebtn"
                               title="Update this record"
                             >
@@ -594,6 +654,58 @@ function ProductsTable() {
         </div>
       ) : (
         <p></p>
+      )}
+      {selectedItem && (
+        <div className="modal-overlay" onClick={closeHistoryModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={closeHistoryModal}>
+              &times;
+            </button>
+            <h1 className="modal-title">Product History</h1>
+            <div className="modal-body">
+              <img
+                src={selectedItem.image}
+                alt="Product"
+                className="product-image"
+              />
+              <div className="product-details">
+                <h3 className="product-description">
+                  {selectedItem.description}
+                </h3>
+                {selectedItem.createdAt && (
+                  <p className="product-info">
+                    <strong>First Entered:</strong>{" "}
+                    {format(
+                      new Date(selectedItem.createdAt),
+                      "EEEE, MMM do, yyyy"
+                    )}
+                  </p>
+                )}
+                <p className="product-info">
+                  <strong>Quantity:</strong> {selectedItem.quantity}
+                </p>
+                <p className="product-info">
+                  <strong>Colour:</strong> {selectedItem.colour}
+                </p>
+                <p className="product-info">
+                  <strong>Location:</strong> {selectedItem.location}
+                </p>
+                <p className="product-info">
+                  <strong>Batch No.:</strong> {selectedItem.bnumber}
+                </p>
+                {selectedItem.updatedAt && (
+                  <p className="product-info">
+                    <strong>Last Updated:</strong>{" "}
+                    {format(
+                      new Date(selectedItem.updatedAt),
+                      "EEEE, MMM do, yyyy"
+                    )}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
