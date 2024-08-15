@@ -208,6 +208,7 @@ function AddSale() {
   }));
  */
 
+
   return (
     <>
       <Navbar />
