@@ -1695,3 +1695,49 @@ a:hover {
   border-radius: 5px;
   outline: 1px solid slategrey;
 }
+
+/*receipt css*/
+.receipt {
+  width: 80mm;
+  margin: auto;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.receipt-header,
+.receipt-footer {
+  text-align: center;
+}
+
+.receipt-body {
+  font-size: 14px;
+}
+
+.receipt-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.receipt-item.header {
+  font-weight: bold;
+}
+
+.receipt-item span {
+  padding: 0 5px;
+  text-align: left;
+}
+
+.receipt-item span:nth-child(3),
+.receipt-item span:nth-child(4),
+.receipt-item span:nth-child(5) {
+  text-align: right;
+}
+
+.total {
+  text-align: right;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+}

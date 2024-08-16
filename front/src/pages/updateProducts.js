@@ -293,7 +293,7 @@ function UpdateProducts() {
         <br />
         <hr />
         <br />
-        Image:
+        {/*Image:
         <hr />
         <div
           style={{
@@ -316,7 +316,7 @@ function UpdateProducts() {
           type="file"
           onChange={convertToBase64}
           name="image"
-        />
+        />*/}
         <br />
         <hr />
         {showAlert && (

@@ -28,7 +28,7 @@ const addProduct = async (req, res) => {
     location,
     bnumber,
     summary,
-    image,
+    //image,
   } = req.body;
 
   const newProduct = new ProductsModel({
@@ -41,7 +41,7 @@ const addProduct = async (req, res) => {
     location,
     bnumber,
     summary,
-    image,
+    //image,
   });
 
   newProduct

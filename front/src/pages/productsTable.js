@@ -18,8 +18,6 @@ function ProductsTable() {
   const [sortByCode, setSortByCode] = useState(true);
   const [sortByNumber, setSortByNumber] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 10;
 
   function gridlayout() {
     setGrid(true);
@@ -173,24 +171,6 @@ function ProductsTable() {
     setSelectedItem(null);
   };
 
-  const filteredProducts = products.filter(
-    (product) =>
-      search.toLowerCase() === "" ||
-      Object.values(product).some(
-        (value) =>
-          typeof value === "string" &&
-          value.toLowerCase().includes(search)
-      )
-  );
-  
-
-  // Pagination logic
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   if (loading) {
     return (
       <div>
@@ -258,9 +238,9 @@ function ProductsTable() {
       <br />
       <br />
 
-      {grid && Array.isArray(currentProducts) ? (
+      {grid && Array.isArray(products) ? (
         <div className="grid-layout">
-          {currentProducts
+          {products
             .filter(
               (product) =>
                 search.toLowerCase() === "" ||
@@ -274,14 +254,14 @@ function ProductsTable() {
             .map((product) => (
               <div className="product" key={product.number}>
                 <div className="card">
-                  <p className="img">
+                  {/* <p className="img">
                     <img
                       src={product.image}
                       alt="Image_here"
                       style={styles2}
                       className="img2"
                     />
-                  </p>
+            </p>*/}
                   <hr />
                   <div className="content">
                     <p>
@@ -377,20 +357,20 @@ function ProductsTable() {
         <p></p>
       )}
 
-      {list && Array.isArray(currentProducts) ? (
+      {list && Array.isArray(products) ? (
         <div className="print-table">
           <div className="table-container">
             <table className="productstable">
               <thead className="table-header">
                 <tr>
-                  <th
+                  {/* <th
                     style={{
                       borderRight: "0.5px solid white",
                       textAlign: "center",
                     }}
                   >
                     Image
-                  </th>
+                  </th>*/}
                   <th
                     style={{
                       textAlign: "center",
@@ -480,7 +460,7 @@ function ProductsTable() {
               </tr>
 
               <tbody>
-                {currentProducts
+                {products
                   .filter(
                     (product) =>
                       search.toLowerCase() === "" ||
@@ -493,21 +473,21 @@ function ProductsTable() {
                   .map((product) => (
                     <React.Fragment key={product._id}>
                       <tr>
-                        <td
+                        {/* <td
                           style={{
                             backgroundColor: "#5bacba",
                             color: "white",
                           }}
                         >
-                          {
+                          
                             <img
                               src={product.image}
                               alt="Image_here"
                               style={styles}
                               className="img2"
                             />
-                          }
-                        </td>
+                        
+                        </td>*/}
                         <td
                           style={{
                             backgroundColor: "#e0e0e0",
@@ -683,11 +663,11 @@ function ProductsTable() {
             </button>
             <h1 className="modal-title">Product History</h1>
             <div className="modal-body">
-              <img
+              {/*<img
                 src={selectedItem.image}
                 alt="Product"
                 className="product-image"
-              />
+      />*/}
               <div className="product-details">
                 <h3 className="product-description">
                   {selectedItem.description}
@@ -727,20 +707,6 @@ function ProductsTable() {
           </div>
         </div>
       )}
-       {/* Pagination Controls */}
-       <div className="pagination">
-        {Array.from({ length: Math.ceil(filteredProducts.length / productsPerPage) }).map(
-          (_, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={index + 1 === currentPage ? "active" : ""}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
-      </div>
     </div>
   );
 }

@@ -179,7 +179,7 @@ function AddSale() {
   };
 
   const productOptions = products.map((product) => ({
-    value:product.number || product.description || product.code, // Combine searchable fields
+    value: product.number || product.description || product.code, // Combine searchable fields
     label: (
       <div style={{ display: "flex", alignItems: "center" }}>
         <img
@@ -208,6 +208,15 @@ function AddSale() {
   }));
  */
 
+  const handleReceipt = () => {
+    window.print();
+    console.log("\x1B|m");
+  };
+
+  const [clicked, setClicked] = useState(false);
+  const addItem = () => {
+    setClicked(true);
+  };
 
   return (
     <>
@@ -275,7 +284,13 @@ function AddSale() {
             </div>
           </div>
           <br />
-
+          <p>
+            Add another item?{" "}
+            <strong onClick={addItem} style={{ cursor: "pointer" }}>
+              Yes
+            </strong>
+          </p>
+          {clicked && <p>Item added</p>}
           <br />
           <br />
           <hr />
@@ -359,12 +374,65 @@ function AddSale() {
             <button className="addbtn" onClick={submit}>
               Add Sale
             </button>
+            <button className="addbtn" onClick={handleReceipt}>
+              Print receipt
+            </button>
             <button className="backbtn" onClick={back}>
               Cancel
             </button>
             {message && <div>{message}</div>}
           </div>
         </form>
+        <div className="print-table">
+          <div className="receipt" id="receipt">
+            <div className="receipt-header">
+              <h1>VALUEMART</h1>
+              <p>
+                <i>Transforming the office workspace</i>
+              </p>
+              <p>Ngara Rd, P.O BOX 513-00600</p>
+              <p>Tel: +254 720 731 982</p>
+              <p>Date: {new Date().toLocaleString()}</p>
+            </div>
+            <hr />
+            <div className="receipt-body">
+              <div className="receipt-item header">
+                <span>
+                  <strong>Qty</strong>
+                </span>{" "}
+                <span>
+                  <strong>Item</strong>
+                </span>{" "}
+                <span>
+                  <strong>Code</strong>
+                </span>
+                <span>
+                  <strong>Each</strong>
+                </span>
+                <span>
+                  <strong>Total</strong>
+                </span>
+              </div>
+              <hr />
+              <div className="receipt-item">
+                <span>1 PC</span>
+                <span>STRAIGHT BACK CHAIR</span>
+                <span>(SBC)</span>
+                <span>KES. 5,000</span>
+                <span>KES. 5,000</span>
+              </div>
+              <hr />
+              <div className="total">
+                <span>Total: KES. 5,000</span>
+              </div>
+            </div>
+            <hr />
+            <div className="receipt-footer">
+              <p>Salesperson: {user.name.toUpperCase()}</p>
+            </div>
+          </div>
+        </div>
+
         {showAnimation && (
           <div className="hourglassOverlay">
             <div className="hourglassBackground">

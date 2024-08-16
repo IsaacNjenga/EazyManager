@@ -447,11 +447,11 @@ function AddProducts() {
             <br />
             <hr />
             <br />
-            Image:
+            {/*Image:
             <hr />
             <input accept="image/*" type="file" onChange={convertToBase64} />
             <br />
-            <hr />
+            <hr />*/}
             {showAlert && (
               <div className="alert">
                 <p style={{ textAlign: "center" }}>

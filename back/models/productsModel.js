@@ -11,7 +11,7 @@ const productsSchema = new mongoose.Schema(
     location: { type: String },
     bnumber: { type: String },
     summary: { type: String },
-    image: { type: String },
+   // image: { type: String },
   },
   { collection: "products", timestamps: true }
 );
