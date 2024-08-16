@@ -179,18 +179,31 @@ function AddSale() {
   };
 
   const productOptions = products.map((product) => ({
-    value: product.number || product.description || product.code, // Combine searchable fields
+    value: product.number, // Keep value simple
+    product, // Store the entire product object for easy access
     label: (
       <div style={{ display: "flex", alignItems: "center" }}>
-        <img
+        {/*<img
           src={product.image}
           alt="no_Image"
           style={{ width: 75, height: 75, marginRight: 10 }}
-        />
+        />*/}
         <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
       </div>
     ),
   }));
+
+  const filterOption = ({ label, value, data }, input) => {
+    if (input) {
+      const searchTerm = input.toLowerCase();
+      return (
+        data.product.number.toLowerCase().includes(searchTerm) ||
+        data.product.description.toLowerCase().includes(searchTerm) ||
+        data.product.code.toLowerCase().includes(searchTerm)
+      );
+    }
+    return true; // Default to showing all options when there's no input
+  };
 
   //previous code
   /*const productOptions = products.map((product) => ({
@@ -258,7 +271,7 @@ function AddSale() {
             styles={customStyles}
             options={productOptions}
             onChange={handleProductSelection}
-            getOptionValue={(option) => option.value} // Use combined value for searching
+            filterOption={filterOption} // Use custom search filter
             placeholder="Type to search..."
             isSearchable={true}
           />
