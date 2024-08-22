@@ -317,14 +317,14 @@ function SalesTable() {
                 <table className="productstable">
                   <thead className="table-header">
                     <tr>
-                      <th
+                      {/* <th
                         style={{
                           borderRight: "0.5px solid white",
                           textAlign: "center",
                         }}
                       >
                         Image
-                      </th>
+                      </th>*/}
                       <th
                         style={{
                           borderRight: "0.5px solid white",
@@ -402,7 +402,7 @@ function SalesTable() {
                     {groupedSalesByDate[date].map((sale, index) => (
                       <React.Fragment key={sale.number}>
                         <tr>
-                          <td
+                          {/*<td
                             style={{
                               backgroundColor: "#5bacba",
                               borderRight: "0px solid grey",
@@ -414,7 +414,7 @@ function SalesTable() {
                               style={styles}
                               className="img2"
                             />
-                          </td>
+                          </td>*/}
                           <td
                             style={{
                               backgroundColor: "#e0e0e0",

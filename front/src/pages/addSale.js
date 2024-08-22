@@ -17,33 +17,40 @@ function AddSale() {
     quantity: 0,
     total: 0,
     datesold: new Date(),
-    saleperson: "",
+    saleperson: user.name.toUpperCase(),
     commission: 0,
     pnumber: "",
     code: "",
     colour: "",
   });
+
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(true);
   const [message, setMessage] = useState(null);
   const [image, setImage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [products, setProducts] = useState([]);
   const [isImageAvailable, setIsImageAvalailable] = useState(false);
+  const [sales, setSales] = useState([]);
+  const [saleItems, setSaleItems] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    setFetching(true);
     const fetchItems = async () => {
       try {
         const response = await axios.get(`products`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
-        const productsArray = Array.isArray(response.data.products)
-          ? response.data.products
-          : [];
-        setProducts(productsArray);
+        setProducts(
+          Array.isArray(response.data.products) ? response.data.products : []
+        );
+        setFetching(false);
       } catch (error) {
-        console.log("Error fetching item:", error);
+        console.log("Error fetching items:", error);
+        setFetching(false);
       }
     };
 
@@ -56,15 +63,20 @@ function AddSale() {
     );
 
     if (selectedProduct) {
-      setSale((prev) => ({
+      setSaleItems((prev) => [
         ...prev,
-        description: selectedProduct.description,
-        colour: selectedProduct.colour,
-        code: selectedProduct.code,
-        pnumber: selectedProduct.number,
-      }));
+        {
+          quantity: "",
+          price: "",
+          description: selectedProduct.description,
+          colour: selectedProduct.colour,
+          code: selectedProduct.code,
+          pnumber: selectedProduct.number,
+          total: "",
+          commission: "",
+        },
+      ]);
 
-      // Set the image if available
       if (selectedProduct.image) {
         setIsImageAvalailable(true);
         setImage(selectedProduct.image);
@@ -72,49 +84,50 @@ function AddSale() {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleRowChange = (index, event) => {
+    const { name, value } = event.target;
+    const items = [...saleItems];
+    items[index][name] = value;
 
-    const newValue =
-      name === "description" || name === "saleperson" || name === "code"
-        ? value.toUpperCase()
-        : name === "colour"
-        ? value
-        : name === "quantity"
-        ? parseInt(value) || 0
-        : parseFloat(value) || 0;
-
-    setSale((prev) => ({
-      ...prev,
-      saleperson: user.name.toUpperCase(),
-      [name]: newValue,
-      total:
-        name === "price" || name === "quantity"
-          ? calculateTotal(
-              name === "price" ? newValue : prev.price,
-              name === "quantity" ? newValue : prev.quantity
-            )
-          : prev.total,
-      commission:
-        name === "price" || name === "quantity"
-          ? calculateCommission(
-              name === "price"
-                ? newValue * prev.quantity
-                : prev.price * newValue
-            )
-          : prev.commission,
-    }));
-  };
-
-  const calculateTotal = (price, quantity) => {
-    return price * quantity;
-  };
-
-  const calculateCommission = (total) => {
-    if (total >= 10000) {
-      return 0.01 * total;
+    // Recalculate total and commission based on quantity and price changes
+    if (name === "quantity" || name === "price") {
+      const price = parseFloat(items[index].price || 0);
+      const quantity = parseInt(items[index].quantity || 0);
+      items[index].total = calculateTotal(price, quantity);
+      items[index].commission = calculateCommission(items[index].total);
     }
-    return 0;
+
+    setSaleItems(items);
+  };
+
+  const calculateTotal = (price, quantity) => price * quantity;
+
+  const calculateCommission = (total) => (total >= 10000 ? 0.01 * total : 0);
+
+  /* const addNewRow = (e) => {
+    e.preventDefault();
+    setSaleItems([
+      ...saleItems,
+      {
+        quantity: "",
+        price: "",
+        description: "",
+        code: "",
+        total: "",
+        commission: "",
+      },
+    ]);
+  };*/
+
+  const removeCurrentRow = (index, e) => {
+    e.preventDefault();
+    setSaleItems(saleItems.filter((_, i) => i !== index));
+  };
+
+  const handleEnterSale = (e) => {
+    e.preventDefault();
+    setSales([...sales, saleItems]);
+    setSaleItems([]);
   };
 
   const handleDateChange = (date) => {
@@ -124,49 +137,57 @@ function AddSale() {
     }));
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const saleData = {
-      ...sale,
-      image: image,
-    };
 
-    axios
-      .post("addSale", saleData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((result) => {
-        setShowAlert(true);
-        setShowAnimation(true);
-        setLoading(false);
-        toast.success("Sale entered");
-        setTimeout(() => {
-          navigate(user.role !== "admin" ? "/login" : "/sales");
-        }, 2000);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-        setMessage(err.response?.data?.error || "An error occurred");
-        toast.error("Failed to add sale");
-      });
+    try {
+      // Loop through each sale item and send them individually
+      for (let saleGroup of sales) {
+        for (let saleItem of saleGroup) {
+          const saleData = {
+            ...sale,
+            number: saleItem.number || sale.number,
+            description: saleItem.description || sale.description,
+            price: parseFloat(saleItem.price) || sale.price,
+            quantity: parseInt(saleItem.quantity) || sale.quantity,
+            total: parseFloat(saleItem.total) || sale.total,
+            datesold: sale.datesold ? new Date(sale.datesold) : new Date(),
+            saleperson: sale.saleperson,
+            commission: saleItem.commission || sale.commission,
+            pnumber: saleItem.pnumber || sale.pnumber,
+            code: saleItem.code || sale.code,
+            colour: saleItem.colour || sale.colour,
+            // image: image, (uncomment if needed)
+          };
+
+          console.log("saleData", saleData);
+
+          await axios.post("addSale", saleData, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+        }
+      }
+
+      setShowAlert(true);
+      setShowAnimation(true);
+      setLoading(false);
+      toast.success("Sales entered successfully");
+      setTimeout(() => {
+        navigate(user.role !== "admin" ? "/login" : "/sales");
+      }, 1000);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      setMessage(err.response?.data?.error || "An error occurred");
+      toast.error("Failed to add sale");
+    }
   };
 
-  const convertToBase64 = (e) => {
-    var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
-    reader.onload = () => {
-      console.log(reader.result);
-      setImage(reader.result);
-    };
-    reader.onerror = (error) => {
-      console.log("Error: ", error);
-      setMessage("An Error occurred. Please try again");
-    };
-  };
-
-  const back = () => {
+  const back = (e) => {
+    e.preventDefault();
     navigate("/sales");
   };
 
@@ -178,20 +199,27 @@ function AddSale() {
     }),
   };
 
-  const productOptions = products.map((product) => ({
-    value: product.number, // Keep value simple
-    product, // Store the entire product object for easy access
-    label: (
-      <div style={{ display: "flex", alignItems: "center" }}>
-        {/*<img
-          src={product.image}
-          alt="no_Image"
-          style={{ width: 75, height: 75, marginRight: 10 }}
-        />*/}
-        <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
-      </div>
-    ),
-  }));
+  const productOptions = fetching
+    ? [
+        {
+          label: (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span>
+                <p>Fetching items. Please wait...</p>
+              </span>
+            </div>
+          ),
+        },
+      ]
+    : products.map((product) => ({
+        value: product.number,
+        product,
+        label: (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
+          </div>
+        ),
+      }));
 
   const filterOption = ({ label, value, data }, input) => {
     if (input) {
@@ -202,33 +230,7 @@ function AddSale() {
         data.product.code.toLowerCase().includes(searchTerm)
       );
     }
-    return true; // Default to showing all options when there's no input
-  };
-
-  //previous code
-  /*const productOptions = products.map((product) => ({
-    value: product.number,
-    label: (
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <img
-          src={product.image}
-          alt="no_Image"
-          style={{ width: 75, height: 75, marginRight: 10 }}
-        />
-        <span>{${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})}</span>
-      </div>
-    ),
-  }));
- */
-
-  const handleReceipt = () => {
-    window.print();
-    console.log("\x1B|m");
-  };
-
-  const [clicked, setClicked] = useState(false);
-  const addItem = () => {
-    setClicked(true);
+    return true;
   };
 
   return (
@@ -238,7 +240,7 @@ function AddSale() {
         <button className="backbtn" onClick={back}>
           Back to Sales
         </button>
-        <form className="form">
+        <form className="sale-form">
           <div style={{ textAlign: "center" }}>
             <span
               style={{ fontSize: "35px", color: "purple", fontStyle: "italic" }}
@@ -258,7 +260,7 @@ function AddSale() {
           <input
             type="text"
             value={sale.number}
-            onChange={handleChange}
+            onChange={(e) => setSale({ ...sale, number: e.target.value })}
             name="number"
           />
           <br />
@@ -271,196 +273,172 @@ function AddSale() {
             styles={customStyles}
             options={productOptions}
             onChange={handleProductSelection}
-            filterOption={filterOption} // Use custom search filter
+            filterOption={filterOption}
             placeholder="Type to search..."
             isSearchable={true}
           />
           <br />
+          <p>Use the search bar to add an item</p>
           <br />
-          <label>Description:</label>
-          <input
-            type="text"
-            name="description"
-            value={sale.description}
-            readOnly
-          />
-          <br />
-          <br />
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div>
-              <label>Colour:</label>
-              <input type="text" name="colour" value={sale.colour} readOnly />
-            </div>
-            <div style={{ marginLeft: "50px" }}>
-              <label>Code:</label>
-              <input type="text" name="code" value={sale.code} readOnly />
-            </div>
+          <div className="sale-table">
+            {/*<button
+              onClick={addNewRow}
+              style={{ cursor: "pointer" }}
+              className="addbtn"
+            >
+              Add item
+  </button>*/}
+            <table className="sale-item-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Colour</th>
+                  <th>Code</th>
+                  <th>Quantity</th>
+                  <th>Price per Item (Ksh.)</th>
+                  <th>Total (Ksh.)</th>
+                  <th>Commission (Ksh.)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {saleItems.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.description}</td>
+                    <td>{item.colour}</td>
+                    <td>{item.code}</td>
+                    <td>
+                      <input
+                        type="number"
+                        name="quantity"
+                        value={item.quantity}
+                        onChange={(e) => handleRowChange(index, e)}
+                        style={{ width: "100px" }}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        name="price"
+                        value={item.price.toLocaleString()}
+                        onChange={(e) => handleRowChange(index, e)}
+                        style={{ width: "250px" }}
+                      />
+                    </td>
+                    <td>{item.total.toLocaleString()}</td>
+                    <td>{item.commission.toLocaleString()}</td>
+                    <td>
+                      <button onClick={(e) => removeCurrentRow(index, e)}>
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           <br />
-          <p>
-            Add another item?{" "}
-            <strong onClick={addItem} style={{ cursor: "pointer" }}>
-              Yes
-            </strong>
-          </p>
-          {clicked && <p>Item added</p>}
-          <br />
-          <br />
-          <hr />
-          <br />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1px",
-            }}
-          >
-            <label>Price:</label>
-            <input
-              type="number"
-              placeholder="Price"
-              onChange={handleChange}
-              name="price"
-            />
-            <label>Quantity:</label>
-            <input
-              type="number"
-              placeholder="Quantity"
-              onChange={handleChange}
-              name="quantity"
-            />
-            <label>Total:</label>
-            <input
-              type="text"
-              placeholder="Total"
-              value={sale.total}
-              readOnly
-            />
-            <label>Commission:</label>
-            <input
-              type="text"
-              placeholder="Commission"
-              value={sale.commission.toLocaleString()}
-              readOnly
-            />
-          </div>
-          <br />
-          <hr />
-          <br />
-          <label>Date of Sale:</label>
+          <label>Date Sold:</label>
           <DatePicker
             selected={sale.datesold}
             onChange={handleDateChange}
-            dateFormat="EEEE, dd-MM-yyyy"
+            dateFormat="dd-MM-yyyy"
+            readOnly
           />
           <br />
-          <br />
-          <label>Salesperson: {user.name.toUpperCase()}</label>
-
-          <br />
-
-          {!isImageAvailable && (
-            <div>
-              <hr />
-              <br />
-              <label>Image:</label>
-              <input accept="image/*" type="file" onChange={convertToBase64} />
-            </div>
-          )}
+          <label>Sold By:</label>
+          <input type="text" value={user.name.toUpperCase()} disabled />
           <br />
           <br />
-          {showAlert && (
-            <div className="alert">
-              <p style={{ textAlign: "center" }}>
-                Success! <i className="material-icons">check</i>
-              </p>
-            </div>
-          )}
-          <hr />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <button className="addbtn" onClick={submit}>
-              Add Sale
-            </button>
-            <button className="addbtn" onClick={handleReceipt}>
-              Print receipt
-            </button>
-            <button className="backbtn" onClick={back}>
-              Cancel
-            </button>
-            {message && <div>{message}</div>}
-          </div>
+          <button onClick={handleEnterSale}>Enter Sale</button>
+          <br />
+          <br />
+          <button onClick={submit} className="submitbtn">
+            {loading ? "Submitting sale..." : "Submit Sale"}
+          </button>
+          <button onClick={back}>Cancel</button>
         </form>
-        <div className="print-table">
-          <div className="receipt" id="receipt">
-            <div className="receipt-header">
-              <h1>VALUEMART</h1>
-              <p>
-                <i>Transforming the office workspace</i>
-              </p>
-              <p>Ngara Rd, P.O BOX 513-00600</p>
-              <p>Tel: +254 720 731 982</p>
-              <p>Date: {new Date().toLocaleString()}</p>
-            </div>
-            <hr />
-            <div className="receipt-body">
-              <div className="receipt-item header">
-                <span>
-                  <strong>Qty</strong>
-                </span>{" "}
-                <span>
-                  <strong>Item</strong>
-                </span>{" "}
-                <span>
-                  <strong>Code</strong>
-                </span>
-                <span>
-                  <strong>Each</strong>
-                </span>
-                <span>
-                  <strong>Total</strong>
-                </span>
-              </div>
-              <hr />
-              <div className="receipt-item">
-                <span>1 PC</span>
-                <span>STRAIGHT BACK CHAIR</span>
-                <span>(SBC)</span>
-                <span>KES. 5,000</span>
-                <span>KES. 5,000</span>
-              </div>
-              <hr />
-              <div className="total">
-                <span>Total: KES. 5,000</span>
-              </div>
-            </div>
-            <hr />
-            <div className="receipt-footer">
-              <p>Salesperson: {user.name.toUpperCase()}</p>
-            </div>
-          </div>
-        </div>
 
-        {showAnimation && (
-          <div className="hourglassOverlay">
-            <div className="hourglassBackground">
-              <div className="hourglassContainer">
-                <div className="hourglassCurves"></div>
-                <div className="hourglassCapTop"></div>
-                <div className="hourglassGlassTop"></div>
-                <div className="hourglassSand"></div>
-                <div className="hourglassSandStream"></div>
-                <div className="hourglassCapBottom"></div>
-                <div className="hourglassGlass"></div>
+        {sales.length > 0 && (
+          <div className="print-table">
+            <div className="receipt" id="receipt">
+              <div className="receipt-header">
+                <h1 style={{ fontFamily: "Georgia" }}>VALUEMART FURNITURES</h1>
+                <p>
+                  <i>~ Transforming the office workspace ~</i>
+                </p>
+                <p>Ngara Rd, P.O BOX 513-00600</p>
+                <p>Tel: +254 720 731 982</p>
+                <p>Date: {new Date().toLocaleString()}</p>
+                <br />
+                <p style={{ textAlign: "left" }}>Receipt No. {sale.number}</p>
+              </div>
+              <hr />
+              {sales.map((sale, index) => {
+                let saleTotal = 0; // Initialize the total for each sale
+                return (
+                  <div className="receipt-body" key={index}>
+                    <div
+                      className="receipt-item header"
+                      style={{ fontFamily: "retro" }}
+                    >
+                      <span>
+                        <strong>Qty</strong>
+                      </span>
+                      <span>
+                        <strong>Item</strong>
+                      </span>
+                      <span>
+                        <strong>Code</strong>
+                      </span>
+                      <span>
+                        <strong>Each</strong>
+                      </span>
+                      <span>
+                        <strong>Total</strong>
+                      </span>
+                    </div>
+                    {sale.map((item, i) => {
+                      saleTotal += item.total; // Accumulate the total for each item
+                      return (
+                        <div key={i}>
+                          <div className="receipt-item">
+                            <span>{item.quantity}</span>
+                            <span>{item.description}</span>
+                            <span>({item.code})</span>
+                            <span>{item.price.toLocaleString()}</span>
+                            <span>{item.total.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div className="total">
+                      <hr />
+                      <span>Total: Ksh. {saleTotal.toLocaleString()}</span>
+                    </div>
+                  </div>
+                );
+              })}
+              <hr />
+              <div className="receipt-footer">
+                <p>Served by: {user.name.toUpperCase()}</p>
+              </div>
+              <div className="footer-message">
+                <p>
+                  <strong>
+                    <i>Thank you for shopping with us. Come again!</i>
+                  </strong>
+                </p>
+                <p>**********************************************</p>
               </div>
             </div>
           </div>
         )}
+
+        {/*isImageAvailable && (
+          <div className="image-container">
+            <img src={image} alt="Selected product" className="product-image" />
+          </div>
+        )*/}
       </div>
     </>
   );

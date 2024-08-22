@@ -174,6 +174,20 @@ function ProductsTable() {
   if (loading) {
     return (
       <div>
+        <div
+          style={{
+            textAlign: "center",
+            margin: "auto",
+            justifyContent: "center",
+          }}
+        >
+          <p>
+            <strong>Just a second...</strong>
+          </p>
+          <p>
+            <strong>Gathering your data</strong>
+          </p>
+        </div>
         {showAnimation && (
           <div className="hourglassOverlay">
             <div className="hourglassBackground">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import {
   BarChart,
   Bar,
@@ -482,9 +482,17 @@ const Dashboard = () => {
 
   const groupedSalesByDate = sales.reduce((acc, sale) => {
     const saleDate = new Date(sale.datesold);
+
+    // Check if the date is valid
+    if (!isValid(saleDate)) {
+      console.error(`Invalid date: ${sale.datesold}`);
+      return acc; // Skip this sale if the date is invalid
+    }
+
     const saleDay = format(saleDate, "EEEE, dd-MM-yyyy");
     acc[saleDay] = acc[saleDay] || [];
     acc[saleDay].push(sale);
+
     return acc;
   }, {});
 

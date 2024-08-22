@@ -36,30 +36,36 @@ function AddProducts() {
   const [filled, setFilled] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+    setShowAnimation(true);
     axios
       .get("products", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((result) => {
-        if (Array.isArray(result.data)) {
-          setProducts(result.data);
-        } else {
-          setProducts([]);
-        }
+        const productsArray = Array.isArray(result.data.products)
+          ? result.data.products
+          : [];
+        setProducts(productsArray);
+        setLoading(false);
+        setShowAnimation(false);
       })
       .catch((err) => {
         console.error("Failed to fetch products:", err);
+        alert("An error occured. Try refreshing the page");
+        setLoading(false);
+        setShowAnimation(false);
         setProducts([]);
       });
   }, []);
 
   const lastProduct = [...products]
-    .sort((a, b) => a.number.localeCompare(b.number))
+    .sort((a, b) => Number(a.number) - Number(b.number)) // Sort by numeric value
     .pop();
 
   let incrementedProductNumber;
   if (lastProduct) {
-    incrementedProductNumber = parseInt(lastProduct.number) + 1;
+    incrementedProductNumber = Number(lastProduct.number) + 1;
   }
 
   const excelEntry = () => {
@@ -243,6 +249,42 @@ function AddProducts() {
   const back = () => {
     navigate("/products");
   };
+
+  if (loading) {
+    return (
+      <div>
+        <div
+          style={{
+            textAlign: "center",
+            margin: "auto",
+            justifyContent: "center",
+          }}
+        >
+          <p>
+            <strong>Just a second...</strong>
+          </p>
+          <p>
+            <strong>Gathering your data</strong>
+          </p>
+        </div>
+        {showAnimation && (
+          <div className="hourglassOverlay">
+            <div className="hourglassBackground">
+              <div className="hourglassContainer">
+                <div className="hourglassCurves"></div>
+                <div className="hourglassCapTop"></div>
+                <div className="hourglassGlassTop"></div>
+                <div className="hourglassSand"></div>
+                <div className="hourglassSandStream"></div>
+                <div className="hourglassCapBottom"></div>
+                <div className="hourglassGlass"></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
