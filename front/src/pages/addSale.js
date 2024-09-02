@@ -18,7 +18,7 @@ function AddSale() {
     quantity: 0,
     total: 0,
     datesold: new Date(),
-    saleperson: "",
+    saleperson: user.role === "admin" ? "" : user.name.toUpperCase(),
     commission: 0,
     pnumber: "",
     code: "",
@@ -293,6 +293,15 @@ function AddSale() {
           />
           <br />
           <br />
+          <label>Date:</label>
+          <DatePicker
+            selected={sale.datesold}
+            onChange={handleDateChange}
+            dateFormat="dd-MM-yyyy"
+            readOnly
+          />
+          <br />
+          <br />
           <label>Select The Product:</label>
           <label>
             Product No. — Description (Code) | [Colour] - (Location)
@@ -365,30 +374,27 @@ function AddSale() {
             </table>
           </div>
           <br />
-          <label>Date Sold:</label>
-          <DatePicker
-            selected={sale.datesold}
-            onChange={handleDateChange}
-            dateFormat="dd-MM-yyyy"
-            readOnly
-          />
+
           <br />
           <label>Sold By:</label>
-          {/* <input type="text" value={user.name.toUpperCase()} disabled /> */}
-          <select
-            name="saleperson"
-            onChange={(e) => setSale({ ...sale, saleperson: e.target.value })}
-            value={sale.saleperson}
-          >
-            <option value="" disabled>
-              Select
-            </option>
-            {salesName.map((saleName) => (
-              <option key={saleName} value={saleName}>
-                {saleName}
+          {user.role === "admin" ? (
+            <select
+              name="saleperson"
+              onChange={(e) => setSale({ ...sale, saleperson: e.target.value })}
+              value={sale.saleperson}
+            >
+              <option value="" disabled>
+                Select
               </option>
-            ))}
-          </select>
+              {salesName.map((saleName) => (
+                <option key={saleName} value={saleName}>
+                  {saleName}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input type="text" value={user.name.toUpperCase()} disabled />
+          )}
           <br />
           <br />
           <button onClick={handleEnterSale} className="addbtn">
@@ -396,21 +402,24 @@ function AddSale() {
           </button>
           <br />
           <br />
-          <button onClick={submit} className="submitbtn">
-            {loading ? "Submitting sale..." : "Submit Sale"}
-          </button>
-          <br />
-          <br />
-          <button onClick={back} className="backbtn">
-            Cancel
-          </button>
+          <hr />
+          <div className="button-div">
+            <button onClick={submit} className="submitbtn">
+              {loading ? "Submit this sale" : "Submit Sale"}
+            </button>
+            <br />
+            <br />
+            <button onClick={back} className="backbtn">
+              Cancel this sale
+            </button>
+          </div>
         </form>
 
         {sales.length > 0 && (
           <div className="print-table">
             <div className="receipt" id="receipt">
               <div className="receipt-header">
-                <h1 style={{ fontFamily: "Georgia" }}>VALUEMART FURNITURES</h1>
+                <h1 style={{ fontFamily: "Georgia" }}>VALUEMART FURNITURE</h1>
                 <p>
                   <i>~ Transforming the office workspace ~</i>
                 </p>
