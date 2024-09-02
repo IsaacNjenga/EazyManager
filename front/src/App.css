@@ -1698,10 +1698,10 @@ a:hover {
 
 /*receipt css*/
 .receipt {
-  width: 80mm;
+  width: 90mm;
   margin: auto;
   padding: 0px;
-  font-family: Arial, sans-serif,retro;
+  font-family: Arial, sans-serif, retro;
 }
 
 .receipt-header,
@@ -1709,10 +1709,15 @@ a:hover {
   display: block;
   text-align: center;
   justify-content: center;
+  font-weight: bold;
+}
+
+.receipt-header {
+  font-size: 18px;
 }
 
 .receipt-body {
-  font-size: 14px;
+  font-size: 16px;
   font-family: retro;
 }
 
@@ -1728,7 +1733,7 @@ a:hover {
 }
 
 .receipt-item span {
-  padding: 0 5px;
+  padding: 0 2px;
   text-align: left;
 }
 

@@ -10,6 +10,7 @@
     "date-fns": "^3.6.0",
     "DatePicker": "^2.0.0",
     "file-saver": "^2.0.5",
+    "jsbarcode": "^3.11.6",
     "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",

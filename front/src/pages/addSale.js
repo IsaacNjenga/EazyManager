@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import { UserContext } from "../App";
 import Select from "react-select";
 import Navbar from "../source/navbar";
+//import Barcode from "../components/barcode";
 
 function AddSale() {
   const { user } = useContext(UserContext);
@@ -17,7 +18,7 @@ function AddSale() {
     quantity: 0,
     total: 0,
     datesold: new Date(),
-    saleperson: user.name.toUpperCase(),
+    saleperson: "",
     commission: 0,
     pnumber: "",
     code: "",
@@ -34,6 +35,7 @@ function AddSale() {
   const [isImageAvailable, setIsImageAvalailable] = useState(false);
   const [sales, setSales] = useState([]);
   const [saleItems, setSaleItems] = useState([]);
+  const [salesName, setSalesName] = useState([]);
 
   const navigate = useNavigate();
 
@@ -44,6 +46,7 @@ function AddSale() {
         const response = await axios.get(`products`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
+
         setProducts(
           Array.isArray(response.data.products) ? response.data.products : []
         );
@@ -55,6 +58,24 @@ function AddSale() {
     };
 
     fetchItems();
+  }, []);
+
+  useEffect(() => {
+    setFetching(true);
+    const fetchStaff = async () => {
+      try {
+        const response = await axios.get("staff", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const salesName = response.data.map((saleName) => saleName.firstname);
+        setSalesName(salesName);
+        setFetching(false);
+      } catch (error) {
+        console.log("Error fetching items:", error);
+        setFetching(false);
+      }
+    };
+    fetchStaff();
   }, []);
 
   const handleProductSelection = (selectedOption) => {
@@ -74,6 +95,7 @@ function AddSale() {
           pnumber: selectedProduct.number,
           total: "",
           commission: "",
+          saleperson: "",
         },
       ]);
 
@@ -126,6 +148,7 @@ function AddSale() {
 
   const handleEnterSale = (e) => {
     e.preventDefault();
+
     setSales([...sales, saleItems]);
     setSaleItems([]);
   };
@@ -140,7 +163,7 @@ function AddSale() {
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    //handleReceipt();
     try {
       // Loop through each sale item and send them individually
       for (let saleGroup of sales) {
@@ -189,6 +212,11 @@ function AddSale() {
   const back = (e) => {
     e.preventDefault();
     navigate("/sales");
+  };
+
+  const handleReceipt = () => {
+    window.print();
+    console.log("\x1B|m");
   };
 
   const customStyles = {
@@ -346,16 +374,36 @@ function AddSale() {
           />
           <br />
           <label>Sold By:</label>
-          <input type="text" value={user.name.toUpperCase()} disabled />
+          {/* <input type="text" value={user.name.toUpperCase()} disabled /> */}
+          <select
+            name="saleperson"
+            onChange={(e) => setSale({ ...sale, saleperson: e.target.value })}
+            value={sale.saleperson}
+          >
+            <option value="" disabled>
+              Select
+            </option>
+            {salesName.map((saleName) => (
+              <option key={saleName} value={saleName}>
+                {saleName}
+              </option>
+            ))}
+          </select>
           <br />
           <br />
-          <button onClick={handleEnterSale}>Enter Sale</button>
+          <button onClick={handleEnterSale} className="addbtn">
+            Enter Sale
+          </button>
           <br />
           <br />
           <button onClick={submit} className="submitbtn">
             {loading ? "Submitting sale..." : "Submit Sale"}
           </button>
-          <button onClick={back}>Cancel</button>
+          <br />
+          <br />
+          <button onClick={back} className="backbtn">
+            Cancel
+          </button>
         </form>
 
         {sales.length > 0 && (
@@ -371,8 +419,9 @@ function AddSale() {
                 <p>Date: {new Date().toLocaleString()}</p>
                 <br />
                 <p style={{ textAlign: "left" }}>Receipt No. {sale.number}</p>
+                {/*<Barcode code={sale.number} />*/}
               </div>
-              <hr />
+              ------------------------------------------------------------------------------
               {sales.map((sale, index) => {
                 let saleTotal = 0; // Initialize the total for each sale
                 return (
@@ -397,6 +446,7 @@ function AddSale() {
                         <strong>Total</strong>
                       </span>
                     </div>
+                    ---------------------------------------------------------------
                     {sale.map((item, i) => {
                       saleTotal += item.total; // Accumulate the total for each item
                       return (
@@ -406,23 +456,28 @@ function AddSale() {
                             <span>{item.description}</span>
                             <span>({item.code})</span>
                             <span>{item.price.toLocaleString()}</span>
-                            <span>{item.total.toLocaleString()}</span>
+                            <span>{item.total.toLocaleString()}</span>{" "}
                           </div>
                         </div>
                       );
                     })}
                     <div className="total">
-                      <hr />
+                      <p>
+                        ---------------------------------------------------------------
+                      </p>
                       <span>Total: Ksh. {saleTotal.toLocaleString()}</span>
+                      <p>
+                        ---------------------------------------------------------------
+                      </p>
                     </div>
                   </div>
                 );
               })}
-              <hr />
               <div className="receipt-footer">
-                <p>Served by: {user.name.toUpperCase()}</p>
+                <p>Served by: {sale.saleperson}</p>
               </div>
               <div className="footer-message">
+                <br />
                 <p>
                   <strong>
                     <i>Thank you for shopping with us. Come again!</i>

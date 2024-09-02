@@ -218,7 +218,7 @@ function StaffTable() {
         <table className="productstable">
           <thead className="table-header">
             <tr>
-              <th>Image</th>
+              {/*<th>Image</th>*/}
               <th>Sales ID</th>
               <th>First Name</th>
               <th>Last Name</th>
@@ -248,14 +248,14 @@ function StaffTable() {
               .map((staff, index) => (
                 <React.Fragment key={staff.number}>
                   <tr>
-                    <td>
+                    {/*<td>
                       <img
                         className="img2"
                         src={staff.image}
                         alt="img_here"
                         style={styles}
                       />
-                    </td>
+              </td>*/}
                     <td
                       style={{
                         backgroundColor: "#e0e0e0",
