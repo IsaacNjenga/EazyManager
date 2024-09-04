@@ -344,7 +344,7 @@ function SalesTable() {
                           borderRight: "0.5px solid white",
                         }}
                       >
-                        Item No.
+                        Product No.
                       </th>
                       <th
                         style={{
