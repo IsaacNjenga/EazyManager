@@ -38,8 +38,8 @@ app.use(
 
 // Handle CORS preflight requests
 app.use((req, res, next) => {
-  console.log("Request Method:", req.method);
-  console.log("Request Headers:", req.headers);
+  //console.log("Request Method:", req.method);
+ // console.log("Request Headers:", req.headers);
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");

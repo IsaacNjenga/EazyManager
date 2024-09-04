@@ -5,26 +5,21 @@ function Welcome() {
   return (
     <div className="sign-page">
       <br />
-
       <br />
-
       <div className="name-styling">
         <span
-          style={{ fontSize: "55px", color: "indigo", fontStyle: "italic" }}
+          style={{ fontSize: "60px", color: "indigo", fontStyle: "italic" }}
         >
           Easy
         </span>
-
-        <span style={{ fontSize: "55px", color: "red", fontWeight: "bold" }}>
+        <span style={{ fontSize: "58px", color: "red", fontWeight: "bold" }}>
           Manager
         </span>
       </div>
-
       <br />
-
       <div className="sign-in-page-div">
         <div className="signin-div">
-          <h1 style={{ color: "white", fontSize:"250%" }}>Welcome Back!</h1>
+          <h1 style={{ color: "white", fontSize: "250%" }}>Welcome</h1>
 
           <p style={{ color: "white" }}>
             To keep connected, please log in with your personal info!
@@ -34,8 +29,7 @@ function Welcome() {
             Login
           </Link>
         </div>
-
-        <div className="signup-div">
+        {/* <div className="signup-div">
           <h1 style={{ color: "white", fontSize:"250%" }}>New User?</h1>
 
           <p style={{ color: "white" }}>
@@ -45,7 +39,7 @@ function Welcome() {
           <Link to="/register" className="button">
             Sign up
           </Link>
-        </div>
+  </div>*/}
       </div>
     </div>
   );
