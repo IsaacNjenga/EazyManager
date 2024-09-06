@@ -163,7 +163,7 @@ function AddSale() {
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    //handleReceipt();
+    handleReceipt();
     try {
       // Loop through each sale item and send them individually
       for (let saleGroup of sales) {
@@ -419,7 +419,7 @@ function AddSale() {
           <div className="print-table">
             <div className="receipt" id="receipt">
               <div className="receipt-header">
-                <h1 style={{ fontFamily: "Georgia" }}>VALUEMART FURNITURE</h1>
+                <h1 style={{ fontFamily: "Georgia" }}>VALUEMART</h1>
                 <p>
                   <i>~ Transforming the office workspace ~</i>
                 </p>

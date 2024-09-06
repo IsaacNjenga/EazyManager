@@ -65,7 +65,7 @@ function SalesTable() {
       .catch((err) => console.log(err));
   }, []);
 
-  const styles = {
+  /*const styles = {
     width: "150px",
     height: "150px",
     maxHeight: "100%",
@@ -73,7 +73,7 @@ function SalesTable() {
     borderRadius: "10px",
     border: "1px inset #050101",
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
-  };
+  };*/
 
   const styles2 = {
     width: "160px",
@@ -344,7 +344,7 @@ function SalesTable() {
                           borderRight: "0.5px solid white",
                         }}
                       >
-                        Product No.
+                        Prod No.
                       </th>
                       <th
                         style={{

@@ -90,7 +90,7 @@ function Login() {
             />
             <span>Password</span>
           </label>
-          <p>
+          {/* <p>
             Don't have an account?{" "}
             <span
               onClick={signUp}
@@ -102,7 +102,7 @@ function Login() {
             >
               Sign up!
             </span>
-          </p>
+            </p>*/}
           <button className="loginbtn" type="submit">
             Login
           </button>

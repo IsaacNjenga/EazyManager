@@ -8,7 +8,7 @@ const userSchema = new Schema(
     role: String,
     password: String,
   },
-  { collection: "users" }
+  { collection: "users", timestamps: true }
 );
 
 const UserModel = mongoose.model("User", userSchema);

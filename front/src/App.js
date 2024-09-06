@@ -32,14 +32,14 @@ axios.defaults.withCredentials = true;
 const router = createBrowserRouter([
   { path: "*", element: <SplashScreen /> },
   { path: "/login", element: <Login /> },
-  {
+  /*{
     path: "/register",
     element: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Register />{" "}
       </ProtectedRoute>
     ),
-  },
+  },*/
   {
     path: "/dashboard",
     element: (
@@ -157,6 +157,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Logs />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/add-user",
+    element: (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Register />
       </ProtectedRoute>
     ),
   },

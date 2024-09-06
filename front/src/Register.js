@@ -16,7 +16,8 @@ function Register() {
     const nameRegex = /^[A-Za-z]+$/;
     if (!name.trim()) return "Name is required";
     if (!nameRegex.test(name)) {
-      return "Name should contain only letters";    }
+      return "Name should contain only letters";
+    }
     if (!role.trim()) return "Role is required";
     if (!number.trim()) return "Sales ID is required";
     if (!/^\d+$/.test(number)) return "Sales ID must contain only numbers";
@@ -68,12 +69,12 @@ function Register() {
     }
   };
 
-  const signIn = () => {
+  /*const signIn = () => {
     navigate("/login");
-  };
+  };*/
 
   const back = () => {
-    navigate("/");
+    navigate("/dashboard");
   };
 
   const capitalizeFirstLetter = (str) => {
@@ -88,7 +89,7 @@ function Register() {
           <button className="backbtn" onClick={back}>
             Back
           </button>
-          <h1 style={{ textAlign: "center" }}>Create Your Account</h1>
+          <h1 style={{ textAlign: "center" }}>Add A User Account</h1>
           <label>
             <input
               className="input"
@@ -134,7 +135,7 @@ function Register() {
             />
             <span>Password</span>
           </label>
-          <p>
+          {/*<p>
             Already have an account?{" "}
             <span
               onClick={signIn}
@@ -146,9 +147,9 @@ function Register() {
             >
               Sign in
             </span>
-          </p>
+            </p>*/}
           <button className="button" type="submit">
-            Create account
+            Create User Account
           </button>
         </form>
       </div>

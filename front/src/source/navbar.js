@@ -147,6 +147,15 @@ export default function Navbar() {
             >
               <i className="material-icons">receipt</i> Logs
             </NavLink>
+            <NavLink
+              to="/add-user"
+              activeClassName="active"
+              id="user"
+              style={linkStyle}
+              onClick={tryToAccess}
+            >
+              <i className="material-icons">groupadd</i> Add User
+            </NavLink>
 
             {user ? (
               <NavLink
