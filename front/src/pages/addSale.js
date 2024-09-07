@@ -489,7 +489,7 @@ function AddSale() {
                 <br />
                 <p>
                   <strong>
-                    <i>Thank you for shopping with us. Come again!</i>
+                    <i>Thank you for shopping!</i>
                   </strong>
                 </p>
                 <p>**********************************************</p>
