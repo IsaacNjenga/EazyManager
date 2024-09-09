@@ -298,7 +298,7 @@ function AddSale() {
             selected={sale.datesold}
             onChange={handleDateChange}
             dateFormat="dd-MM-yyyy"
-            readOnly
+            readOnly={user.role === "salesperson"}
           />
           <br />
           <br />
