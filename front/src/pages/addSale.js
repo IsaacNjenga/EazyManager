@@ -32,7 +32,7 @@ function AddSale() {
   const [showAlert, setShowAlert] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [products, setProducts] = useState([]);
-  const [isImageAvailable, setIsImageAvalailable] = useState(false);
+  const [isImageAvailable, setIsImageAvailable] = useState(false);
   const [sales, setSales] = useState([]);
   const [saleItems, setSaleItems] = useState([]);
   const [salesName, setSalesName] = useState([]);
@@ -93,6 +93,7 @@ function AddSale() {
           colour: selectedProduct.colour,
           code: selectedProduct.code,
           pnumber: selectedProduct.number,
+          image: isImageAvailable ? image : selectedProduct.image,
           total: "",
           commission: "",
           saleperson: "",
@@ -100,7 +101,7 @@ function AddSale() {
       ]);
 
       if (selectedProduct.image) {
-        setIsImageAvalailable(true);
+        setIsImageAvailable(true);
         setImage(selectedProduct.image);
       }
     }
@@ -181,7 +182,7 @@ function AddSale() {
             pnumber: saleItem.pnumber || sale.pnumber,
             code: saleItem.code || sale.code,
             colour: saleItem.colour || sale.colour,
-            // image: image, (uncomment if needed)
+            image: image,
           };
 
           console.log("saleData", saleData);
@@ -245,6 +246,7 @@ function AddSale() {
         label: (
           <div style={{ display: "flex", alignItems: "center" }}>
             <span>{`${product.number} — ${product.description} (${product.code}) | [${product.colour}] - (${product.location})`}</span>
+            <img src={product.img} alt="_" style={{ width: "20px" }} />
           </div>
         ),
       }));
@@ -328,6 +330,7 @@ function AddSale() {
             <table className="sale-item-table">
               <thead>
                 <tr>
+                  <th>Image</th>
                   <th>Item</th>
                   <th>Colour</th>
                   <th>Code</th>
@@ -340,6 +343,19 @@ function AddSale() {
               <tbody>
                 {saleItems.map((item, index) => (
                   <tr key={index}>
+                    <td>
+                      <img
+                        src={item.image}
+                        alt="_"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                          padding: "5px",
+                        }}
+                      />
+                    </td>
                     <td>{item.description}</td>
                     <td>{item.colour}</td>
                     <td>{item.code}</td>

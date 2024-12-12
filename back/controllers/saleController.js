@@ -47,7 +47,6 @@ const addSale = async (req, res) => {
       colour,
     });
 
-    console.log("Saving new sale: ", newSale);
     const savedSale = await newSale.save();
 
     const product = await ProductsModel.findOne({ number: pnumber });

@@ -18,10 +18,11 @@ function UpdateProducts() {
     image: "",
   });
 
-  const [newImage, setNewImage] = useState("");
+  const [publicId, setPublicId] = useState("");
+  const [image, setImage] = useState("");
+  const [picture, setPicture] = useState();
   const [showAlert, setShowAlert] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [imageChange, setImageChange] = useState(false);
   const navigate = useNavigate();
   const [newQuantity, setNewQuantity] = useState(0);
   const { id } = useParams();
@@ -46,33 +47,70 @@ function UpdateProducts() {
     setProduct((prev) => ({ ...prev, [name]: inputValueInCaps }));
   };
 
-  const convertToBase64 = (e) => {
-    const file = e.target.files[0];
+  const cloud_name = "dinsdfwod";
+  const preset_key = "EasyManager";
 
-    // Check if file is larger than 10MB
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
     const maxSize = 10 * 1024 * 1024; // 10 MB in bytes
     if (file.size > maxSize) {
       alert("File size exceeds 10 MB. Please select a smaller file.");
       return;
     }
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      setNewImage(reader.result);
-      setImageChange(true);
-    };
-    reader.onerror = (error) => {
-      console.log("Error: ", error);
-      alert("Payload is too large. Select a smaller image");
-    };
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", preset_key);
+    axios
+      .post(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+        formData,
+        { withCredentials: false }
+      )
+      .then((res) => {
+        toast.success("Image added");
+        setImage(res.data.secure_url);
+        setPicture(res.data.secure_url);
+        setPublicId(res.data.public_id);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Error adding image");
+      });
+  };
+
+  const deletePicture = (e) => {
+    e.preventDefault();
+
+    if (!publicId) {
+      alert("No image to delete");
+    }
+
+    axios
+      .delete("deleteImage", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        data: { publicId },
+      })
+      .then(() => {
+        setImage("");
+        setPicture("");
+        setPublicId("");
+        toast.success("Image deleted");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Failed to delete");
+      });
   };
 
   const update = (e) => {
     e.preventDefault();
     const productData = {
       ...product,
-      image: imageChange ? newImage : product.image,
+      image: image,
     };
+    console.log(productData);
     axios
       .put(`updateProducts/` + id, productData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -316,7 +354,40 @@ function UpdateProducts() {
           type="file"
           onChange={convertToBase64}
           name="image"
-        />*/}
+        />*/}{" "}
+        Image:
+        <hr />
+        <div
+          style={{
+            margin: "auto",
+            width: "60px",
+            padding: "10px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          {" "}
+          {picture ? (
+            <div>
+              <img src={picture} alt="uploaded" style={{ width: "200px" }} />
+              <div
+                style={{
+                  margin: "auto",
+                  width: "60px",
+                  padding: "10px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <button onClick={deletePicture}>Remove picture</button>
+              </div>
+            </div>
+          ) : (
+            <img src={product.image} alt="_" style={{ width: "200px" }} />
+          )}
+        </div>{" "}
+        <label>Change image:</label>
+        <input accept="image/*" type="file" onChange={handleImageUpload} />{" "}
         <br />
         <hr />
         {showAlert && (

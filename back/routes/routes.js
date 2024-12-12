@@ -31,6 +31,7 @@ import {
   updateStaff,
 } from "../controllers/staffController.js";
 import { logouts, logins } from "../controllers/logsController.js";
+import { deleteImage } from "../controllers/cloudinaryController.js";
 
 //User control endpoints
 router.post("/register", Register);
@@ -65,8 +66,11 @@ router.get("/getStaff/:id", VerifyUser, getStaff);
 router.put("/updateStaff/:id", VerifyUser, updateStaff);
 router.delete("/deleteStaff/:id", VerifyUser, deleteStaff);
 
-//logs control points
+//logs control endpoints
 router.get("/logins", logins);
 router.get("/logouts", logouts);
+
+//cloudinary control endpoints
+router.delete("/deleteImage", VerifyUser, deleteImage);
 
 export { router as Router };

@@ -85,7 +85,7 @@ function ProductsTable() {
       });
   }, [sortByCode, sortByNumber]);
 
-  /*const styles = {
+  const styles = {
     width: "150px",
     height: "150px",
     maxHeight: "100%",
@@ -94,7 +94,7 @@ function ProductsTable() {
     border: "1px inset #050101",
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
   };
-
+/*
   const styles2 = {
     width: "160px",
     height: "150px",
@@ -336,14 +336,14 @@ function ProductsTable() {
             <table className="productstable">
               <thead className="table-header">
                 <tr>
-                  {/* <th
+                  <th
                     style={{
                       borderRight: "0.5px solid white",
                       textAlign: "center",
                     }}
                   >
                     Image
-                  </th>*/}
+                  </th>
                   <th
                     style={{
                       textAlign: "center",
@@ -446,7 +446,7 @@ function ProductsTable() {
                   .map((product) => (
                     <React.Fragment key={product._id}>
                       <tr>
-                        {/* <td
+                         <td
                           style={{
                             backgroundColor: "#5bacba",
                             color: "white",
@@ -460,7 +460,7 @@ function ProductsTable() {
                               className="img2"
                             />
                         
-                        </td>*/}
+                        </td>
                         <td
                           style={{
                             backgroundColor: "#e0e0e0",

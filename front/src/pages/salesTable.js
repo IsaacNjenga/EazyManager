@@ -65,7 +65,7 @@ function SalesTable() {
       .catch((err) => console.log(err));
   }, []);
 
-  /*const styles = {
+  const styles = {
     width: "150px",
     height: "150px",
     maxHeight: "100%",
@@ -73,7 +73,7 @@ function SalesTable() {
     borderRadius: "10px",
     border: "1px inset #050101",
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
-  };*/
+  };
 
   const styles2 = {
     width: "160px",
@@ -317,14 +317,14 @@ function SalesTable() {
                 <table className="productstable">
                   <thead className="table-header">
                     <tr>
-                      {/* <th
+                      <th
                         style={{
                           borderRight: "0.5px solid white",
                           textAlign: "center",
                         }}
                       >
                         Image
-                      </th>*/}
+                      </th>
                       <th
                         style={{
                           borderRight: "0.5px solid white",
@@ -402,7 +402,7 @@ function SalesTable() {
                     {groupedSalesByDate[date].map((sale, index) => (
                       <React.Fragment key={sale.number}>
                         <tr>
-                          {/*<td
+                          <td
                             style={{
                               backgroundColor: "#5bacba",
                               borderRight: "0px solid grey",
@@ -414,7 +414,7 @@ function SalesTable() {
                               style={styles}
                               className="img2"
                             />
-                          </td>*/}
+                          </td>
                           <td
                             style={{
                               backgroundColor: "#e0e0e0",
