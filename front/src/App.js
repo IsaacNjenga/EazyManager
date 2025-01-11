@@ -21,6 +21,7 @@ import UpdateSale from "./pages/updateSale";
 import AddSale from "./pages/addSale";
 import ProtectedRoute from "./context/protectedRoutes";
 import Logs from "./logs";
+import Customers from "./customers";
 
 export const UserContext = createContext();
 
@@ -166,6 +167,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={["admin"]}>
         <Register />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/customers",
+    element: (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Customers />
       </ProtectedRoute>
     ),
   },

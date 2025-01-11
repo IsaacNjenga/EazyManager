@@ -110,6 +110,15 @@ export default function Navbar() {
               style={linkStyle}
             >
               <i className="material-icons">shopping_cart</i> Sales
+            </NavLink>{" "}
+            <NavLink
+              to="/customers"
+              activeClassName="active"
+              id="expenses"
+              style={linkStyle}
+              onClick={tryToAccess}
+            >
+              <i className="material-icons">person</i> Customers
             </NavLink>
             <NavLink
               to="/expenses"
@@ -156,7 +165,6 @@ export default function Navbar() {
             >
               <i className="material-icons">groupadd</i> Add User
             </NavLink>
-
             {user ? (
               <NavLink
                 to="/"

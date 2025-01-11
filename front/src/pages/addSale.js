@@ -36,6 +36,8 @@ function AddSale() {
   const [sales, setSales] = useState([]);
   const [saleItems, setSaleItems] = useState([]);
   const [salesName, setSalesName] = useState([]);
+  const [enterCustomerInfo, setEnterCustomerInfo] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState([]);
 
   const navigate = useNavigate();
 
@@ -161,6 +163,26 @@ function AddSale() {
     }));
   };
 
+  const handleCustomerInfoChange = (e) => {
+    setCustomerInfo({ ...customerInfo, [e.target.name]: e.target.value });
+  };
+
+  const handleCustomerFormSubmit = (e) => {
+    e.preventDefault();
+    console.log(customerInfo);
+    toast.success("Customer Info saved!");
+    setEnterCustomerInfo(false);
+  };
+
+  const closeCustomerInfoFormModal = () => {
+    setEnterCustomerInfo(null);
+  };
+
+  const openCustomerFormModal = (e) => {
+    e.preventDefault();
+    setEnterCustomerInfo(true);
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -183,9 +205,12 @@ function AddSale() {
             code: saleItem.code || sale.code,
             colour: saleItem.colour || sale.colour,
             image: image,
+            customerName: customerInfo.customerName,
+            customerPhone: customerInfo.customerPhone,
+            customerEmail: customerInfo.customerEmail,
           };
 
-          console.log("saleData", saleData);
+          //console.log("saleData", saleData);
 
           await axios.post("addSale", saleData, {
             headers: {
@@ -390,7 +415,11 @@ function AddSale() {
             </table>
           </div>
           <br />
-
+          <button onClick={openCustomerFormModal} className="open-modal-btn">
+            {" "}
+            Enter Customer info
+          </button>
+          <br />
           <br />
           <label>Sold By:</label>
           {user.role === "admin" ? (
@@ -411,6 +440,7 @@ function AddSale() {
           ) : (
             <input type="text" value={user.name.toUpperCase()} disabled />
           )}
+
           <br />
           <br />
           <button onClick={handleEnterSale} className="addbtn">
@@ -431,6 +461,60 @@ function AddSale() {
           </div>
         </form>
 
+        {enterCustomerInfo && (
+          <div
+            className="customer-form-modal-overlay"
+            onClick={closeCustomerInfoFormModal}
+          >
+            <div
+              className="customer-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="customer-modal-close-button"
+                onClick={closeCustomerInfoFormModal}
+              >
+                &times;
+              </button>
+              <div className="customer-modal-body">
+                <form
+                  onSubmit={handleCustomerFormSubmit}
+                  className="customer-form"
+                >
+                  <div>
+                    <label>Customer Name</label>
+                    <input
+                      type="text"
+                      name="customerName"
+                      onChange={handleCustomerInfoChange}
+                      placeholder=""
+                      className="customer-input"
+                    />
+                    <label>Customer Phone Number</label>{" "}
+                    <input
+                      type="text"
+                      name="customerPhone"
+                      onChange={handleCustomerInfoChange}
+                      placeholder=""
+                      className="customer-input"
+                    />
+                    <label>Email address</label>{" "}
+                    <input
+                      type="email"
+                      name="customerEmail"
+                      onChange={handleCustomerInfoChange}
+                      placeholder=""
+                      className="customer-input"
+                    />
+                  </div>
+                  <button type="submit" className="save-customer-form-btn">
+                    Save
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
         {sales.length > 0 && (
           <div className="print-table">
             <div className="receipt" id="receipt">

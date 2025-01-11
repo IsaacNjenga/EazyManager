@@ -29,6 +29,9 @@ const addSale = async (req, res) => {
     pnumber,
     code,
     colour,
+    customerName,
+    customerPhone,
+    customerEmail,
   } = req.body;
 
   try {
@@ -45,6 +48,9 @@ const addSale = async (req, res) => {
       pnumber,
       code,
       colour,
+      customerName,
+      customerPhone,
+      customerEmail,
     });
 
     const savedSale = await newSale.save();

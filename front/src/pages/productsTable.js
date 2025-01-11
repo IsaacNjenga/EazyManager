@@ -6,6 +6,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import { format } from "date-fns";
 import DataTable from "react-data-table-component";
 import { toast } from "react-hot-toast";
+import Navbar from "../source/navbar";
 
 function ProductsTable() {
   const [products, setProducts] = useState([]);
@@ -94,7 +95,7 @@ function ProductsTable() {
     border: "1px inset #050101",
     boxShadow: "5px 5px 36px #a78e8e, -5px -5px 36px #e7c4c4",
   };
-/*
+  /*
   const styles2 = {
     width: "160px",
     height: "150px",
@@ -243,37 +244,40 @@ function ProductsTable() {
 
   if (loading) {
     return (
-      <div>
-        <div
-          style={{
-            textAlign: "center",
-            margin: "auto",
-            justifyContent: "center",
-          }}
-        >
-          <p>
-            <strong>Just a second...</strong>
-          </p>
-          <p>
-            <strong>Gathering your data</strong>
-          </p>
-        </div>
-        {showAnimation && (
-          <div className="hourglassOverlay">
-            <div className="hourglassBackground">
-              <div className="hourglassContainer">
-                <div className="hourglassCurves"></div>
-                <div className="hourglassCapTop"></div>
-                <div className="hourglassGlassTop"></div>
-                <div className="hourglassSand"></div>
-                <div className="hourglassSandStream"></div>
-                <div className="hourglassCapBottom"></div>
-                <div className="hourglassGlass"></div>
+      <>
+        <Navbar />
+        <div>
+          <div
+            style={{
+              textAlign: "center",
+              margin: "auto",
+              justifyContent: "center",
+            }}
+          >
+            <p>
+              <strong>Just a second...</strong>
+            </p>
+            <p>
+              <strong>Gathering your data</strong>
+            </p>
+          </div>
+          {showAnimation && (
+            <div className="hourglassOverlay">
+              <div className="hourglassBackground">
+                <div className="hourglassContainer">
+                  <div className="hourglassCurves"></div>
+                  <div className="hourglassCapTop"></div>
+                  <div className="hourglassGlassTop"></div>
+                  <div className="hourglassSand"></div>
+                  <div className="hourglassSandStream"></div>
+                  <div className="hourglassCapBottom"></div>
+                  <div className="hourglassGlass"></div>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </>
     );
   }
 
@@ -446,20 +450,18 @@ function ProductsTable() {
                   .map((product) => (
                     <React.Fragment key={product._id}>
                       <tr>
-                         <td
+                        <td
                           style={{
                             backgroundColor: "#5bacba",
                             color: "white",
                           }}
                         >
-                          
-                            <img
-                              src={product.image}
-                              alt="Image_here"
-                              style={styles}
-                              className="img2"
-                            />
-                        
+                          <img
+                            src={product.image}
+                            alt="Image_here"
+                            style={styles}
+                            className="img2"
+                          />
                         </td>
                         <td
                           style={{

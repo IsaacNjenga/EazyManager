@@ -14,6 +14,9 @@ const salesSchema = new mongoose.Schema(
     pnumber: String,
     code: String,
     colour: String,
+    customerName: String,
+    customerPhone: String,
+    customerEmail: String,
   },
   { collection: "sales", timestamps: true }
 );
