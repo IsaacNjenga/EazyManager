@@ -4,7 +4,7 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
-
+import CustomerSearch from "./components/customerSearch";
 function Customers() {
   const [loading, setLoading] = useState(false);
   const [customerData, setCustomerData] = useState([]);
@@ -87,7 +87,7 @@ function Customers() {
       sortable: true,
       style: {
         fontWeight: "bold",
-        color: "#007BFF",
+        color: "green",
       },
     },
     {
@@ -170,11 +170,19 @@ function Customers() {
       },
     },
   };
+
   return (
     <>
       <Navbar />
       <div id="main">
         <h1>Customers</h1>
+        <div>
+          <CustomerSearch
+            customerData={customerData}
+            columns={columns}
+            customStyles={customStyles}
+          />
+        </div>
         <div>
           {loading ? (
             <p>Loading. Please Wait</p>
