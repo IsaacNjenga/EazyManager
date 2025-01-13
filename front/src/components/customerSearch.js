@@ -33,13 +33,14 @@ const CustomerSearch = ({ customerData, columns, customStyles }) => {
 
       {/* Data Table */}
       {search && (
-        <div>
+        <div className="datatable-container">
           <DataTable
+            title={`Search results for "${search}"`}
             columns={columns}
             data={searchedCustomerData}
             highlightOnHover
             customStyles={customStyles}
-            pagination
+            //pagination
           />
         </div>
       )}
