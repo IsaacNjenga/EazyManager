@@ -32,6 +32,7 @@ import {
 } from "../controllers/staffController.js";
 import { logouts, logins } from "../controllers/logsController.js";
 import { deleteImage } from "../controllers/cloudinaryController.js";
+import { sendEmail } from "../controllers/emailController.js";
 
 //User control endpoints
 router.post("/register", Register);
@@ -72,5 +73,8 @@ router.get("/logouts", logouts);
 
 //cloudinary control endpoints
 router.delete("/deleteImage", VerifyUser, deleteImage);
+
+//mail endpoints
+router.post("/send-email", sendEmail);
 
 export { router as Router };

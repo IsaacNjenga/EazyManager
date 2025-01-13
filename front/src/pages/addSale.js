@@ -217,9 +217,15 @@ function AddSale() {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           });
+          axios.post("/send-email", {
+            to: "njengaisaac789@gmail.com",
+            subject: "New sale!",
+            text: JSON.stringify(saleData),
+            imageUrl: saleData.image,
+          });
         }
       }
-
+     
       setShowAlert(true);
       setShowAnimation(true);
       setLoading(false);
