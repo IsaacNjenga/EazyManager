@@ -218,14 +218,14 @@ function AddSale() {
             },
           });
           axios.post("/send-email", {
-            to: "njengaisaac789@gmail.com",
+            to: "valuemart.kenya@gmail.com",
             subject: "New sale!",
             text: JSON.stringify(saleData),
             imageUrl: saleData.image,
           });
         }
       }
-     
+
       setShowAlert(true);
       setShowAnimation(true);
       setLoading(false);
